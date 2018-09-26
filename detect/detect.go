@@ -2,11 +2,12 @@ package detect
 
 import (
 	"fmt"
+	"path/filepath"
+
 	libbuildpackV3 "github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/libbuildpack"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/package_json"
 	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
-	"path/filepath"
+	"github.com/cloudfoundry/nodejs-cnb-buildpack/package_json"
 )
 
 func UpdateBuildPlan(detector *libbuildpackV3.Detect) error {

@@ -3,9 +3,6 @@ package dagger
 import (
 	"bytes"
 	"fmt"
-	"github.com/BurntSushi/toml"
-	libbuildpackV3 "github.com/buildpack/libbuildpack"
-	"github.com/cloudfoundry/libbuildpack/cutlass"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -15,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	libbuildpackV3 "github.com/buildpack/libbuildpack"
+	"github.com/cloudfoundry/libbuildpack/cutlass"
 )
 
 const (

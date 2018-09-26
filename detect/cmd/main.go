@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	libbuildpackV3 "github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/nodejs-cnb-buildpack/detect"
-	"os"
 )
 
 func main() {

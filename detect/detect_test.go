@@ -2,14 +2,15 @@ package detect_test
 
 import (
 	"fmt"
-	libbuildpackV3 "github.com/buildpack/libbuildpack"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/detect"
 	"os"
 	"path/filepath"
+
+	libbuildpackV3 "github.com/buildpack/libbuildpack"
+	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
+	"github.com/cloudfoundry/nodejs-cnb-buildpack/detect"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("UpdateBuildPlan", func() {

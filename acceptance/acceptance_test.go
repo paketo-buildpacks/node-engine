@@ -1,11 +1,12 @@
 package acceptance
 
 import (
+	"path/filepath"
+
 	"github.com/cloudfoundry/libbuildpack/cutlass"
+	"github.com/cloudfoundry/nodejs-cnb-buildpack/dagger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/dagger"
-	"path/filepath"
 )
 
 var _ = Describe("Nodejs buildpack", func() {

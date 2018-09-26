@@ -2,8 +2,9 @@ package package_json
 
 import (
 	"errors"
-	"github.com/cloudfoundry/libbuildpack"
 	"os"
+
+	"github.com/cloudfoundry/libbuildpack"
 )
 
 type PackageJSON struct {
