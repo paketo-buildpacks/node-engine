@@ -1,10 +1,13 @@
 package build_test
 
 import (
+	"path/filepath"
+
 	"github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/libjavabuildpack/test"
 	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
-	"path/filepath"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("NewNode", func() {
