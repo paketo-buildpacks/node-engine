@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack/cutlass"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/dagger"
+	"github.com/cloudfoundry/dagger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
