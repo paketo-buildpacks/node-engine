@@ -3,7 +3,6 @@ package integration
 import (
 	"path/filepath"
 
-	"github.com/cloudfoundry/libbuildpack/cutlass"
 	"github.com/cloudfoundry/dagger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +17,7 @@ var _ = Describe("Nodejs buildpack", func() {
 	BeforeEach(func() {
 		var err error
 
-		rootDir, err = cutlass.FindRoot()
+		rootDir, err = dagger.FindRoot()
 		Expect(err).ToNot(HaveOccurred())
 
 		dagg, err = dagger.NewDagger(rootDir)
