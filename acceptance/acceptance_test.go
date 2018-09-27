@@ -22,9 +22,6 @@ var _ = Describe("Nodejs buildpack", func() {
 
 		dagg, err = dagger.NewDagger(rootDir)
 		Expect(err).ToNot(HaveOccurred())
-
-		err = dagg.BundleBuildpack()
-		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -32,7 +29,10 @@ var _ = Describe("Nodejs buildpack", func() {
 	})
 
 	It("should create a working app in an OCI image", func() {
-		app, err := dagg.Pack(filepath.Join(rootDir, "fixtures", "simple_app"))
+		app, err := dagg.Pack(
+			filepath.Join(rootDir, "fixtures", "simple_app"),
+			filepath.Join(rootDir, "fixtures", "lifecycle", "builder.toml.tmpl"),
+		)
 		Expect(err).ToNot(HaveOccurred())
 
 		err = app.Start()

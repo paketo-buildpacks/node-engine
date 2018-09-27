@@ -22,9 +22,6 @@ var _ = Describe("Nodejs buildpack", func() {
 
 		dagg, err = dagger.NewDagger(rootDir)
 		Expect(err).ToNot(HaveOccurred())
-
-		err = dagg.BundleBuildpack()
-		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -32,7 +29,10 @@ var _ = Describe("Nodejs buildpack", func() {
 	})
 
 	It("should run detect", func() {
-		detectResult, err := dagg.Detect(filepath.Join(rootDir, "fixtures", "simple_app"))
+		detectResult, err := dagg.Detect(
+			filepath.Join(rootDir, "fixtures", "simple_app"),
+			filepath.Join(rootDir, "fixtures", "lifecycle", "order.toml"),
+		)
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(len(detectResult.Group.Buildpacks)).To(Equal(1))
@@ -45,7 +45,11 @@ var _ = Describe("Nodejs buildpack", func() {
 	})
 
 	It("should run build", func() {
-		launchResult, err := dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"))
+		launchResult, err := dagg.Build(
+			filepath.Join(rootDir, "fixtures", "simple_app"),
+			filepath.Join(rootDir, "fixtures", "lifecycle", "group.toml"),
+			filepath.Join(rootDir, "fixtures", "lifecycle", "plan.toml"),
+		)
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(len(launchResult.LaunchMetadata.Processes)).To(Equal(1))

@@ -14,6 +14,8 @@ github.com/buildpack/libbuildpack v0.0.0-20180917215559-e0a1f1ae6c05 h1:2RADCCZG
 github.com/buildpack/libbuildpack v0.0.0-20180917215559-e0a1f1ae6c05/go.mod h1:8yCVTr9ZVay93VBZOqrJROhqMIA6UYT15KB85F1hyec=
 github.com/cloudfoundry/dagger v0.0.0-20180927142544-abcfe4070585 h1:pIESd3YDNw32Yh1kyzXT6COhe5UcLRjloyImWv2ppnM=
 github.com/cloudfoundry/dagger v0.0.0-20180927142544-abcfe4070585/go.mod h1:V7Ci7vHllPdz3lDINWv5lvepQeQt3KL1PYBY6/kSg6s=
+github.com/cloudfoundry/dagger v0.0.0-20180927214929-ce210890eae3 h1:9JrMMUBNxWDDNxI66+uNPdaLhZwIJ6YchiNUgqISpWY=
+github.com/cloudfoundry/dagger v0.0.0-20180927214929-ce210890eae3/go.mod h1:V7Ci7vHllPdz3lDINWv5lvepQeQt3KL1PYBY6/kSg6s=
 github.com/cloudfoundry/libbuildpack v0.0.0-20180921192109-e722b94c65b5 h1:lpAgsF5CjRbu6n023ipC1lVrC34ya4ulER0LFBY/Sfw=
 github.com/cloudfoundry/libbuildpack v0.0.0-20180921192109-e722b94c65b5/go.mod h1:YCwi0hLymaYgwx8z9YrLbnIzch/2E89mqZkn2IVcpKk=
 github.com/cloudfoundry/libjavabuildpack v0.0.0-20180921193157-e42458f4dcc7 h1:y+JzLnuuXvEhRLbVYuaiizifhkOCYBSTWOQP46sGDFQ=
