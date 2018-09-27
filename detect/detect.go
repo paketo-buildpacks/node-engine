@@ -2,6 +2,7 @@ package detect
 
 import (
 	"fmt"
+	"github.com/cloudfoundry/libjavabuildpack"
 	"path/filepath"
 
 	libbuildpackV3 "github.com/buildpack/libbuildpack"
@@ -11,7 +12,7 @@ import (
 
 func UpdateBuildPlan(detector *libbuildpackV3.Detect) error {
 	packageJSONPath := filepath.Join(detector.Application.Root, "package.json")
-	if exists, err := libbuildpackV3.FileExists(packageJSONPath); err != nil {
+	if exists, err := libjavabuildpack.FileExists(packageJSONPath); err != nil {
 		return fmt.Errorf("error checking filepath %s", packageJSONPath)
 	} else if !exists {
 		return fmt.Errorf("no package.json found in %s", packageJSONPath)
