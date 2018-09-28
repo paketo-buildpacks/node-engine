@@ -19,7 +19,9 @@ func CreateLaunchMetadata() libbuildpackV3.LaunchMetadata {
 }
 
 type Node struct {
-	launchLayer libjavabuildpack.DependencyLaunchLayer
+	buildContribution, launchContribution bool
+	cacheLayer                            libjavabuildpack.DependencyCacheLayer
+	launchLayer                           libjavabuildpack.DependencyLaunchLayer
 }
 
 func NewNode(builder libjavabuildpack.Build) (Node, bool, error) {
@@ -38,17 +40,40 @@ func NewNode(builder libjavabuildpack.Build) (Node, bool, error) {
 		return Node{}, false, err
 	}
 
-	node := Node{builder.Launch.DependencyLayer(dep)}
+	node := Node{}
+
+	if _, ok := bp.Metadata["build"]; ok {
+		node.buildContribution = true
+		node.cacheLayer = builder.Cache.DependencyLayer(dep)
+	}
+
+	if _, ok := bp.Metadata["launch"]; ok {
+		node.launchContribution = true
+		node.launchLayer = builder.Launch.DependencyLayer(dep)
+	}
+
 	return node, true, nil
 }
 
 func (n Node) Contribute() error {
-	return n.launchLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyLaunchLayer) error {
-		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
-		if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
-			return err
-		}
-		return nil
-	})
+	if n.buildContribution {
+		return n.cacheLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyCacheLayer) error {
+			layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
+			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+
+	if n.launchContribution {
+		return n.launchLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyLaunchLayer) error {
+			layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
+			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
+				return err
+			}
+			return nil
+		})
+	}
 	return nil
 }

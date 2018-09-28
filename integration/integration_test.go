@@ -1,9 +1,11 @@
 package integration
 
 import (
+	"github.com/buildpack/libbuildpack"
+	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
+	"github.com/cloudfoundry/dagger"
 	"path/filepath"
 
-	"github.com/cloudfoundry/dagger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,41 +30,69 @@ var _ = Describe("Nodejs buildpack", func() {
 		dagg.Destroy()
 	})
 
-	It("should run detect", func() {
-		detectResult, err := dagg.Detect(
-			filepath.Join(rootDir, "fixtures", "simple_app"),
-			filepath.Join(rootDir, "fixtures", "lifecycle", "order.toml"),
-		)
-		Expect(err).ToNot(HaveOccurred())
+	Context("build", func() {
+		var group dagger.Group
+		BeforeEach(func() {
+			group = dagger.Group{
+				Buildpacks: []libbuildpack.BuildpackInfo{
+					{
+						ID:      "org.cloudfoundry.buildpacks.nodejs",
+						Version: "1.6.32",
+					},
+				},
+			}
 
-		Expect(len(detectResult.Group.Buildpacks)).To(Equal(1))
-		Expect(detectResult.Group.Buildpacks[0].Id).To(Equal("org.cloudfoundry.buildpacks.nodejs"))
-		Expect(detectResult.Group.Buildpacks[0].Version).To(Equal("1.6.32"))
+		})
 
-		Expect(len(detectResult.BuildPlan)).To(Equal(1))
-		Expect(detectResult.BuildPlan).To(HaveKey("node"))
-		Expect(detectResult.BuildPlan["node"].Version).To(Equal("~10"))
-	})
+		Context("when the build plan says to add node to cache", func() {
+			It("installs node in the cache layer", func() {
+				plan := libbuildpack.BuildPlan{
+					build.NodeDependency: libbuildpack.BuildPlanDependency{
+						Version: "~10",
+						Metadata: libbuildpack.BuildPlanDependencyMetadata{
+							"build": true,
+						},
+					},
+				}
 
-	It("should run build", func() {
-		launchResult, err := dagg.Build(
-			filepath.Join(rootDir, "fixtures", "simple_app"),
-			filepath.Join(rootDir, "fixtures", "lifecycle", "group.toml"),
-			filepath.Join(rootDir, "fixtures", "lifecycle", "plan.toml"),
-		)
-		Expect(err).ToNot(HaveOccurred())
+				buildResult, err := dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
+				Expect(err).ToNot(HaveOccurred())
 
-		Expect(len(launchResult.LaunchMetadata.Processes)).To(Equal(1))
-		Expect(launchResult.LaunchMetadata.Processes[0].Type).To(Equal("web"))
-		Expect(launchResult.LaunchMetadata.Processes[0].Command).To(Equal("npm start"))
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "lib")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "include")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "share")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+			})
+		})
 
-		nodeLayer := launchResult.Layer
-		Expect(nodeLayer.Metadata.Version).To(MatchRegexp("10.*.*"))
-		Expect(filepath.Join(nodeLayer.Root, "node", "bin")).To(BeADirectory())
-		Expect(filepath.Join(nodeLayer.Root, "node", "lib")).To(BeADirectory())
-		Expect(filepath.Join(nodeLayer.Root, "node", "include")).To(BeADirectory())
-		Expect(filepath.Join(nodeLayer.Root, "node", "share")).To(BeADirectory())
-		Expect(filepath.Join(nodeLayer.Root, "node", "bin", "node")).To(BeAnExistingFile())
-		Expect(filepath.Join(nodeLayer.Root, "node", "bin", "npm")).To(BeAnExistingFile())
+		Context("when the build plan says to add node to launch", func() {
+			It("installs node in the launch layer", func() {
+				plan := libbuildpack.BuildPlan{
+					build.NodeDependency: libbuildpack.BuildPlanDependency{
+						Version: "~10",
+						Metadata: libbuildpack.BuildPlanDependencyMetadata{
+							"launch": true,
+						},
+					},
+				}
+
+				buildResult, err := dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
+				Expect(err).ToNot(HaveOccurred())
+
+				metadata, exists, err := buildResult.GetLayerMetadata("node")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(exists).To(BeTrue())
+				Expect(metadata.Version).To(MatchRegexp("10.*.*"))
+
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "lib")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "include")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "share")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+			})
+		})
 	})
 })

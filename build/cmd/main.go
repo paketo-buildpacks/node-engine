@@ -30,10 +30,5 @@ func main() {
 		}
 	}
 
-	if err := builder.Launch.WriteMetadata(build.CreateLaunchMetadata()); err != nil {
-		builder.Logger.Info("failed node build: %s", err)
-		builder.Failure(100)
-	}
-
 	builder.Success()
 }

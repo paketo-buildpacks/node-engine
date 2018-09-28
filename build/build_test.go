@@ -31,9 +31,11 @@ var _ = Describe("NewNode", func() {
 		Expect(ok).To(BeFalse())
 	})
 
-	It("contributes node to the launch layer", func() {
+	It("does not contribute node to the cache or launch layer when build and launch are not set", func() {
 		f := test.NewBuildFactory(T)
-		f.AddBuildPlan(T, build.NodeDependency, libbuildpack.BuildPlanDependency{})
+		f.AddBuildPlan(T, build.NodeDependency, libbuildpack.BuildPlanDependency{
+			Metadata: libbuildpack.BuildPlanDependencyMetadata{},
+		})
 		f.AddDependency(T, build.NodeDependency, stubNodeFixture)
 
 		nodeDep, _, err := build.NewNode(f.Build)
@@ -42,7 +44,47 @@ var _ = Describe("NewNode", func() {
 		err = nodeDep.Contribute()
 		Expect(err).NotTo(HaveOccurred())
 
-		layerRoot := filepath.Join(f.Build.Launch.Root, "node")
+		cacheLayerRoot := filepath.Join(f.Build.Cache.Root, build.NodeDependency)
+		launchLayerRoot := filepath.Join(f.Build.Launch.Root, build.NodeDependency)
+		Expect(filepath.Join(cacheLayerRoot, "stub.txt")).NotTo(BeAnExistingFile())
+		Expect(filepath.Join(launchLayerRoot, "stub.txt")).NotTo(BeAnExistingFile())
+	})
+
+	It("contributes node to the cache layer when build is true", func() {
+		f := test.NewBuildFactory(T)
+		f.AddBuildPlan(T, build.NodeDependency, libbuildpack.BuildPlanDependency{
+			 Metadata: libbuildpack.BuildPlanDependencyMetadata{
+			 	"build": true,
+			 },
+		})
+		f.AddDependency(T, build.NodeDependency, stubNodeFixture)
+
+		nodeDep, _, err := build.NewNode(f.Build)
+		Expect(err).NotTo(HaveOccurred())
+
+		err = nodeDep.Contribute()
+		Expect(err).NotTo(HaveOccurred())
+
+		layerRoot := filepath.Join(f.Build.Cache.Root, build.NodeDependency)
+		Expect(filepath.Join(layerRoot, "stub.txt")).To(BeARegularFile())
+	})
+
+	It("contributes node to the launch layer when launch is true", func() {
+		f := test.NewBuildFactory(T)
+		f.AddBuildPlan(T, build.NodeDependency, libbuildpack.BuildPlanDependency{
+			Metadata: libbuildpack.BuildPlanDependencyMetadata{
+				"launch": true,
+			},
+		})
+		f.AddDependency(T, build.NodeDependency, stubNodeFixture)
+
+		nodeDep, _, err := build.NewNode(f.Build)
+		Expect(err).NotTo(HaveOccurred())
+
+		err = nodeDep.Contribute()
+		Expect(err).NotTo(HaveOccurred())
+
+		layerRoot := filepath.Join(f.Build.Launch.Root, build.NodeDependency)
 		Expect(filepath.Join(layerRoot, "stub.txt")).To(BeARegularFile())
 	})
 })
