@@ -1,6 +1,7 @@
 package build
 
 import (
+	"fmt"
 	libbuildpackV3 "github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/libjavabuildpack"
 )
@@ -55,6 +56,16 @@ func NewNode(builder libjavabuildpack.Build) (Node, bool, error) {
 	return node, true, nil
 }
 
+var environment = map[string]string{
+	"NODE_ENV":              "production",
+	"NODE_MODULES_CACHE":    "true",
+	"NODE_VERBOSE":          "false",
+	"NPM_CONFIG_PRODUCTION": "true",
+	"NPM_CONFIG_LOGLEVEL":   "error",
+	"WEB_MEMORY":            "512",
+	"WEB_CONCURRENCY":       "1",
+}
+
 func (n Node) Contribute() error {
 	if n.buildContribution {
 		return n.cacheLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyCacheLayer) error {
@@ -62,6 +73,15 @@ func (n Node) Contribute() error {
 			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 				return err
 			}
+
+			layer.Logger.SubsequentLine("Writing NODE_HOME")
+			layer.OverrideEnv("NODE_HOME", layer.Root)
+
+			for key, value := range environment {
+				layer.Logger.SubsequentLine("Writing " + key)
+				layer.OverrideEnv(key, value)
+			}
+
 			return nil
 		})
 	}
@@ -72,6 +92,15 @@ func (n Node) Contribute() error {
 			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 				return err
 			}
+
+			layer.Logger.SubsequentLine("Writing profile.d/NODE_HOME")
+			layer.WriteProfile("NODE_HOME", fmt.Sprintf("export NODE_HOME=%s", layer.Root))
+
+			for key, value := range environment {
+				layer.Logger.SubsequentLine("Writing profile.d/" + key)
+				layer.WriteProfile(key, fmt.Sprintf("export %s=%s", key, value))
+			}
+
 			return nil
 		})
 	}
