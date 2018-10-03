@@ -1,4 +1,4 @@
-module github.com/cloudfoundry/nodejs-cnb-buildpack
+module github.com/cloudfoundry/nodejs-cnb
 
 require (
 	github.com/buildpack/libbuildpack v0.0.0-20180917215559-e0a1f1ae6c05

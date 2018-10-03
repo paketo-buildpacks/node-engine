@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/libjavabuildpack"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
+	"github.com/cloudfoundry/nodejs-cnb/build"
 )
 
 func main() {

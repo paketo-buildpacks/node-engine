@@ -2,7 +2,7 @@ package integration
 
 import (
 	"github.com/buildpack/libbuildpack"
-	"github.com/cloudfoundry/nodejs-cnb-buildpack/build"
+	"github.com/cloudfoundry/nodejs-cnb/build"
 	"github.com/cloudfoundry/dagger"
 	"path/filepath"
 
