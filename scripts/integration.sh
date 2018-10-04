@@ -11,6 +11,10 @@ export CNB_BUILD_IMAGE=${CNB_BUILD_IMAGE:-cfbuildpacks/cflinuxfs3-cnb-experiment
 
 # TODO: change default to `cfbuildpacks/cflinuxfs3-cnb-experimental:run` when pack cli can use it
 export CNB_RUN_IMAGE=${CNB_RUN_IMAGE:-packs/run}
+
+# Always pull latest images
+# Most helpful for local testing consistency with CI (which would already pull the latest)
+docker pull $CNB_BUILD_IMAGE
 docker pull $CNB_RUN_IMAGE
 
 cd integration
