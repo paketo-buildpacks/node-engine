@@ -2,7 +2,7 @@
 [buildpack]
 id = "org.cloudfoundry.buildpacks.nodejs"
 name = "Node.js Buildpack"
-version = "1.6.32"
+version = "0.0.1"
 
 [[metadata.dependencies]]
 id = "node"
