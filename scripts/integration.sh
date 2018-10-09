@@ -4,6 +4,9 @@ set -euo pipefail
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 source  ./scripts/install_tools.sh
 
+# Install Pack CLI
+wget "https://github.com/buildpack/pack/releases/download/$version/pack-$host.tar.gz" -O $GOBIN/pack && chmod +x $GOBIN/pack
+
 GINKGO_NODES=${GINKGO_NODES:-1}
 GINKGO_ATTEMPTS=${GINKGO_ATTEMPTS:-1}
 
