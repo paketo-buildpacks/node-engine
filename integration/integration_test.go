@@ -1,10 +1,11 @@
 package integration
 
 import (
-	"github.com/buildpack/libbuildpack"
-	"github.com/cloudfoundry/nodejs-cnb/build"
-	"github.com/cloudfoundry/dagger"
 	"path/filepath"
+
+	"github.com/buildpack/libbuildpack"
+	"github.com/cloudfoundry/dagger"
+	"github.com/cloudfoundry/nodejs-cnb/cmd/build"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
