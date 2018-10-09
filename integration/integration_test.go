@@ -38,7 +38,7 @@ var _ = Describe("Nodejs buildpack", func() {
 				Buildpacks: []libbuildpack.BuildpackInfo{
 					{
 						ID:      "org.cloudfoundry.buildpacks.nodejs",
-						Version: "1.6.32",
+						Version: "0.0.1",
 					},
 				},
 			}
