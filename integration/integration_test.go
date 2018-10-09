@@ -5,7 +5,7 @@ import (
 
 	"github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/dagger"
-	"github.com/cloudfoundry/nodejs-cnb/cmd/build"
+	"github.com/cloudfoundry/nodejs-cnb/internal/build"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
