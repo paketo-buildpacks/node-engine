@@ -56,7 +56,7 @@ var environment = map[string]string{
 
 func (n Node) Contribute() error {
 	if n.buildContribution {
-		return n.cacheLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyCacheLayer) error {
+		err := n.cacheLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyCacheLayer) error {
 			layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
 			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 				return err
@@ -72,10 +72,13 @@ func (n Node) Contribute() error {
 
 			return nil
 		})
+		if err != nil {
+			return err
+		}
 	}
 
 	if n.launchContribution {
-		return n.launchLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyLaunchLayer) error {
+		err := n.launchLayer.Contribute(func(artifact string, layer libjavabuildpack.DependencyLaunchLayer) error {
 			layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
 			if err := libjavabuildpack.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 				return err
@@ -91,6 +94,9 @@ func (n Node) Contribute() error {
 
 			return nil
 		})
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
