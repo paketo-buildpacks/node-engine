@@ -1,13 +1,12 @@
 package integration
 
 import (
-	"testing"
+"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+
+. "github.com/onsi/gomega"
 )
 
 func TestIntegration(t *testing.T) {
-	RegisterFailHandler(Fail)
 	RunSpecs(t, "Integration Suite")
 }

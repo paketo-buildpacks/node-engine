@@ -1,39 +1,46 @@
 package integration
 
 import (
+	"github.com/sclevine/spec/report"
 	"path/filepath"
+	"testing"
 
 	"github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/dagger"
 	"github.com/cloudfoundry/nodejs-cnb/internal/build"
+	"github.com/sclevine/spec"
 
-	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Nodejs buildpack", func() {
+func TestIntegrations(t *testing.T){
+	spec.Run(t, "object", testIntegration, spec.Report(report.Terminal{}))
+}
+
+func testIntegration(t *testing.T, when spec.G, it spec.S){
 	var (
 		rootDir string
 		dagg    *dagger.Dagger
 	)
+	g := NewGomegaWithT(t)
 
-	BeforeEach(func() {
+	it.Before(func() {
 		var err error
 
 		rootDir, err = dagger.FindRoot()
-		Expect(err).ToNot(HaveOccurred())
+		g.Expect(err).ToNot(HaveOccurred())
 
 		dagg, err = dagger.NewDagger(rootDir)
-		Expect(err).ToNot(HaveOccurred())
+		g.Expect(err).ToNot(HaveOccurred())
 	})
 
-	AfterEach(func() {
+	it.After(func() {
 		dagg.Destroy()
 	})
 
-	Context("build", func() {
+	when("build", func() {
 		var group dagger.Group
-		BeforeEach(func() {
+		it.Before(func() {
 			group = dagger.Group{
 				Buildpacks: []libbuildpack.BuildpackInfo{
 					{
@@ -45,13 +52,13 @@ var _ = Describe("Nodejs buildpack", func() {
 
 		})
 
-		Context("when the build plan says to add node to the cache", func() {
+		when("when the build plan says to add node to the cache", func() {
 			var (
 				buildResult *dagger.BuildResult
 				err         error
 			)
 
-			BeforeEach(func() {
+			it.Before(func() {
 				plan := libbuildpack.BuildPlan{
 					build.NodeDependency: libbuildpack.BuildPlanDependency{
 						Version: "~10",
@@ -62,43 +69,43 @@ var _ = Describe("Nodejs buildpack", func() {
 				}
 
 				buildResult, err = dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
-				Expect(err).ToNot(HaveOccurred())
+				g.Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("installs node in the cache layer", func() {
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "lib")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "include")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "share")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "node")).To(BeAnExistingFile())
-				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+			it("installs node in the cache layer", func() {
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "lib")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "include")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "share")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
 			})
 
-			It("sets the nodejs environment variables", func() {
+			it("sets the nodejs environment variables", func() {
 				env, err := buildResult.GetCacheLayerEnv("node")
-				Expect(err).ToNot(HaveOccurred())
+				g.Expect(err).ToNot(HaveOccurred())
 
-				Expect(env["NODE_HOME"]).To(Equal("/cache/org.cloudfoundry.buildpacks.nodejs/node"))
-				Expect(env["NODE_ENV"]).To(Equal("production"))
-				Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
-				Expect(env["NODE_VERBOSE"]).To(Equal("false"))
+				g.Expect(env["NODE_HOME"]).To(Equal("/cache/org.cloudfoundry.buildpacks.nodejs/node"))
+				g.Expect(env["NODE_ENV"]).To(Equal("production"))
+				g.Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
+				g.Expect(env["NODE_VERBOSE"]).To(Equal("false"))
 
-				Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
-				Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
+				g.Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
+				g.Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
 
-				Expect(env["WEB_MEMORY"]).To(Equal("512"))
-				Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
+				g.Expect(env["WEB_MEMORY"]).To(Equal("512"))
+				g.Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
 			})
 		})
 
-		Context("when the build plan says to add node to launch", func() {
+		when("when the build plan says to add node to launch", func() {
 
 			var (
 				buildResult *dagger.BuildResult
 				err         error
 			)
 
-			BeforeEach(func() {
+			it.Before(func() {
 				plan := libbuildpack.BuildPlan{
 					build.NodeDependency: libbuildpack.BuildPlanDependency{
 						Version: "~10",
@@ -109,38 +116,38 @@ var _ = Describe("Nodejs buildpack", func() {
 				}
 
 				buildResult, err = dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
-				Expect(err).ToNot(HaveOccurred())
+				g.Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("installs node in the launch layer", func() {
+			it("installs node in the launch layer", func() {
 				metadata, exists, err := buildResult.GetLayerMetadata("node")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(exists).To(BeTrue())
-				Expect(metadata.Version).To(MatchRegexp("10.*.*"))
+				g.Expect(err).ToNot(HaveOccurred())
+				g.Expect(exists).To(BeTrue())
+				g.Expect(metadata.Version).To(MatchRegexp("10.*.*"))
 
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "lib")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "include")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "share")).To(BeADirectory())
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "node")).To(BeAnExistingFile())
-				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "lib")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "include")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "share")).To(BeADirectory())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
 			})
 
-			It("sets the nodejs environment variables", func() {
+			it("sets the nodejs environment variables", func() {
 				env, err := buildResult.GetLaunchLayerEnv("node")
-				Expect(err).ToNot(HaveOccurred())
+				g.Expect(err).ToNot(HaveOccurred())
 
-				Expect(env["NODE_HOME"]).To(Equal("/workspace/org.cloudfoundry.buildpacks.nodejs/node"))
-				Expect(env["NODE_ENV"]).To(Equal("production"))
-				Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
-				Expect(env["NODE_VERBOSE"]).To(Equal("false"))
+				g.Expect(env["NODE_HOME"]).To(Equal("/workspace/org.cloudfoundry.buildpacks.nodejs/node"))
+				g.Expect(env["NODE_ENV"]).To(Equal("production"))
+				g.Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
+				g.Expect(env["NODE_VERBOSE"]).To(Equal("false"))
 
-				Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
-				Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
+				g.Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
+				g.Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
 
-				Expect(env["WEB_MEMORY"]).To(Equal("512"))
-				Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
+				g.Expect(env["WEB_MEMORY"]).To(Equal("512"))
+				g.Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
 			})
 		})
 	})
-})
+}

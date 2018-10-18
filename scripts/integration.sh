@@ -25,4 +25,5 @@ docker pull $CNB_RUN_IMAGE
 cd integration
 
 echo "Run Buildpack Runtime Integration Tests"
-ginkgo -r --flakeAttempts=$GINKGO_ATTEMPTS -nodes $GINKGO_NODES
+#ginkgo -r --flakeAttempts=$GINKGO_ATTEMPTS -nodes $GINKGO_NODES
+go test -v
