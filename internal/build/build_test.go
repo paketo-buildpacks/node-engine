@@ -8,12 +8,12 @@ import (
 	"github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/libjavabuildpack/test"
 	"github.com/cloudfoundry/nodejs-cnb/internal/build"
-	"github.com/sclevine/spec"
 	. "github.com/onsi/gomega"
+	"github.com/sclevine/spec"
 )
 
-func TestBuilds(t *testing.T){
-	spec.Run(t, "object", testBuilds, spec.Report(report.Terminal{}))
+func TestUnitBuild(t *testing.T){
+	spec.Run(t, "build", testBuilds, spec.Report(report.Terminal{}))
 }
 
 func testBuilds(t *testing.T, when spec.G, it spec.S){

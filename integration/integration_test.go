@@ -13,8 +13,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestIntegrations(t *testing.T){
-	spec.Run(t, "object", testIntegration, spec.Report(report.Terminal{}))
+func TestIntegration(t *testing.T){
+	spec.Run(t, "integration", testIntegration, spec.Report(report.Terminal{}))
 }
 
 func testIntegration(t *testing.T, when spec.G, it spec.S){
