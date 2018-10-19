@@ -14,6 +14,7 @@ import (
 )
 
 func TestIntegration(t *testing.T){
+	RegisterTestingT(t)
 	spec.Run(t, "integration", testIntegration, spec.Report(report.Terminal{}))
 }
 
@@ -22,16 +23,15 @@ func testIntegration(t *testing.T, when spec.G, it spec.S){
 		rootDir string
 		dagg    *dagger.Dagger
 	)
-	g := NewGomegaWithT(t)
 
 	it.Before(func() {
 		var err error
 
 		rootDir, err = dagger.FindRoot()
-		g.Expect(err).ToNot(HaveOccurred())
+		Expect(err).ToNot(HaveOccurred())
 
 		dagg, err = dagger.NewDagger(rootDir)
-		g.Expect(err).ToNot(HaveOccurred())
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	it.After(func() {
@@ -69,32 +69,32 @@ func testIntegration(t *testing.T, when spec.G, it spec.S){
 				}
 
 				buildResult, err = dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
-				g.Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			it("installs node in the cache layer", func() {
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "lib")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "include")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "share")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "node")).To(BeAnExistingFile())
-				g.Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "lib")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "include")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "share")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.CacheRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
 			})
 
 			it("sets the nodejs environment variables", func() {
 				env, err := buildResult.GetCacheLayerEnv("node")
-				g.Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 
-				g.Expect(env["NODE_HOME"]).To(Equal("/cache/org.cloudfoundry.buildpacks.nodejs/node"))
-				g.Expect(env["NODE_ENV"]).To(Equal("production"))
-				g.Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
-				g.Expect(env["NODE_VERBOSE"]).To(Equal("false"))
+				Expect(env["NODE_HOME"]).To(Equal("/cache/org.cloudfoundry.buildpacks.nodejs/node"))
+				Expect(env["NODE_ENV"]).To(Equal("production"))
+				Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
+				Expect(env["NODE_VERBOSE"]).To(Equal("false"))
 
-				g.Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
-				g.Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
+				Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
+				Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
 
-				g.Expect(env["WEB_MEMORY"]).To(Equal("512"))
-				g.Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
+				Expect(env["WEB_MEMORY"]).To(Equal("512"))
+				Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
 			})
 		})
 
@@ -116,37 +116,37 @@ func testIntegration(t *testing.T, when spec.G, it spec.S){
 				}
 
 				buildResult, err = dagg.Build(filepath.Join(rootDir, "fixtures", "simple_app"), group, plan)
-				g.Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			it("installs node in the launch layer", func() {
 				metadata, exists, err := buildResult.GetLayerMetadata("node")
-				g.Expect(err).ToNot(HaveOccurred())
-				g.Expect(exists).To(BeTrue())
-				g.Expect(metadata.Version).To(MatchRegexp("10.*.*"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(exists).To(BeTrue())
+				Expect(metadata.Version).To(MatchRegexp("10.*.*"))
 
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "lib")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "include")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "share")).To(BeADirectory())
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "node")).To(BeAnExistingFile())
-				g.Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "lib")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "include")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "share")).To(BeADirectory())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "node")).To(BeAnExistingFile())
+				Expect(filepath.Join(buildResult.LaunchRootDir, "node", "bin", "npm")).To(BeAnExistingFile())
 			})
 
 			it("sets the nodejs environment variables", func() {
 				env, err := buildResult.GetLaunchLayerEnv("node")
-				g.Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 
-				g.Expect(env["NODE_HOME"]).To(Equal("/workspace/org.cloudfoundry.buildpacks.nodejs/node"))
-				g.Expect(env["NODE_ENV"]).To(Equal("production"))
-				g.Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
-				g.Expect(env["NODE_VERBOSE"]).To(Equal("false"))
+				Expect(env["NODE_HOME"]).To(Equal("/workspace/org.cloudfoundry.buildpacks.nodejs/node"))
+				Expect(env["NODE_ENV"]).To(Equal("production"))
+				Expect(env["NODE_MODULES_CACHE"]).To(Equal("true"))
+				Expect(env["NODE_VERBOSE"]).To(Equal("false"))
 
-				g.Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
-				g.Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
+				Expect(env["NPM_CONFIG_PRODUCTION"]).To(Equal("true"))
+				Expect(env["NPM_CONFIG_LOGLEVEL"]).To(Equal("error"))
 
-				g.Expect(env["WEB_MEMORY"]).To(Equal("512"))
-				g.Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
+				Expect(env["WEB_MEMORY"]).To(Equal("512"))
+				Expect(env["WEB_CONCURRENCY"]).To(Equal("1"))
 			})
 		})
 	})
