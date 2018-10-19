@@ -119,6 +119,7 @@ version = "10.11.0"
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
+sha256 = "8d13d57aaf95177e97d29c0944d79a17de8c3a31ba3fe88d1846cfd907e52111"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v10.12.0/node-v10.12.0-linux-x64.tar.gz"
 version = "10.12.0"
