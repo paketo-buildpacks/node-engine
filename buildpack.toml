@@ -132,6 +132,22 @@ stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.13.0-linux-x64-cflinuxfs3-941d707a.tgz"
 version = "10.13.0"
 
+[[metadata.dependencies]]
+id = "node"
+name = "NodeJS"
+sha256 = "e571de4e9b42fc411314d51ff730de37e3cef4d1d31cf4b84854e7a34a454cc7"
+stacks = ["io.buildpacks.stacks.bionic"]
+uri = "https://nodejs.org/dist/v11.0.0/node-v11.0.0-linux-x64.tar.gz"
+version = "11.0.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "NodeJS"
+sha256 = "659c455747e89b6e99c83c529a8700f114e85c93a95fc2243a1afdb5bf124222"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-11.0.0-linux-x64-cflinuxfs3-659c4557.tgz"
+version = "11.0.0"
+
 [[stacks]]
 id = "org.cloudfoundry.stacks.cflinuxfs3"
 
