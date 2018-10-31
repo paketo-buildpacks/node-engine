@@ -7,7 +7,7 @@ import (
 
 	"github.com/buildpack/libbuildpack"
 	"github.com/cloudfoundry/dagger"
-	"github.com/cloudfoundry/nodejs-cnb/internal/build"
+	"github.com/cloudfoundry/nodejs-cnb/build"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
