@@ -151,30 +151,6 @@ version = "9.11.2"
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
-sha256 = "8d13d57aaf95177e97d29c0944d79a17de8c3a31ba3fe88d1846cfd907e52111"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v10.12.0/node-v10.12.0-linux-x64.tar.gz"
-version = "10.12.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "NodeJS"
-sha256 = "94e3b9e92d5c898b1c7cf55f7e53b3aee1fc79fdbed17d1977fe95a2b7e1b463"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs2"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.12.0-linux-x64-cflinuxfs2-94e3b9e9.tgz"
-version = "10.12.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "NodeJS"
-sha256 = "b702b09eb7198cec42cc2268088ceff3f52961cd52050fc9a312a0ec941a4363"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.12.0-linux-x64-cflinuxfs3-b702b09e.tgz"
-version = "10.12.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "NodeJS"
 sha256 = "b4b5d8f73148dcf277df413bb16827be476f4fa117cbbec2aaabc8cc0a8588e1"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.gz"
@@ -195,6 +171,30 @@ sha256 = "941d707aaa07d6bdfc93710fd86296f0f4a720ad0b45a38410e00bd2344c8edc"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.13.0-linux-x64-cflinuxfs3-941d707a.tgz"
 version = "10.13.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "NodeJS"
+sha256 = "2f10d1a5d211a150d6813bdca8f3b1fe673a68fd534b1f547befec1314244596"
+stacks = ["io.buildpacks.stacks.bionic"]
+uri = "https://nodejs.org/dist/v10.14.0/node-v10.14.0-linux-x64.tar.gz"
+version = "10.14.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "NodeJS"
+sha256 = "7ed8093c196e66fa639ea1467c12eb3d5673157c9db89111c69bd805642abd4a"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs2"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.14.0-linux-x64-cflinuxfs2-7ed8093c.tgz"
+version = "10.14.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "NodeJS"
+sha256 = "72f3ac305982ba4b727be462c90cb1f5eb4394e3f7e193636242c3b1b4f039be"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.14.0-linux-x64-cflinuxfs3-72f3ac30.tgz"
+version = "10.14.0"
 
 [[metadata.dependencies]]
 id = "node"
