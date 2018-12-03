@@ -4,31 +4,38 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/libjavabuildpack"
-	"github.com/cloudfoundry/nodejs-cnb/build"
+	"github.com/buildpack/libbuildpack/buildplan"
+
+	"github.com/cloudfoundry/libcfbuildpack/build"
+	"github.com/cloudfoundry/nodejs-cnb/node"
 )
 
 func main() {
-	builder, err := libjavabuildpack.DefaultBuild()
+	builder, err := build.DefaultBuild()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to create default builder: %s", err)
-		os.Exit(100)
+		os.Exit(101)
 	}
 
-	node, ok, err := build.NewNode(builder)
+	builder.Logger.FirstLine(build.Logger.PrettyIdentity(builder.Buildpack))
+
+	nodeContributor, willContribute, err := node.NewNodeContributor(builder)
 	if err != nil {
 		builder.Logger.Info(err.Error())
-		builder.Failure(102)
-		return
+		os.Exit(102)
 	}
 
-	if ok {
-		if err := node.Contribute(); err != nil {
+	if willContribute {
+		if err := nodeContributor.Contribute(); err != nil {
 			builder.Logger.Info(err.Error())
-			builder.Failure(103)
-			return
+			os.Exit(103)
 		}
 	}
 
-	builder.Success()
+	code, err := builder.Success(buildplan.BuildPlan{})
+	if err != nil {
+		builder.Logger.Info(err.Error())
+	}
+
+	os.Exit(code)
 }
