@@ -11,14 +11,18 @@ import (
 func main() {
 	detector, err := detect.DefaultDetect()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to create default detector: %s", err)
-		os.Exit(100)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to create default detector: %s", err)
+		os.Exit(101)
 	}
 
-	code, err := detector.Pass(buildplan.BuildPlan{})
+	code, err := runDetect(detector)
 	if err != nil {
 		detector.Logger.Info(err.Error())
 	}
 
 	os.Exit(code)
+}
+
+func runDetect(detector detect.Detect) (int, error) {
+	return detector.Pass(buildplan.BuildPlan{})
 }

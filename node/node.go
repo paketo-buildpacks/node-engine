@@ -5,31 +5,31 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/layers"
 )
 
-const NodeDependency = "node"
+const Dependency = "node"
 
-type NodeContributor struct {
+type Contributor struct {
 	buildContribution  bool
 	launchContribution bool
 	layer              layers.DependencyLayer
 }
 
-func NewNodeContributor(builder build.Build) (NodeContributor, bool, error) {
-	plan, wantDependency := builder.BuildPlan[NodeDependency]
+func NewContributor(builder build.Build) (Contributor, bool, error) {
+	plan, wantDependency := builder.BuildPlan[Dependency]
 	if !wantDependency {
-		return NodeContributor{}, false, nil
+		return Contributor{}, false, nil
 	}
 
 	deps, err := builder.Buildpack.Dependencies()
 	if err != nil {
-		return NodeContributor{}, false, err
+		return Contributor{}, false, err
 	}
 
-	dep, err := deps.Best(NodeDependency, plan.Version, builder.Stack)
+	dep, err := deps.Best(Dependency, plan.Version, builder.Stack)
 	if err != nil {
-		return NodeContributor{}, false, err
+		return Contributor{}, false, err
 	}
 
-	contributor := NodeContributor{layer: builder.Layers.DependencyLayer(dep)}
+	contributor := Contributor{layer: builder.Layers.DependencyLayer(dep)}
 
 	if _, ok := plan.Metadata["build"]; ok {
 		contributor.buildContribution = true
@@ -42,7 +42,7 @@ func NewNodeContributor(builder build.Build) (NodeContributor, bool, error) {
 	return contributor, true, nil
 }
 
-func (n NodeContributor) Contribute() error {
+func (n Contributor) Contribute() error {
 	return n.layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
 		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
 		if err := layers.ExtractTarGz(artifact, layer.Root, 1); err != nil {
@@ -85,7 +85,7 @@ func (n NodeContributor) Contribute() error {
 	}, n.flags()...)
 }
 
-func (n NodeContributor) flags() []layers.Flag {
+func (n Contributor) flags() []layers.Flag {
 	flags := []layers.Flag{layers.Cache}
 
 	if n.buildContribution {
