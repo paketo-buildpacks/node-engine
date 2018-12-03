@@ -17,7 +17,7 @@ func main() {
 		os.Exit(101)
 	}
 
-	builder.Logger.FirstLine(build.Logger.PrettyIdentity(builder.Buildpack))
+	builder.Logger.FirstLine(builder.Logger.PrettyIdentity(builder.Buildpack))
 
 	nodeContributor, willContribute, err := node.NewNodeContributor(builder)
 	if err != nil {
