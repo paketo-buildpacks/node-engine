@@ -42,7 +42,7 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 		it("contributes node to the cache layer when included in the build plan", func() {
 			f := test.NewBuildFactory(t)
 			f.AddBuildPlan(t, Dependency, buildplan.Dependency{
-				Metadata: buildplan.Metadata{"build": false},
+				Metadata: buildplan.Metadata{"build": true},
 			})
 			f.AddDependency(t, Dependency, stubNodeFixture)
 
