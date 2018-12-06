@@ -9,20 +9,20 @@ import (
 )
 
 func main() {
-	detector, err := detect.DefaultDetect()
+	context, err := detect.DefaultDetect()
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to create default detector: %s", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to create a default detection context: %s", err)
 		os.Exit(101)
 	}
 
-	code, err := runDetect(detector)
+	code, err := runDetect(context)
 	if err != nil {
-		detector.Logger.Info(err.Error())
+		context.Logger.Info(err.Error())
 	}
 
 	os.Exit(code)
 }
 
-func runDetect(detector detect.Detect) (int, error) {
-	return detector.Pass(buildplan.BuildPlan{})
+func runDetect(context detect.Detect) (int, error) {
+	return context.Pass(buildplan.BuildPlan{})
 }
