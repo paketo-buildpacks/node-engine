@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/cloudfoundry/libcfbuildpack/build"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/layers"
 )
 
@@ -45,7 +46,7 @@ func NewContributor(builder build.Build) (Contributor, bool, error) {
 func (n Contributor) Contribute() error {
 	return n.layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
 		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
-		if err := layers.ExtractTarGz(artifact, layer.Root, 1); err != nil {
+		if err := helper.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 			return err
 		}
 
