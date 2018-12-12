@@ -79,6 +79,7 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 
 			layer := f.Build.Layers.Layer(Dependency)
+			Expect(layer).To(test.HaveLayerMetadata(false, true, true))
 			Expect(filepath.Join(layer.Root, "stub.txt")).To(BeARegularFile())
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_HOME", layer.Root))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_HOME", layer.Root))

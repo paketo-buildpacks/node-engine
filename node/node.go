@@ -14,23 +14,23 @@ type Contributor struct {
 	layer              layers.DependencyLayer
 }
 
-func NewContributor(builder build.Build) (Contributor, bool, error) {
-	plan, wantDependency := builder.BuildPlan[Dependency]
+func NewContributor(context build.Build) (Contributor, bool, error) {
+	plan, wantDependency := context.BuildPlan[Dependency]
 	if !wantDependency {
 		return Contributor{}, false, nil
 	}
 
-	deps, err := builder.Buildpack.Dependencies()
+	deps, err := context.Buildpack.Dependencies()
 	if err != nil {
 		return Contributor{}, false, err
 	}
 
-	dep, err := deps.Best(Dependency, plan.Version, builder.Stack)
+	dep, err := deps.Best(Dependency, plan.Version, context.Stack)
 	if err != nil {
 		return Contributor{}, false, err
 	}
 
-	contributor := Contributor{layer: builder.Layers.DependencyLayer(dep)}
+	contributor := Contributor{layer: context.Layers.DependencyLayer(dep)}
 
 	if _, ok := plan.Metadata["build"]; ok {
 		contributor.buildContribution = true
