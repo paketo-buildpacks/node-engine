@@ -1,12 +1,37 @@
 package node
 
 import (
+	"encoding/json"
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/layers"
+	"os"
 )
 
 const Dependency = "node"
+
+type packageJSON struct {
+	Engines engines `json:"engines"`
+}
+
+type engines struct {
+	Node string `json:"node"`
+}
+
+func GetVersion(packageFile string) (version string, err error) {
+	file, err := os.Open(packageFile)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	pkgJSON := packageJSON{}
+	if err := json.NewDecoder(file).Decode(&pkgJSON); err != nil {
+		return "", err
+	}
+
+	return pkgJSON.Engines.Node, nil
+}
 
 type Contributor struct {
 	buildContribution  bool
