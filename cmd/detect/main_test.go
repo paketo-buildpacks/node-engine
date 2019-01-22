@@ -11,7 +11,8 @@ import (
 	"github.com/sclevine/spec/report"
 )
 
-func TestDetect(t *testing.T) {
+func TestUnitDetect(t *testing.T) {
+	RegisterTestingT(t)
 	spec.Run(t, "Detect", testDetect, spec.Report(report.Terminal{}))
 }
 
