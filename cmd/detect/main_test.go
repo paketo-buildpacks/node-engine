@@ -12,11 +12,14 @@ import (
 )
 
 func TestUnitDetect(t *testing.T) {
-	RegisterTestingT(t)
 	spec.Run(t, "Detect", testDetect, spec.Report(report.Terminal{}))
 }
 
 func testDetect(t *testing.T, _ spec.G, it spec.S) {
+	it.Before(func() {
+		RegisterTestingT(t)
+	})
+
 	it("always passes", func() {
 		f := test.NewDetectFactory(t)
 		code, err := runDetect(f.Detect)

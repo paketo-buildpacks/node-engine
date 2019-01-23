@@ -13,11 +13,14 @@ import (
 )
 
 func TestUnitNode(t *testing.T) {
-	RegisterTestingT(t)
 	spec.Run(t, "Node", testNode, spec.Report(report.Terminal{}))
 }
 
 func testNode(t *testing.T, when spec.G, it spec.S) {
+	it.Before(func() {
+		RegisterTestingT(t)
+	})
+
 	when("NewContributor", func() {
 		var stubNodeFixture = filepath.Join("testdata", "stub-node.tar.gz")
 

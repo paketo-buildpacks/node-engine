@@ -12,11 +12,14 @@ import (
 )
 
 func TestUnitBuild(t *testing.T) {
-	RegisterTestingT(t)
 	spec.Run(t, "Build", testBuild, spec.Report(report.Terminal{}))
 }
 
 func testBuild(t *testing.T, _ spec.G, it spec.S) {
+	it.Before(func() {
+		RegisterTestingT(t)
+	})
+
 	it("always passes", func() {
 		f := test.NewBuildFactory(t)
 		code, err := runBuild(f.Build)
