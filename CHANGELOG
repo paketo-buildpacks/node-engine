@@ -1,0 +1,30 @@
+v0.0.3 Feb 04, 2019
+====================
+
+* Add node 6.16.0, remove node 6.15.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162848357)
+
+* Add node 8.14.1, remove node 8.13.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162736295)
+
+* Add node 8.15.0, remove node 8.14.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162848337)
+
+* Add node 10.15.0, remove node 10.14.1
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/162847345)
+
+* Remove node 1.11.0
+  for stack(s) org.cloudfoundry.stacks.cflinuxfs3
+
+* Add node 11.8.0, remove node 11.4.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163473112)
+
+* Add node 11.9.0, remove node 11.3.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163608561)
+
