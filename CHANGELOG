@@ -1,3 +1,13 @@
+v0.0.4 Feb 13, 2019
+====================
+
+* Use .nvmrc to provide node version if available
+  (https://www.pivotaltracker.com/story/show/163528537)
+
+* Add node 10.15.1
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/163568677)
+
 v0.0.3 Feb 04, 2019
 ====================
 
