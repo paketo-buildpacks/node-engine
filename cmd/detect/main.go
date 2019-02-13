@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+	"github.com/cloudfoundry/nodejs-cnb/node"
+	"github.com/cloudfoundry/nodejs-cnb/nvmrc"
 	"os"
+	"path/filepath"
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/detect"
@@ -24,5 +28,25 @@ func main() {
 }
 
 func runDetect(context detect.Detect) (int, error) {
+	nvmrcPath := filepath.Join(context.Application.Root, ".nvmrc")
+	exists, err := helper.FileExists(nvmrcPath)
+	if err != nil {
+		return context.Fail(), err
+	}
+
+	if exists {
+		version, err := nvmrc.GetVersion(nvmrcPath, context.Logger)
+		if err != nil {
+			return context.Fail(), err
+		}
+
+		return context.Pass(buildplan.BuildPlan{
+			node.Dependency: {
+				Version:  version,
+				Metadata: buildplan.Metadata{"launch": true},
+			},
+		})
+	}
+
 	return context.Pass(buildplan.BuildPlan{})
 }
