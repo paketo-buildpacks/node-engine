@@ -94,5 +94,17 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_MEMORY", "512"))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_CONCURRENCY", "1"))
 		})
+
+		it("returns an error when unreleased version of node is included in the build plan", func() {
+			f := test.NewBuildFactory(t)
+			f.AddBuildPlan(Dependency, buildplan.Dependency{
+				Version: "9000.0.0",
+				Metadata: buildplan.Metadata{"launch": true},
+			})
+
+			_, shouldContribute, err := NewContributor(f.Build)
+			Expect(err).To(HaveOccurred())
+			Expect(shouldContribute).To(BeFalse())
+		})
 	})
 }
