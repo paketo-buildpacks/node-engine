@@ -1,0 +1,81 @@
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
+# github.com/Masterminds/semver v1.4.2
+github.com/Masterminds/semver
+# github.com/buildpack/libbuildpack v1.10.0
+github.com/buildpack/libbuildpack/buildplan
+github.com/buildpack/libbuildpack/internal
+github.com/buildpack/libbuildpack/build
+github.com/buildpack/libbuildpack/layers
+github.com/buildpack/libbuildpack/detect
+github.com/buildpack/libbuildpack/application
+github.com/buildpack/libbuildpack/buildpack
+github.com/buildpack/libbuildpack/logger
+github.com/buildpack/libbuildpack/platform
+github.com/buildpack/libbuildpack/services
+github.com/buildpack/libbuildpack/stack
+# github.com/cloudfoundry/cnb-tools v0.0.0-20190219172305-154ea1cc62b2
+github.com/cloudfoundry/cnb-tools/install_tools
+github.com/cloudfoundry/cnb-tools/integration
+github.com/cloudfoundry/cnb-tools/package
+github.com/cloudfoundry/cnb-tools/unit
+github.com/cloudfoundry/cnb-tools/action
+github.com/cloudfoundry/cnb-tools/utils
+# github.com/cloudfoundry/libcfbuildpack v1.42.0
+github.com/cloudfoundry/libcfbuildpack/build
+github.com/cloudfoundry/libcfbuildpack/detect
+github.com/cloudfoundry/libcfbuildpack/helper
+github.com/cloudfoundry/libcfbuildpack/layers
+github.com/cloudfoundry/libcfbuildpack/buildpack
+github.com/cloudfoundry/libcfbuildpack/logger
+github.com/cloudfoundry/libcfbuildpack/services
+github.com/cloudfoundry/libcfbuildpack/test
+github.com/cloudfoundry/libcfbuildpack/internal
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
+# github.com/mattn/go-colorable v0.1.0
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.4
+github.com/mattn/go-isatty
+# github.com/mitchellh/mapstructure v1.1.2
+github.com/mitchellh/mapstructure
+# github.com/onsi/gomega v1.4.3
+github.com/onsi/gomega
+github.com/onsi/gomega/types
+github.com/onsi/gomega/internal/assertion
+github.com/onsi/gomega/internal/asyncassertion
+github.com/onsi/gomega/internal/testingtsupport
+github.com/onsi/gomega/matchers
+github.com/onsi/gomega/internal/oraclematcher
+github.com/onsi/gomega/format
+github.com/onsi/gomega/matchers/support/goraph/bipartitegraph
+github.com/onsi/gomega/matchers/support/goraph/edge
+github.com/onsi/gomega/matchers/support/goraph/node
+github.com/onsi/gomega/matchers/support/goraph/util
+# github.com/sclevine/spec v1.2.0
+github.com/sclevine/spec
+github.com/sclevine/spec/report
+# golang.org/x/net v0.0.0-20190206173232-65e2d4e15006
+golang.org/x/net/html/charset
+golang.org/x/net/html
+golang.org/x/net/html/atom
+# golang.org/x/sys v0.0.0-20190204203706-41f3e6584952
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.0
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/htmlindex
+golang.org/x/text/transform
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/japanese
+golang.org/x/text/encoding/korean
+golang.org/x/text/encoding/simplifiedchinese
+golang.org/x/text/encoding/traditionalchinese
+golang.org/x/text/encoding/unicode
+golang.org/x/text/language
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/internal/tag
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
