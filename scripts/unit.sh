@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
+set -uo pipefail
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
-go run "$DIR/cmd_router.go" unit "$@"
+echo "Run Buildpack Unit Tests"
+go test ./... -v -run Unit
+exit_code=$?
+
+if [ "$exit_code" != "0" ]; then
+    echo -e "\n\033[0;31m** GO Test Failed **\033[0m"
+else
+    echo -e "\n\033[0;32m** GO Test Succeeded **\033[0m"
+fi
+
+exit $exit_code
