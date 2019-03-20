@@ -7,6 +7,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
 echo "Target OS is $TARGET_OS"
 echo -n "Creating buildpack directory..."
+bp_name="${PWD##*/}"
 bp_dir="${PWD##*/}"_$(openssl rand -hex 12)
 mkdir $bp_dir
 echo "done"
@@ -29,5 +30,8 @@ fullPath=$(realpath "$bp_dir")
 echo "Buildpack packaged into: $fullPath"
 
 pushd $bp_dir
-    tar czvf ../nodejs-cnb.tgz *
+    tar czvf "../$bp_name.tgz" *
+    echo "Buildpack .tar into: $(realpath "../$bp_name.tgz")"
 popd
+
+#rm -rf "$fullPath"

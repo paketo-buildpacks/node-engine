@@ -48,6 +48,9 @@ type BuildFactory struct {
 	// Output is the BuildPlan output at termination.
 	Output buildplan.BuildPlan
 
+	// Runner is the used to capture commands executed outside the process.
+	Runner *Runner
+
 	t *testing.T
 }
 
@@ -79,6 +82,22 @@ func (f *BuildFactory) AddDependencyWithVersion(id string, version string, fixtu
 	f.addDependency(d)
 }
 
+// SetDefaultVersion sets a default dependency version in the buildpack metadata
+func (f *BuildFactory) SetDefaultVersion(id, version string) {
+	f.t.Helper()
+
+	if f.Build.Buildpack.Metadata == nil {
+		f.Build.Buildpack.Metadata = make(buildpack.Metadata)
+	}
+
+	if _, ok := f.Build.Buildpack.Metadata[buildpack.DefaultVersions]; !ok {
+		f.Build.Buildpack.Metadata[buildpack.DefaultVersions] = map[string]interface{}{}
+	}
+
+	metadata := f.Build.Buildpack.Metadata
+	metadata[buildpack.DefaultVersions].(map[string]interface{})[id] = version
+}
+
 // AddService adds an entry to the collection of services.
 func (f *BuildFactory) AddService(name string, credentials services.Credentials, tags ...string) {
 	f.t.Helper()
@@ -97,12 +116,12 @@ func (f *BuildFactory) addDependency(dependency buildpack.Dependency) {
 		f.Build.Buildpack.Metadata = make(buildpack.Metadata)
 	}
 
-	if _, ok := f.Build.Buildpack.Metadata["dependencies"]; !ok {
-		f.Build.Buildpack.Metadata["dependencies"] = make([]map[string]interface{}, 0)
+	if _, ok := f.Build.Buildpack.Metadata[buildpack.DependenciesMetadata]; !ok {
+		f.Build.Buildpack.Metadata[buildpack.DependenciesMetadata] = make([]map[string]interface{}, 0)
 	}
 
 	metadata := f.Build.Buildpack.Metadata
-	dependencies := metadata["dependencies"].([]map[string]interface{})
+	dependencies := metadata[buildpack.DependenciesMetadata].([]map[string]interface{})
 
 	var stacks []interface{}
 	for _, stack := range dependency.Stacks {
@@ -117,7 +136,7 @@ func (f *BuildFactory) addDependency(dependency buildpack.Dependency) {
 		})
 	}
 
-	metadata["dependencies"] = append(dependencies, map[string]interface{}{
+	metadata[buildpack.DependenciesMetadata] = append(dependencies, map[string]interface{}{
 		"id":       dependency.ID,
 		"name":     dependency.Name,
 		"version":  dependency.Version.Version.Original(),
@@ -159,8 +178,9 @@ func NewBuildFactory(t *testing.T) *BuildFactory {
 	t.Helper()
 
 	root := ScratchDir(t, "build")
+	runner := &Runner{}
 
-	f := BuildFactory{Home: filepath.Join(root, "home"), t: t}
+	f := BuildFactory{Home: filepath.Join(root, "home"), Runner: runner, t: t}
 
 	f.Build.Application.Root = filepath.Join(root, "application")
 	if err := os.MkdirAll(f.Build.Application.Root, 0755); err != nil {
@@ -174,10 +194,9 @@ func NewBuildFactory(t *testing.T) *BuildFactory {
 	}
 	f.Build.Layers = layers.NewLayers(
 		bpLayers.Layers{Root: filepath.Join(root, "layers")},
-		bpLayers.Layers{Root: filepath.Join(root, "buildpack-cache")},
-		f.Build.Buildpack.Info,
-		logger.Logger{})
+		bpLayers.Layers{Root: filepath.Join(root, "buildpack-cache")}, f.Build.Buildpack, logger.Logger{})
 	f.Build.Platform.Root = filepath.Join(root, "platform")
+	f.Build.Runner = runner
 	f.Build.Services = services.Services{Services: bpServices.Services{}}
 	f.Build.Stack = stack.Stack("test-stack")
 

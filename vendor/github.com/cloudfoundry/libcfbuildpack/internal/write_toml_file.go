@@ -30,7 +30,7 @@ func WriteTomlFile(filename string, perm os.FileMode, value interface{}) error {
 		return err
 	}
 
-	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, perm)
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 	if err != nil {
 		return err
 	}

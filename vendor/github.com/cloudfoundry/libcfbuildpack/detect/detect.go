@@ -22,6 +22,7 @@ import (
 	"github.com/buildpack/libbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
+	"github.com/cloudfoundry/libcfbuildpack/runner"
 	"github.com/cloudfoundry/libcfbuildpack/services"
 )
 
@@ -34,6 +35,9 @@ type Detect struct {
 
 	// Logger is used to write debug and info to the console.
 	Logger logger.Logger
+
+	// Runner is used to run commands outside of the process.
+	Runner runner.Runner
 
 	// Services represents the services bound to the application.
 	Services services.Services
@@ -65,6 +69,7 @@ func DefaultDetect() (Detect, error) {
 		d,
 		buildpack,
 		logger,
+		runner.CommandRunner{},
 		services,
 	}, nil
 }

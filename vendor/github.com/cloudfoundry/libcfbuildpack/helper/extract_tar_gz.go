@@ -17,9 +17,7 @@
 package helper
 
 import (
-	"archive/tar"
 	"compress/gzip"
-	"io"
 	"os"
 )
 
@@ -38,38 +36,5 @@ func ExtractTarGz(source string, destination string, stripComponents int) error 
 	}
 	defer gz.Close()
 
-	return extractTar(gz, destination, stripComponents)
-}
-
-func extractTar(source io.Reader, destination string, stripComponents int) error {
-	t := tar.NewReader(source)
-
-	for {
-		f, err := t.Next()
-		if err == io.EOF {
-			break
-		}
-
-		target := strippedPath(f.Name, destination, stripComponents)
-		if target == "" {
-			continue
-		}
-
-		info := f.FileInfo()
-		if info.IsDir() {
-			if err := os.MkdirAll(target, 0755); err != nil {
-				return err
-			}
-		} else if info.Mode()&os.ModeSymlink != 0 {
-			if err := WriteSymlink(f.Linkname, target); err != nil {
-				return err
-			}
-		} else {
-			if err := WriteFileFromReader(target, info.Mode(), t); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return handleTar(gz, destination, stripComponents)
 }

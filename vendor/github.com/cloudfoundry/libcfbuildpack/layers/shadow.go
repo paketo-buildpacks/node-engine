@@ -38,3 +38,7 @@ type Metadata = layers.Metadata
 type Processes = layers.Processes
 
 type Process = layers.Process
+
+type Slices = layers.Slices
+
+type Slice = layers.Slice

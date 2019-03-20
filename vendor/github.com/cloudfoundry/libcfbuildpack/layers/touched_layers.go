@@ -86,9 +86,11 @@ func (t TouchedLayers) candidates() (internal.Set, error) {
 
 	candidates := internal.NewSet()
 
-	launch := filepath.Join(t.Root, "launch.toml")
+	app := filepath.Join(t.Root, "app.toml")
+	launch := filepath.Join(t.Root, "launch.toml") // TODO: Remove once launch.toml removed from lifecycle
+	store := filepath.Join(t.Root, "store.toml")
 	for _, f := range files {
-		if f != launch {
+		if f != app && f != launch && f != store {
 			candidates.Add(f)
 		}
 	}

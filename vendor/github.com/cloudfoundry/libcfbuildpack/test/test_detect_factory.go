@@ -39,6 +39,9 @@ type DetectFactory struct {
 	// Output is the BuildPlan output at termination.
 	Output buildplan.BuildPlan
 
+	// Runner is the used to capture commands executed outside the process.
+	Runner *Runner
+
 	t *testing.T
 }
 
@@ -69,8 +72,9 @@ func NewDetectFactory(t *testing.T) *DetectFactory {
 	t.Helper()
 
 	root := ScratchDir(t, "detect")
+	runner := &Runner{}
 
-	f := DetectFactory{Home: filepath.Join(root, "home"), t: t}
+	f := DetectFactory{Home: filepath.Join(root, "home"), Runner: runner, t: t}
 
 	f.Detect.Application.Root = filepath.Join(root, "application")
 	if err := os.MkdirAll(f.Detect.Application.Root, 0755); err != nil {
@@ -83,6 +87,7 @@ func NewDetectFactory(t *testing.T) *DetectFactory {
 		return nil
 	}
 	f.Detect.Platform.Root = filepath.Join(root, "platform")
+	f.Detect.Runner = runner
 	f.Detect.Services = services.Services{Services: bp.Services{}}
 	f.Detect.Stack = stack.Stack("test-stack")
 

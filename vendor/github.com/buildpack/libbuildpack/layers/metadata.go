@@ -24,9 +24,12 @@ import (
 type Metadata struct {
 	// Processes is a collection of processes.
 	Processes Processes `toml:"processes"`
+
+	// Slices is a collection of slices.
+	Slices Slices `toml:"slices"`
 }
 
 // String makes Metadata satisfy the Stringer interface.
 func (m Metadata) String() string {
-	return fmt.Sprintf("Metadata{ Processes: %s }", m.Processes)
+	return fmt.Sprintf("Metadata{ Processes: %s, Slices: %s }", m.Processes, m.Slices)
 }

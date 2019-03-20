@@ -4,6 +4,19 @@ id = "org.cloudfoundry.buildpacks.nodejs"
 name = "Node.js Buildpack"
 version = "0.0.4"
 
+[metadata.default_versions]
+node = "6.16.0"
+
+[metadata]
+    include_files = [
+        "bin/build",
+        "bin/detect",
+        "buildpack.toml",
+        "go.mod",
+        "go.sum",
+    ]
+    pre_package = "./scripts/build.sh"
+
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
@@ -127,7 +140,7 @@ version = "9.11.1"
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
-sha256 = "166cc28bd9c8217c533b2921edd5e980b14f1d670d828e9d40c1d5b37f51496d"
+sha256 = "bbb46f86c64abe96ee98faa733424fc76f20a38d12f59bdcd60057efa5f1ce89"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v9.11.2/node-v9.11.2-linux-x64.tar.gz"
 version = "9.11.2"

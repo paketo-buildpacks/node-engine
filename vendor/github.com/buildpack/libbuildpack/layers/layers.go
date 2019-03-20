@@ -43,12 +43,33 @@ func (l Layers) String() string {
 	return fmt.Sprintf("Layers{ Root: %s, logger: %s }", l.Root, l.logger)
 }
 
-// WriteMetadata writes launch metadata to the filesystem.
-func (l Layers) WriteMetadata(metadata Metadata) error {
-	f := filepath.Join(l.Root, "launch.toml")
+// WriteApplicationMetadata writes application metadata to the filesystem.
+func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
+	f := filepath.Join(l.Root, "launch.toml") // TODO: Remove once launch.toml removed from lifecycle
 
-	l.logger.Debug("Writing launch metadata: %s <= %s", f, metadata)
+	l.logger.Debug("Writing application metadata: %s <= %s", f, metadata)
+	if err := internal.WriteTomlFile(f, 0644, metadata); err != nil {
+		return err
+	}
+
+	f = filepath.Join(l.Root, "app.toml")
+
+	l.logger.Debug("Writing application metadata: %s <= %s", f, metadata)
 	return internal.WriteTomlFile(f, 0644, metadata)
+}
+
+// WritePersistentMetadata writes persistent metadata to the filesystem.
+func (l Layers) WritePersistentMetadata(metadata interface{}) error {
+	f := filepath.Join(l.Root, "store.toml")
+
+	pm := persistentMetadata{Metadata: metadata}
+
+	l.logger.Debug("Writing persistent metadata: %s <= %s", f, pm)
+	return internal.WriteTomlFile(f, 0644, pm)
+}
+
+type persistentMetadata struct {
+	Metadata interface{} `toml:"metadata"`
 }
 
 // NewLayers creates a new Logger instance.

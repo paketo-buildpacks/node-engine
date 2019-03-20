@@ -1,45 +1,39 @@
 package node
 
 import (
-	"encoding/json"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/layers"
-	"os"
 )
 
 const Dependency = "node"
 
-type packageJSON struct {
-	Engines engines `json:"engines"`
+type Config struct {
+	OptimizeMemory bool `yaml:"optimize-memory"`
 }
 
-type engines struct {
-	Node string `json:"node"`
-}
-
-func GetVersion(packageFile string) (version string, err error) {
-	file, err := os.Open(packageFile)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	pkgJSON := packageJSON{}
-	if err := json.NewDecoder(file).Decode(&pkgJSON); err != nil {
-		return "", err
-	}
-
-	return pkgJSON.Engines.Node, nil
+type BuildpackYAML struct {
+	Config Config `yaml:"nodejs"`
 }
 
 type Contributor struct {
+	BuildpackYAML      BuildpackYAML
 	buildContribution  bool
 	launchContribution bool
 	layer              layers.DependencyLayer
 }
 
 func NewContributor(context build.Build) (Contributor, bool, error) {
+	buildpackYAML, err := LoadBuildpackYAML(context.Application.Root)
+	if err != nil {
+		return Contributor{}, false, err
+	}
+
 	plan, wantDependency := context.BuildPlan[Dependency]
 	if !wantDependency {
 		return Contributor{}, false, nil
@@ -50,12 +44,19 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 		return Contributor{}, false, err
 	}
 
-	dep, err := deps.Best(Dependency, plan.Version, context.Stack)
+	version := plan.Version
+	if version == "" {
+		if version, err = context.Buildpack.DefaultVersion(Dependency); err != nil {
+			return Contributor{}, false, err
+		}
+	}
+
+	dep, err := deps.Best(Dependency, version, context.Stack)
 	if err != nil {
 		return Contributor{}, false, err
 	}
 
-	contributor := Contributor{layer: context.Layers.DependencyLayer(dep)}
+	contributor := Contributor{layer: context.Layers.DependencyLayer(dep), BuildpackYAML: buildpackYAML}
 
 	if _, ok := plan.Metadata["build"]; ok {
 		contributor.buildContribution = true
@@ -68,8 +69,8 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 	return contributor, true, nil
 }
 
-func (n Contributor) Contribute() error {
-	return n.layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
+func (c Contributor) Contribute() error {
+	return c.layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
 		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
 		if err := helper.ExtractTarGz(artifact, layer.Root, 1); err != nil {
 			return err
@@ -107,20 +108,69 @@ func (n Contributor) Contribute() error {
 			return err
 		}
 
+		if err := layer.WriteProfile("0_memory_available.sh", memoryAvailable()); err != nil {
+			return err
+		}
+
+		if c.BuildpackYAML.Config.OptimizeMemory || os.Getenv("OPTIMIZE_MEMORY") == "true" {
+			if err := layer.WriteProfile("1_optimize_memory.sh", `export NODE_OPTIONS="--max_old_space_size=$(( $MEMORY_AVAILABLE * 75 / 100 ))"`); err != nil {
+				return err
+			}
+		}
+
 		return nil
-	}, n.flags()...)
+	}, c.flags()...)
 }
 
-func (n Contributor) flags() []layers.Flag {
+func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
+	buildpackYAML, configFile := BuildpackYAML{}, filepath.Join(appRoot, "buildpack.yml")
+
+	if exists, err := helper.FileExists(configFile); err != nil {
+		return BuildpackYAML{}, err
+	} else if exists {
+		file, err := os.Open(configFile)
+		if err != nil {
+			return BuildpackYAML{}, err
+		}
+		defer file.Close()
+
+		contents, err := ioutil.ReadAll(file)
+		if err != nil {
+			return BuildpackYAML{}, err
+		}
+
+		err = yaml.Unmarshal(contents, &buildpackYAML)
+		if err != nil {
+			return BuildpackYAML{}, err
+		}
+	}
+	return buildpackYAML, nil
+}
+
+func (c Contributor) flags() []layers.Flag {
 	flags := []layers.Flag{layers.Cache}
 
-	if n.buildContribution {
+	if c.buildContribution {
 		flags = append(flags, layers.Build)
 	}
 
-	if n.launchContribution {
+	if c.launchContribution {
 		flags = append(flags, layers.Launch)
 	}
 
 	return flags
+}
+
+func memoryAvailable() string {
+	return `which jq
+if [[ $? -eq 0 ]]; then
+	MEMORY_AVAILABLE="$(echo $VCAP_APPLICATION | jq .limits.mem)"
+fi
+
+if [[ -z "$MEMORY_AVAILABLE" ]]; then
+	memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
+	MEMORY_AVAILABLE="$(( $memory_in_bytes / ( 1024 * 1024 ) ))"
+fi
+export MEMORY_AVAILABLE
+`
 }

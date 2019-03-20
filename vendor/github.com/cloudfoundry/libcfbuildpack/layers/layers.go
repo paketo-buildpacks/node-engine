@@ -18,6 +18,7 @@ package layers
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/buildpack/libbuildpack/layers"
@@ -36,8 +37,8 @@ type Layers struct {
 	// TouchedLayers registers the layers that have been touched during this execution.
 	TouchedLayers TouchedLayers
 
+	buildpack      buildpack.Buildpack
 	buildpackCache layers.Layers
-	info           buildpack.Info
 	logger         logger.Logger
 }
 
@@ -58,7 +59,19 @@ func (l Layers) DownloadLayer(dependency buildpack.Dependency) DownloadLayer {
 		l.Layer(dependency.SHA256),
 		Layer{l.buildpackCache.Layer(dependency.SHA256), l.logger, l.TouchedLayers},
 		dependency,
-		l.info,
+		l.buildpack.Info,
+		l.logger,
+	}
+}
+
+// HelperLayer returns a HelperLayer unique to a buildpack provided dependency.
+func (l Layers) HelperLayer(id string, name string) HelperLayer {
+	return HelperLayer{
+		l.Layer(id),
+		id,
+		l.buildpack,
+		l.DependencyBuildPlans,
+		name,
 		l.logger,
 	}
 }
@@ -70,27 +83,44 @@ func (l Layers) Layer(name string) Layer {
 
 // String makes Layers satisfy the Stringer interface.
 func (l Layers) String() string {
-	return fmt.Sprintf("Layers{ Layers: %s, DependencyBuildPlans: %s, TouchedLayers: %s, buildpackCache: %s, info :%s, logger: %s }",
-		l.Layers, l.DependencyBuildPlans, l.TouchedLayers, l.buildpackCache, l.info, l.logger)
+	return fmt.Sprintf("Layers{ Layers: %s, DependencyBuildPlans: %s, TouchedLayers: %s, buildpack: %s, buildpackCache: %s, logger: %s }",
+		l.Layers, l.DependencyBuildPlans, l.TouchedLayers, l.buildpack, l.buildpackCache, l.logger)
 }
 
-// WriteMetadata writes Launch metadata to the filesystem.
-func (l Layers) WriteMetadata(metadata Metadata) error {
-	l.logger.FirstLine("Process types:")
-
-	max := l.maximumTypeLength(metadata)
-	for _, p := range metadata.Processes {
-		format := fmt.Sprintf("%%s:%%-%ds %%s", max-len(p.Type))
-		l.logger.SubsequentLine(format, color.CyanString(p.Type), "", p.Command)
+// WriteApplicationMetadata writes application metadata to the filesystem.
+func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
+	if len(metadata.Slices) > 0 {
+		l.logger.FirstLine("%d application slices", len(metadata.Slices))
 	}
 
-	return l.Layers.WriteMetadata(metadata)
+	if len(metadata.Processes) > 0 {
+		l.logger.FirstLine("Process types:")
+
+		p := metadata.Processes
+		sort.Slice(p, func(i int, j int) bool {
+			return p[i].Type < p[j].Type
+		})
+
+		max := l.maximumTypeLength(p)
+		for _, p := range p {
+			format := fmt.Sprintf("%%s:%%-%ds %%s", max-len(p.Type))
+			l.logger.SubsequentLine(format, color.CyanString(p.Type), "", p.Command)
+		}
+	}
+
+	return l.Layers.WriteApplicationMetadata(metadata)
 }
 
-func (l Layers) maximumTypeLength(metadata Metadata) int {
+// WritePersistentMetadata writes persistent metadata to the filesystem.
+func (l Layers) WritePersistentMetadata(metadata interface{}) error {
+	l.logger.SubsequentLine("Writing persistent metadata")
+	return l.Layers.WritePersistentMetadata(metadata)
+}
+
+func (l Layers) maximumTypeLength(processes Processes) int {
 	max := 0
 
-	for _, t := range metadata.Processes {
+	for _, t := range processes {
 		if l := len(t.Type); l > max {
 			max = l
 		}
@@ -100,13 +130,13 @@ func (l Layers) maximumTypeLength(metadata Metadata) int {
 }
 
 // NewLayers creates a new instance of Layers.
-func NewLayers(layers layers.Layers, buildpackCache layers.Layers, info buildpack.Info, logger logger.Logger) Layers {
+func NewLayers(layers layers.Layers, buildpackCache layers.Layers, buildpack buildpack.Buildpack, logger logger.Logger) Layers {
 	return Layers{
 		Layers:               layers,
 		DependencyBuildPlans: make(buildplan.BuildPlan),
 		TouchedLayers:        NewTouchedLayers(layers.Root, logger),
+		buildpack:            buildpack,
 		buildpackCache:       buildpackCache,
-		info:                 info,
 		logger:               logger,
 	}
 }

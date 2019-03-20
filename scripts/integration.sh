@@ -21,7 +21,7 @@ docker pull $CNB_RUN_IMAGE
 
 echo "Run Buildpack Runtime Integration Tests"
 set +e
-go test ./integration/... -v -run Integration
+go test ./integration/... -timeout 0 -v -run Integration
 exit_code=$?
 
 if [ "$exit_code" != "0" ]; then

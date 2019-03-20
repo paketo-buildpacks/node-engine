@@ -19,6 +19,7 @@ package buildpack
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/Masterminds/semver"
 	"github.com/buildpack/libbuildpack/stack"
@@ -50,7 +51,7 @@ func (d Dependencies) Best(id string, versionConstraint string, stack stack.Stac
 	}
 
 	if len(candidates) == 0 {
-		return Dependency{}, fmt.Errorf("no valid dependencies for %s, %s, and %s in %s", id, vc, stack, d)
+		return Dependency{}, fmt.Errorf("no valid dependencies for %s, %s, and %s in [%s]", id, vc, stack, d.candidateMessage())
 	}
 
 	sort.Slice(candidates, func(i int, j int) bool {
@@ -70,4 +71,14 @@ func (d Dependencies) Has(id string) bool {
 	}
 
 	return false
+}
+
+func (d Dependencies) candidateMessage() string {
+	var s []string
+
+	for _, c := range d {
+		s = append(s, fmt.Sprintf("(%s, %s, %s)", c.ID, c.Version.Original(), c.Stacks))
+	}
+
+	return strings.Join(s, ", ")
 }
