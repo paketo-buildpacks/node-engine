@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/nodejs-cnb/node"
 	"github.com/cloudfoundry/nodejs-cnb/nvmrc"
-	"os"
-	"path/filepath"
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/detect"
