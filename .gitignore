@@ -3,4 +3,4 @@
 .idea
 .bin
 nodejs-cnb_*
-bin/
+/bin
