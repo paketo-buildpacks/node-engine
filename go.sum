@@ -6,12 +6,8 @@ github.com/buildpack/libbuildpack v1.10.0 h1:xwgXTulLRU2zCFbYy35azMsHOjy8uQVyw9x
 github.com/buildpack/libbuildpack v1.10.0/go.mod h1:5YC4KNbppjwmsX561s0rS+4rtuJA++AnzUvcKc6lexc=
 github.com/buildpack/libbuildpack v1.11.0 h1:yIjsdJuQaTspDE/6wjkUX4OF56YRtMHajbARQLmm8KU=
 github.com/buildpack/libbuildpack v1.11.0/go.mod h1:tKGgGnBYfOL23Ma4JWM8ucBcGX6Im3p1WTmKPixDPPM=
-github.com/cloudfoundry/cnb-tools v0.0.0-20190219172305-154ea1cc62b2 h1:28ef8Q5X8QmcGGXVcp1MyBtyV6kzKChnhEuyXRUiyr4=
-github.com/cloudfoundry/cnb-tools v0.0.0-20190219172305-154ea1cc62b2/go.mod h1:4/XXo++Se0dkBKJIHUJcQBQqwZsSiEmUxd84Su8ER3E=
 github.com/cloudfoundry/dagger v0.0.0-20190306213529-d3f6c0c3a285 h1:fhUbEDvAP8ZMuUpP7Jk+F4acK0H3PuPlhyHRlEQMgnE=
 github.com/cloudfoundry/dagger v0.0.0-20190306213529-d3f6c0c3a285/go.mod h1:+csOcW7GEqDwsV/MxLuXL0qVIgzjm6lbUbP2JXe5R8c=
-github.com/cloudfoundry/libcfbuildpack v1.42.0 h1:vHVF9t0Px4p0WsgCG2EkUTTyXxI3QgE95O+hMKUq7z0=
-github.com/cloudfoundry/libcfbuildpack v1.42.0/go.mod h1:C2AOm63Ca1GIBP7NdVhd8Q2gKenz600PVWqtOAbrN4o=
 github.com/cloudfoundry/libcfbuildpack v1.44.0/go.mod h1:C2AOm63Ca1GIBP7NdVhd8Q2gKenz600PVWqtOAbrN4o=
 github.com/cloudfoundry/libcfbuildpack v1.48.0 h1:VfEqThOWrYZrpvFKeNdhbjUs0fP5bvCXAfxuS33JMoQ=
 github.com/cloudfoundry/libcfbuildpack v1.48.0/go.mod h1:Dq7Sg12rmsfJld22pGTvHRKHNGBfauXqgIzcPrPGbD4=
@@ -21,6 +17,7 @@ github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/golang/protobuf v1.3.0 h1:kbxbvI4Un1LUWKxufD+BiE6AEExYYgkQLQmLFqA1LFk=
 github.com/golang/protobuf v1.3.0/go.mod h1:Qd/q+1AKNOZr9uGQzbzCmRO6sUih6GTPZv6a1/R87v0=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
