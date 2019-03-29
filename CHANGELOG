@@ -1,3 +1,9 @@
+v0.0.6 Mar 29, 2019
+====================
+
+* Change go build output dir to conform to pack spec
+
+
 v0.0.5 Mar 29, 2019
 ====================
 
