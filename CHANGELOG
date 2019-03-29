@@ -1,3 +1,38 @@
+v0.0.5 Mar 29, 2019
+====================
+
+* Fix node_modules in optimize_memory app
+
+* remove node 9.X.X dependencies
+
+* Add node 11.13.0, remove node 11.8.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164970456)
+  (https://www.pivotaltracker.com/story/show/164443683)
+  (https://www.pivotaltracker.com/story/show/163995835)
+
+* Add node 11.12.0, remove node 11.9.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164675145)
+  (https://www.pivotaltracker.com/story/show/164301719)
+
+* Add node 10.15.3, remove node 10.15.1
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164408746)
+
+* Add node 10.15.2
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164301704)
+
+* Add node 8.15.1, remove node 8.14.1
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164301709)
+
+* Add node 6.17.0, remove node 6.15.1
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs2, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/164301707)
+
+
 v0.0.4 Feb 13, 2019
 ====================
 

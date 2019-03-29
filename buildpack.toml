@@ -2,20 +2,14 @@
 [buildpack]
 id = "org.cloudfoundry.buildpacks.nodejs"
 name = "Node.js Buildpack"
-version = "0.0.4"
+version = "0.0.5"
+
+[metadata]
+include_files = ["bin/cmd/build","bin/cmd/detect","buildpack.toml","go.mod","go.sum"]
+pre_package = "./scripts/build.sh"
 
 [metadata.default_versions]
 node = "6.16.0"
-
-[metadata]
-    include_files = [
-        "bin/cmd/build",
-        "bin/cmd/detect",
-        "buildpack.toml",
-        "go.mod",
-        "go.sum",
-    ]
-    pre_package = "./scripts/build.sh"
 
 [[metadata.dependencies]]
 id = "node"
