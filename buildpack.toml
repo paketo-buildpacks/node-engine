@@ -126,18 +126,18 @@ version = "11.13.0"
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
-sha256 = "0d5c078137c992a919898c8fda7e5af40118f355bb938fccfd5aecddaf2dc123"
+sha256 = "98bd18051cbdb39bbcda1ab169ca3fd3935d87e9cfc36e1b6fd6f609d46856bb"
 stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v11.14.0/node-v11.14.0-linux-x64.tar.gz"
-version = "11.14.0"
+uri = "https://nodejs.org/dist/v11.15.0/node-v11.15.0-linux-x64.tar.gz"
+version = "11.15.0"
 
 [[metadata.dependencies]]
 id = "node"
 name = "NodeJS"
-sha256 = "c352f13e9701b052e88b5241af1d89e928d900cdf2cd470607e53da3fb0a854d"
+sha256 = "e3bda126d878f78e4371dcbfe33a2f621b353e4075f938a15bd0f2169659146e"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-11.14.0-linux-x64-cflinuxfs3-c352f13e.tgz"
-version = "11.14.0"
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-11.15.0-linux-x64-cflinuxfs3-e3bda126.tgz"
+version = "11.15.0"
 
 [[metadata.dependencies]]
 id = "node"
