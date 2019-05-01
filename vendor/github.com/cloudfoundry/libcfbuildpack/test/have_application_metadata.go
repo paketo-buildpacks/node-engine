@@ -38,25 +38,32 @@ type haveApplicationMetadataMatcher struct {
 }
 
 func (m *haveApplicationMetadataMatcher) Match(actual interface{}) (bool, error) {
-	path, err := m.path(actual)
+	metadata, err := m.getMetadata(actual)
 	if err != nil {
 		return false, err
-	}
-
-	var metadata layers.Metadata
-	if _, err := toml.DecodeFile(path, &metadata); err != nil {
-		return false, fmt.Errorf("failed to decode file: %s", err.Error())
 	}
 
 	return reflect.DeepEqual(metadata, m.expected), nil
 }
 
 func (m *haveApplicationMetadataMatcher) FailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nto have application metadata\n\t%#v", actual, m.expected)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf("Expected\n\t%#v\nto have application metadata\n\t%#v\n"+
+		"but found\n\t%#v\n", actual, m.expected, actualMetadata)
 }
 
 func (m *haveApplicationMetadataMatcher) NegatedFailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nnot to have application metadata\n\t%#v", actual, m.expected)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf("Expected\n\t%#v\nnot to have application metadata\n\t%#v\n"+
+		"but found\n\t%#v\n", actual, m.expected, actualMetadata)
 }
 
 func (m *haveApplicationMetadataMatcher) path(actual interface{}) (string, error) {
@@ -66,4 +73,18 @@ func (m *haveApplicationMetadataMatcher) path(actual interface{}) (string, error
 	}
 
 	return filepath.Join(v.Interface().(string), "app.toml"), nil
+}
+
+func (m *haveApplicationMetadataMatcher) getMetadata(actual interface{}) (layers.Metadata, error) {
+	path, err := m.path(actual)
+	if err != nil {
+		return layers.Metadata{}, err
+	}
+
+	var metadata layers.Metadata
+	if _, err := toml.DecodeFile(path, &metadata); err != nil {
+		return layers.Metadata{}, fmt.Errorf("failed to decode file: %s", err.Error())
+	}
+
+	return metadata, nil
 }

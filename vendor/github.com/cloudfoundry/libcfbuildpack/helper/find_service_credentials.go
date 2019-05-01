@@ -38,7 +38,7 @@ func FindServiceCredentials(filter string, credentials ...string) (Credentials, 
 		return nil, false, err
 	}
 
-	var match []service
+	match := make([]service, 0)
 	for _, s := range services {
 		if matchesService(s, filter) && matchesCredentials(s, credentials) {
 			match = append(match, s)

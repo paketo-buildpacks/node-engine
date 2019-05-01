@@ -18,6 +18,7 @@ package buildpack
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -49,10 +50,27 @@ func (b Buildpack) String() string {
 		b.Info, b.Metadata, b.Root, b.Stacks, b.logger)
 }
 
+// New creates an instance of Buildpack given a root dir and a logger extracting the contents of the buildpack.toml file in the root
+// of the buildpack.
+func New(rootDir string, logger logger.Logger) (Buildpack, error) {
+	f, err := ioutil.ReadFile(filepath.Join(rootDir, "buildpack.toml"))
+	if err != nil {
+		return Buildpack{}, fmt.Errorf("could not find buildpack.toml in the directory %s", rootDir)
+	}
+
+	b := Buildpack{Root: rootDir, logger: logger}
+	if err := toml.Unmarshal(f, &b); err != nil {
+		return Buildpack{}, err
+	}
+
+	logger.Debug("Buildpack: %s", b)
+	return b, nil
+}
+
 // DefaultBuildpack creates a new instance of Buildpack extracting the contents of the buildpack.toml file in the root
 // of the buildpack.
 func DefaultBuildpack(logger logger.Logger) (Buildpack, error) {
-	f, err := findBuildpackToml()
+	f, err := findBuildpackTOML()
 	if err != nil {
 		return Buildpack{}, err
 	}
@@ -73,7 +91,7 @@ func DefaultBuildpack(logger logger.Logger) (Buildpack, error) {
 	return b, nil
 }
 
-func findBuildpackToml() (string, error) {
+func findBuildpackTOML() (string, error) {
 	path, err := internal.Argument(0)
 	if err != nil {
 		return "", err

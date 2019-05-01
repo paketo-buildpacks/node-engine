@@ -16,29 +16,7 @@
 
 package services
 
-import (
-	"encoding/json"
-	"sort"
-)
-
-// Credentials is the collection of credential keys.
-//
-// In order to encourage good design, this does not include the values even though they exist.  Buildpacks should
-// only extract values at startup/runtime and not embed them in image.
-type Credentials []string
-
-// UnmarshalJSON makes Credentials satisfy the json.Unmarshaler interface.
-func (c *Credentials) UnmarshalJSON(text []byte) error {
-	var in map[string]interface{}
-
-	if err := json.Unmarshal(text, &in); err != nil {
-		return err
-	}
-
-	for key, _ := range in {
-		*c = append(*c, key)
-	}
-
-	sort.Strings(*c)
-	return nil
-}
+// Credentials is the collection of credentials available exposed by a service.
+// Great care should be used when handling credentials, as they expose sensitive information.
+// Buildpacks should only extract values at startup/runtime and not embed them in the image.
+type Credentials map[string]interface{}

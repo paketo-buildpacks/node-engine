@@ -40,14 +40,9 @@ type haveLayerMetadataMatcher struct {
 }
 
 func (m *haveLayerMetadataMatcher) Match(actual interface{}) (bool, error) {
-	path, err := m.path(actual)
+	metadata, err := m.getMetadata(actual)
 	if err != nil {
 		return false, err
-	}
-
-	var metadata map[string]interface{}
-	if _, err := toml.DecodeFile(path, &metadata); err != nil {
-		return false, fmt.Errorf("failed to decode file: %s", err.Error())
 	}
 
 	if metadata["build"].(bool) != m.build {
@@ -66,13 +61,29 @@ func (m *haveLayerMetadataMatcher) Match(actual interface{}) (bool, error) {
 }
 
 func (m *haveLayerMetadataMatcher) FailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nto have layer metadata\n\tbuild: %t, cache: %t, launch: %t",
-		actual, m.build, m.cache, m.launch)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf(
+		"Expected\n\t%#v\nto have layer metadata\n\tbuild: %t, cache: %t, launch: %t\n"+
+			"but found\n\tbuild: %t, cache: %t, launch: %t\n",
+		actual, m.build, m.cache, m.launch,
+		actualMetadata["build"], actualMetadata["cache"], actualMetadata["launch"])
 }
 
 func (m *haveLayerMetadataMatcher) NegatedFailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nnot to have layer metadata\n\tbuild: %t, cache: %t, launch: %t",
-		actual, m.build, m.cache, m.launch)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf(
+		"Expected\n\t%#v\nnot to have layer metadata\n\tbuild: %t, cache: %t, launch: %t\n"+
+			"but found\n\tbuild: %t, cache: %t, launch: %t\n",
+		actual, m.build, m.cache, m.launch,
+		actualMetadata["build"], actualMetadata["cache"], actualMetadata["launch"])
 }
 
 func (m *haveLayerMetadataMatcher) path(actual interface{}) (string, error) {
@@ -82,4 +93,18 @@ func (m *haveLayerMetadataMatcher) path(actual interface{}) (string, error) {
 	}
 
 	return v.Interface().(string), nil
+}
+
+func (m *haveLayerMetadataMatcher) getMetadata(actual interface{}) (map[string]interface{}, error) {
+	path, err := m.path(actual)
+	if err != nil {
+		return nil, err
+	}
+
+	var metadata map[string]interface{}
+	if _, err := toml.DecodeFile(path, &metadata); err != nil {
+		return nil, fmt.Errorf("failed to decode file: %s", err.Error())
+	}
+
+	return metadata, nil
 }

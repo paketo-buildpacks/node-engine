@@ -37,23 +37,9 @@ type havePersistentMetadataMatcher struct {
 }
 
 func (m *havePersistentMetadataMatcher) Match(actual interface{}) (bool, error) {
-	path, err := m.path(actual)
+	metadata, err := m.getMetadata(actual)
 	if err != nil {
 		return false, err
-	}
-
-	in := struct {
-		Metadata toml.Primitive `toml:"metadata"`
-	}{}
-
-	md, err := toml.DecodeFile(path, &in)
-	if err != nil {
-		return false, fmt.Errorf("failed to decode file: %s", err.Error())
-	}
-
-	metadata := reflect.New(reflect.TypeOf(m.expected)).Interface()
-	if err := md.PrimitiveDecode(in.Metadata, metadata); err != nil {
-		return false, fmt.Errorf("failed to decode: %s", err.Error())
 	}
 
 	e2 := reflect.New(reflect.TypeOf(m.expected))
@@ -63,11 +49,27 @@ func (m *havePersistentMetadataMatcher) Match(actual interface{}) (bool, error) 
 }
 
 func (m *havePersistentMetadataMatcher) FailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nto have persistent metadata\n\t%#v", actual, m.expected)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf(
+		"Expected\n\t%#v\nto have persistent metadata\n\t%#v\n"+
+			"but found\n\t%#v\n",
+		actual, m.expected, actualMetadata)
 }
 
 func (m *havePersistentMetadataMatcher) NegatedFailureMessage(actual interface{}) string {
-	return fmt.Sprintf("Expected\n\t%#v\nnot to have persistent metadata\n\t%#v", actual, m.expected)
+	actualMetadata, err := m.getMetadata(actual)
+	if err != nil {
+		return err.Error()
+	}
+
+	return fmt.Sprintf(
+		"Expected\n\t%#v\nnot to have persistent metadata\n\t%#v\n"+
+			"but found\n\t%#v\n",
+		actual, m.expected, actualMetadata)
 }
 
 func (m *havePersistentMetadataMatcher) path(actual interface{}) (string, error) {
@@ -77,4 +79,27 @@ func (m *havePersistentMetadataMatcher) path(actual interface{}) (string, error)
 	}
 
 	return filepath.Join(v.Interface().(string), "store.toml"), nil
+}
+
+func (m *havePersistentMetadataMatcher) getMetadata(actual interface{}) (interface{}, error) {
+	path, err := m.path(actual)
+	if err != nil {
+		return nil, err
+	}
+
+	in := struct {
+		Metadata toml.Primitive `toml:"metadata"`
+	}{}
+
+	md, err := toml.DecodeFile(path, &in)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode file: %s", err.Error())
+	}
+
+	metadata := reflect.New(reflect.TypeOf(m.expected)).Interface()
+	if err := md.PrimitiveDecode(in.Metadata, metadata); err != nil {
+		return nil, fmt.Errorf("failed to decode: %s", err.Error())
+	}
+
+	return metadata, nil
 }

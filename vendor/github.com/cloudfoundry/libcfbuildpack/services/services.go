@@ -27,6 +27,29 @@ type Services struct {
 	services.Services
 }
 
+// FindServiceCredentials returns the credentials payload for given service.  The selected service is one who's
+// BindingName, InstanceName, Label, or Tags contain the filter and has the required credentials.  Returns the
+// credentials and true if exactly one service is matched, otherwise false.
+//
+// NOTE: This function should ONLY be used to extract values that are CONSTANT throughout the lifecycle of a staged
+// application.  Typically this means you should only use this function to get agent download information from Service
+// Brokers and SHOULD NOT EVER retrieve and use connection credentials.
+func (s Services) FindServiceCredentials(filter string, credentials ...string) (Credentials, bool) {
+	match := make([]Service, 0)
+
+	for _, c := range s.Services {
+		if s.matchesService(c, filter) && s.matchesCredentials(c, credentials) {
+			match = append(match, c)
+		}
+	}
+
+	if len(match) != 1 {
+		return nil, false
+	}
+
+	return match[0].Credentials, true
+}
+
 // HasService determines whether a single service, who's BindingName, InstanceName, Label, or Tags contain the filter
 // and has the required credentials, exists.  Returns true if exactly one service is matched, false otherwise.
 func (s Services) HasService(filter string, credentials ...string) bool {
@@ -62,7 +85,12 @@ func (Services) matchesBindingName(service Service, filter string) bool {
 }
 
 func (s Services) matchesCredentials(service Service, credentials []string) bool {
-	candidates := service.Credentials
+	cr := service.Credentials
+
+	candidates := make([]string, 0, len(cr))
+	for k := range cr {
+		candidates = append(candidates, k)
+	}
 
 	for _, c := range credentials {
 		if !s.any(s.equality, c, candidates) {
