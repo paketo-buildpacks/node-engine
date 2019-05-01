@@ -28,7 +28,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		runDetectAndExpectBuildplan(f, buildplan.BuildPlan{})
 	})
 
-	when("there is an .nvmrc", func () {
+	when("there is an .nvmrc", func() {
 		it("should request the node version in the .nvmrc file", func() {
 			f := test.NewDetectFactory(t)
 

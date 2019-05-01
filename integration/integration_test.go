@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -12,26 +13,30 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var (
+	bp, npmBP string
+)
+
 func TestIntegration(t *testing.T) {
+	RegisterTestingT(t)
+	root, err := dagger.FindBPRoot()
+	Expect(err).ToNot(HaveOccurred())
+	bp, err = dagger.PackageBuildpack(root)
+	Expect(err).NotTo(HaveOccurred())
+	npmBP, err = dagger.GetLatestBuildpack("npm-cnb")
+	Expect(err).ToNot(HaveOccurred())
+	defer func() {
+		os.RemoveAll(bp)
+		os.RemoveAll(npmBP)
+	}()
+
 	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
+
 }
 
-func testIntegration(t *testing.T, when spec.G, it spec.S) {
-	var (
-		bp    string
-		npmBP string
-	)
-
+func testIntegration(t *testing.T, _ spec.G, it spec.S) {
 	it.Before(func() {
 		RegisterTestingT(t)
-
-		var err error
-
-		bp, err = dagger.PackageBuildpack() // TODO can this return an absolute path?
-		Expect(err).ToNot(HaveOccurred())
-
-		npmBP, err = dagger.GetLatestBuildpack("npm-cnb")
-		Expect(err).ToNot(HaveOccurred())
 	})
 
 	it("sets max_old_space_size when nodejs.optimize-memory is set in buildpack.yml", func() {

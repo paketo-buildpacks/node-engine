@@ -82,7 +82,7 @@ export MEMORY_AVAILABLE
 			Expect(layer).To(test.HaveProfile("0_memory_available.sh", memoryAvailableProfile))
 		})
 
-		it("uses the default version when a version is not requested", func(){
+		it("uses the default version when a version is not requested", func() {
 			f.AddDependencyWithVersion(node.Dependency, "0.9", filepath.Join("testdata", "stub-node-default.tar.gz"))
 			f.SetDefaultVersion(node.Dependency, "0.9")
 			f.AddBuildPlan(node.Dependency, buildplan.Dependency{})
