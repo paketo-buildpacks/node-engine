@@ -157,7 +157,7 @@ func (f *BuildFactory) cacheFixture(dependency buildpack.Dependency, fixturePath
 	f.t.Helper()
 
 	l := f.Build.Layers.Layer(dependency.SHA256)
-	if err := helper.CopyFile(fixturePath, filepath.Join(l.Root, dependency.Name)); err != nil {
+	if err := helper.CopyFile(fixturePath, filepath.Join(l.Root, filepath.Base(fixturePath))); err != nil {
 		f.t.Fatal(err)
 	}
 
