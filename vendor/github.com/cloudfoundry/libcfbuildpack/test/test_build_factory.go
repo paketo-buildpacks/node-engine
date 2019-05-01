@@ -74,12 +74,18 @@ func (f *BuildFactory) AddDependency(id string, fixturePath string) {
 
 // AddDependencyWithVersion adds a dependency to the buildpack metadata and copies a fixture into a cached dependency
 // layer
-func (f *BuildFactory) AddDependencyWithVersion(id string, version string, fixturePath string) {
+func (f *BuildFactory) AddDependencyWithDependency(dependency buildpack.Dependency, fixturePath string) {
 	f.t.Helper()
 
-	d := f.newDependency(id, version, filepath.Base(fixturePath))
-	f.cacheFixture(d, fixturePath)
-	f.addDependency(d)
+	f.cacheFixture(dependency, fixturePath)
+	f.addDependency(dependency)
+}
+
+// AddDependencyWithVersion adds a dependency to the buildpack metadata and copies a fixture into a cached dependency
+// layer
+func (f *BuildFactory) AddDependencyWithVersion(id string, version string, fixturePath string) {
+	f.t.Helper()
+	f.AddDependencyWithDependency(f.newDependency(id, version, filepath.Base(fixturePath)), fixturePath)
 }
 
 // SetDefaultVersion sets a default dependency version in the buildpack metadata
