@@ -2,7 +2,7 @@
 [buildpack]
 id = "org.cloudfoundry.buildpacks.nodejs"
 name = "Node.js Buildpack"
-version = "0.0.7"
+version = "0.0.8"
 
 [metadata]
 include_files = ["bin/build","bin/detect","buildpack.toml","go.mod","go.sum"]
