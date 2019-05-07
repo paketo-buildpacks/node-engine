@@ -47,13 +47,16 @@ func FindBPRoot() (string, error) {
 }
 
 func PackageBuildpack(root string) (string, error) {
-	bp := fmt.Sprintf("%s_%s", root, RandStringRunes(6))
-	path, err := filepath.Abs(bp)
+	path, err := filepath.Abs(root)
 	if err != nil {
 		return "", err
 	}
+
+	bpName := fmt.Sprintf("%s_%s", filepath.Base(path), RandStringRunes(8))
+	bpPath := filepath.Join(path, bpName)
+
 	cmd := exec.Command("scripts/package.sh")
-	cmd.Env = append(os.Environ(), fmt.Sprintf("PACKAGE_DIR=%s", path))
+	cmd.Env = append(os.Environ(), fmt.Sprintf("PACKAGE_DIR=%s", bpPath))
 	cmd.Dir = root
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -61,7 +64,7 @@ func PackageBuildpack(root string) (string, error) {
 		return "", err
 	}
 
-	return path, nil
+	return bpPath, nil
 }
 
 func PackageCachedBuildpack(root string) (string, string, error) {
