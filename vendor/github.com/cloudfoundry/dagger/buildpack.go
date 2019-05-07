@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"sync"
 	"time"
 
@@ -48,16 +47,21 @@ func FindBPRoot() (string, error) {
 }
 
 func PackageBuildpack(root string) (string, error) {
-	cmd := exec.Command("./scripts/package.sh")
-	cmd.Dir = root
-	cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
+	bp := fmt.Sprintf("%s_%s", root, RandStringRunes(6))
+	path, err := filepath.Abs(bp)
 	if err != nil {
 		return "", err
 	}
-	r := regexp.MustCompile("Buildpack packaged into: (.*)")
-	bpDir := r.FindStringSubmatch(string(out))[1]
-	return bpDir, nil
+	cmd := exec.Command("scripts/package.sh")
+	cmd.Env = append(os.Environ(), fmt.Sprintf("PACKAGE_DIR=%s", path))
+	cmd.Dir = root
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return path, nil
 }
 
 func PackageCachedBuildpack(root string) (string, string, error) {
