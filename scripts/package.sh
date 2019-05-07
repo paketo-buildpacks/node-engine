@@ -15,3 +15,7 @@ if [[ $1 == "-c" ]]; then #package as cached
 fi
 
 eval "$args $full_path"
+
+if [[ -n "$BP_REWRITE_HOST" ]]; then
+    sed -i '' -e "s|^uri = \"https:\/\/buildpacks\.cloudfoundry\.org\(.*\)\"$|uri = \"http://$BP_REWRITE_HOST\1\"|g" "$full_path/buildpack.toml"
+fi
