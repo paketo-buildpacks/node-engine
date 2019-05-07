@@ -1,35 +1,17 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
-TARGET_OS=${1:-linux}
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+./scripts/install_tools.sh
 
-cd "$( dirname "${BASH_SOURCE[0]}" )/.."
+PACKAGE_DIR=${PACKAGE_DIR:-"${PWD##*/}_$(openssl rand -hex 4)"}
 
-echo "Target OS is $TARGET_OS"
-echo -n "Creating buildpack directory..."
-bp_dir="${PWD##*/}"_$(openssl rand -hex 12)
-mkdir $bp_dir
-echo "done"
+full_path=$(realpath "$PACKAGE_DIR")
+args=".bin/packager -uncached"
 
-echo -n "Copying buildpack.toml..."
-cp buildpack.toml $bp_dir/buildpack.toml
-echo "done"
-
-if [ "${BP_REWRITE_HOST:-}" != "" ]; then
-    sed -i -e "s|^uri = \"https:\/\/buildpacks\.cloudfoundry\.org\(.*\)\"$|uri = \"http://$BP_REWRITE_HOST\1\"|g" "$bp_dir/buildpack.toml"
+if [[ $1 == "-c" ]]; then #package as cached
+    full_path="$full_path-cached"
+    args=".bin/packager"
 fi
 
-for b in $(ls cmd); do
-    echo -n "Building $b..."
-    GOOS=$TARGET_OS go build -o $bp_dir/bin/$b ./cmd/$b
-    echo "done"
-done
-
-fullPath=$(realpath "$bp_dir")
-echo "Buildpack packaged into: $fullPath"
-
-buildpack_name="$(basename `pwd`)"
-
-pushd $bp_dir
-    tar czvf "../$buildpack_name.tgz" *
-popd
+eval "$args $full_path"
