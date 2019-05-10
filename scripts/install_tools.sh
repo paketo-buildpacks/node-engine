@@ -33,6 +33,7 @@ install_pack_master() {
 }
 
 install_pack() {
+    if [[ -f ".bin/pack" ]]; then return 0; fi
     OS=$(uname -s)
 
     if [[ $OS == "Darwin" ]]; then
@@ -106,6 +107,6 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 mkdir -p .bin
 export PATH=$(pwd)/.bin:$PATH
 
-install_pack_master
+install_pack
 install_packager
 
