@@ -1,3 +1,12 @@
+v0.0.9 May 10, 2019
+====================
+
+* Remove buildpacks from id
+
+* Add node 12.2.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/165865903)
+
 v0.0.8 May 01, 2019
 ====================
 
