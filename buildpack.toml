@@ -5,7 +5,7 @@ name = "Node.js Buildpack"
 version = "0.0.10"
 
 [metadata]
-include_files = ["bin/build","bin/detect","buildpack.toml","go.mod","go.sum"]
+include_files = ["bin/build","bin/detect","buildpack.toml"]
 pre_package = "./scripts/build.sh"
 
 [metadata.default_versions]
