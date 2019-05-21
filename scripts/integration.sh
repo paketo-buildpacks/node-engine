@@ -11,8 +11,8 @@ fi
 PACK_VERSION=${PACK_VERSION:-""}
 source scripts/install_tools.sh "$PACK_VERSION"
 
-export CNB_BUILD_IMAGE=${CNB_BUILD_IMAGE:-cfbuildpacks/cflinuxfs3-cnb-experimental:build}
-export CNB_RUN_IMAGE=${CNB_RUN_IMAGE:-cfbuildpacks/cflinuxfs3-cnb-experimental:run}
+export CNB_BUILD_IMAGE=${CNB_BUILD_IMAGE:-cloudfoundry/cnb-build:cflinuxfs3}
+export CNB_RUN_IMAGE=${CNB_RUN_IMAGE:-cloudfoundry/cnb-run:cflinuxfs3}
 
 # Always pull latest images
 # Most helpful for local testing consistency with CI (which would already pull the latest)
