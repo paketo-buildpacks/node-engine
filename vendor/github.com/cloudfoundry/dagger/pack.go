@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	CFLinuxFS2        = "org.cloudfoundry.stacks.cflinuxfs3"
+	CFLinuxFS3        = "org.cloudfoundry.stacks.cflinuxfs3"
 	Bionic            = "io.buildpacks.stacks.bionic"
-	DefaultBuildImage = "cfbuildpacks/cflinuxfs3-cnb-experimental:build"
-	DefaultRunImage   = "cfbuildpacks/cflinuxfs3-cnb-experimental:run"
+	DefaultBuildImage = "cloudfoundry/cnb-build:cflinuxfs3"
+	DefaultRunImage   = "cloudfoundry/cnb-run:cflinuxfs3"
 	TestBuilderImage  = "cfbuildpacks/cflinuxfs3-cnb-test-builder"
 )
 
