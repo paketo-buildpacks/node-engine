@@ -18,10 +18,11 @@ package buildpack
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/buildpack/libbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"github.com/mitchellh/mapstructure"
-	"path/filepath"
 )
 
 const (
@@ -49,7 +50,7 @@ func (b Buildpack) Dependencies() (Dependencies, error) {
 
 	var dependencies Dependencies
 	for _, dep := range deps {
-		d, err := b.dependency(dep)
+		d, err := b.Dependency(dep)
 		if err != nil {
 			return Dependencies{}, err
 		}
@@ -106,7 +107,7 @@ func (b Buildpack) PrePackage() (string, bool) {
 	return p, ok
 }
 
-func (b Buildpack) dependency(dep map[string]interface{}) (Dependency, error) {
+func (b Buildpack) Dependency(dep map[string]interface{}) (Dependency, error) {
 	var d Dependency
 
 	config := mapstructure.DecoderConfig{
