@@ -38,6 +38,15 @@ func (b BuildPlan) Init() error {
 	return nil
 }
 
+// Merge performs a shallow merge of the entries in passed BuildPlans into this.
+func (b BuildPlan) Merge(buildPlans ...BuildPlan) {
+	for _, bp := range buildPlans {
+		for k, v := range bp {
+			b[k] = v
+		}
+	}
+}
+
 // Write writes the build plan.
 func (b BuildPlan) Write(writer Writer) error {
 	return writer(b)

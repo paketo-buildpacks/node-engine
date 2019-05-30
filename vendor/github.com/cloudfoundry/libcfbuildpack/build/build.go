@@ -58,7 +58,10 @@ func (b Build) String() string {
 // Success signals a successful build by exiting with a zero status code.  Combines specied build plan with build
 // plan entries for all contributed dependencies.
 func (b Build) Success(buildPlan buildplan.BuildPlan) (int, error) {
-	code, err := b.Build.Success(b.merge(b.Layers.DependencyBuildPlans, buildPlan))
+	bp := buildplan.BuildPlan{}
+	bp.Merge(b.Layers.DependencyBuildPlans, buildPlan)
+
+	code, err := b.Build.Success(bp)
 	if err != nil {
 		return code, err
 	}
@@ -69,18 +72,6 @@ func (b Build) Success(buildPlan buildplan.BuildPlan) (int, error) {
 
 	b.Logger.Info("")
 	return code, nil
-}
-
-func (b Build) merge(buildPlans ...buildplan.BuildPlan) buildplan.BuildPlan {
-	merged := buildplan.BuildPlan{}
-
-	for _, bp := range buildPlans {
-		for k, v := range bp {
-			merged[k] = v
-		}
-	}
-
-	return merged
 }
 
 // DefaultBuild creates a new instance of Build using default values.  During initialization, all platform environment

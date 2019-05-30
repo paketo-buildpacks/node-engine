@@ -29,10 +29,6 @@ type Stack string
 func DefaultStack(logger logger.Logger) (Stack, error) {
 	s, ok := os.LookupEnv("CNB_STACK_ID")
 	if !ok {
-		s, ok = os.LookupEnv("PACK_STACK_ID")  // TODO: Remove once PACK_STACK_ID removed from lifecycle
-	}
-
-	if !ok {
 		return "", fmt.Errorf("CNB_STACK_ID not set")
 	}
 
