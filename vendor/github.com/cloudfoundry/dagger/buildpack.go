@@ -83,7 +83,11 @@ func PackageCachedBuildpack(root string) (string, string, error) {
 }
 
 func GetLatestBuildpack(name string) (string, error) {
-	uri := fmt.Sprintf("https://api.github.com/repos/cloudfoundry/%s/releases/latest", name)
+	return GetLatestCommunityBuildpack("cloudfoundry", name)
+}
+
+func GetLatestCommunityBuildpack(org, name string) (string, error) {
+	uri := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", org, name)
 	ctx := context.Background()
 	client := NewGitClient(ctx)
 
