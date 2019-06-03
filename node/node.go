@@ -1,6 +1,7 @@
 package node
 
 import (
+	"github.com/cloudfoundry/libcfbuildpack/buildpack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -51,9 +52,23 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 		}
 	}
 
-	dep, err := deps.Best(Dependency, version, context.Stack)
-	if err != nil {
-		return Contributor{}, false, err
+	var dep buildpack.Dependency
+	if entry, ok := plan.Metadata["override"]; ok {
+		// cast entry as string
+		if stringEntry, ok := entry.(string); ok {
+			var overrideDep buildpack.Dependency
+
+			if err := yaml.Unmarshal([]byte(stringEntry), &overrideDep); err != nil {
+				return Contributor{}, false, err
+			}
+
+			dep = overrideDep
+		}
+	} else {
+		dep, err = deps.Best(Dependency, version, context.Stack)
+		if err != nil {
+			return Contributor{}, false, err
+		}
 	}
 
 	contributor := Contributor{layer: context.Layers.DependencyLayer(dep), BuildpackYAML: buildpackYAML}
@@ -122,6 +137,24 @@ func (c Contributor) Contribute() error {
 	}, c.flags()...)
 }
 
+func (c Contributor) flags() []layers.Flag {
+	flags := []layers.Flag{layers.Cache}
+
+	if c.buildContribution {
+		flags = append(flags, layers.Build)
+	}
+
+	if c.launchContribution {
+		flags = append(flags, layers.Launch)
+	}
+
+	return flags
+}
+
+func (c Contributor) GetLayer() layers.DependencyLayer {
+	return c.layer
+}
+
 func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
 	buildpackYAML, configFile := BuildpackYAML{}, filepath.Join(appRoot, "buildpack.yml")
 
@@ -145,20 +178,6 @@ func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
 		}
 	}
 	return buildpackYAML, nil
-}
-
-func (c Contributor) flags() []layers.Flag {
-	flags := []layers.Flag{layers.Cache}
-
-	if c.buildContribution {
-		flags = append(flags, layers.Build)
-	}
-
-	if c.launchContribution {
-		flags = append(flags, layers.Launch)
-	}
-
-	return flags
 }
 
 func memoryAvailable() string {
