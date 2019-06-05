@@ -18,6 +18,7 @@ package buildpack
 
 import (
 	"fmt"
+	"github.com/mitchellh/mapstructure"
 )
 
 // Dependency represents a buildpack dependency.
@@ -42,6 +43,27 @@ type Dependency struct {
 
 	// Licenses are the stacks the dependency is distributed under.
 	Licenses Licenses `mapstruct:"licenses" toml:"licenses"`
+}
+
+// NewDependency makes a Dependency from a generic map describing a Dependency
+func NewDependency(dep map[string]interface{}) (Dependency, error) {
+	var d Dependency
+
+	config := mapstructure.DecoderConfig{
+		DecodeHook: unmarshalText,
+		Result:     &d,
+	}
+
+	decoder, err := mapstructure.NewDecoder(&config)
+	if err != nil {
+		return Dependency{}, err
+	}
+
+	if err := decoder.Decode(dep); err != nil {
+		return Dependency{}, err
+	}
+
+	return d, nil
 }
 
 // Identity make Buildpack satisfy the Identifiable interface.

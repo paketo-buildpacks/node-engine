@@ -22,13 +22,12 @@ import (
 
 	"github.com/buildpack/libbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
-	"github.com/mitchellh/mapstructure"
 )
 
 const (
 	cacheRoot            = "dependency-cache"
 	DependenciesMetadata = "dependencies"
-	DefaultVersions      = "default_versions"
+	DefaultVersions      = "default-versions"
 )
 
 // Buildpack is an extension to libbuildpack.Buildpack that adds additional opinionated behaviors.
@@ -50,7 +49,7 @@ func (b Buildpack) Dependencies() (Dependencies, error) {
 
 	var dependencies Dependencies
 	for _, dep := range deps {
-		d, err := b.Dependency(dep)
+		d, err := NewDependency(dep)
 		if err != nil {
 			return Dependencies{}, err
 		}
@@ -105,26 +104,6 @@ func (b Buildpack) IncludeFiles() ([]string, error) {
 func (b Buildpack) PrePackage() (string, bool) {
 	p, ok := b.Metadata["pre_package"].(string)
 	return p, ok
-}
-
-func (b Buildpack) Dependency(dep map[string]interface{}) (Dependency, error) {
-	var d Dependency
-
-	config := mapstructure.DecoderConfig{
-		DecodeHook: unmarshalText,
-		Result:     &d,
-	}
-
-	decoder, err := mapstructure.NewDecoder(&config)
-	if err != nil {
-		return Dependency{}, err
-	}
-
-	if err := decoder.Decode(dep); err != nil {
-		return Dependency{}, err
-	}
-
-	return d, nil
 }
 
 // String makes Buildpack satisfy the Stringer interface.
