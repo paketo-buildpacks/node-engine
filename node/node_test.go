@@ -134,28 +134,6 @@ export MEMORY_AVAILABLE
 			Expect(shouldContribute).To(BeFalse())
 		})
 
-		it("respects override.yml entries added by nodejs-compat-buildpack", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{
-				Version:  "9000.0.0",
-				Metadata: buildplan.Metadata{
-					"override": `---
-name: node
-version: 99.99.99
-uri: https://buildpacks.cloudfoundry.org/dependencies/node/node.99.99.99-linux-x64.tgz
-sha256: 062d906c87839d03b243e2821e10653c89b4c92878bfe2bf995dec231e117bfc
-cf_stacks:
-- cflinuxfs2
-`,			},
-			})
-
-			nodeContributor, _, err := node.NewContributor(f.Build)
-			Expect(err).NotTo(HaveOccurred())
-
-			depLayer := nodeContributor.GetLayer()
-			Expect(depLayer.Dependency.Version.Version.String()).To(Equal("99.99.99"))
-			Expect(depLayer.Dependency.URI).To(Equal("https://buildpacks.cloudfoundry.org/dependencies/node/node.99.99.99-linux-x64.tgz"))
-		})
-
 		when("optimize memory", func() {
 			var (
 				contributor           node.Contributor

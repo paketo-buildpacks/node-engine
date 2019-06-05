@@ -1,7 +1,6 @@
 package node
 
 import (
-	"github.com/cloudfoundry/libcfbuildpack/buildpack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -52,23 +51,9 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 		}
 	}
 
-	var dep buildpack.Dependency
-	if entry, ok := plan.Metadata["override"]; ok {
-		// cast entry as string
-		if stringEntry, ok := entry.(string); ok {
-			var overrideDep buildpack.Dependency
-
-			if err := yaml.Unmarshal([]byte(stringEntry), &overrideDep); err != nil {
-				return Contributor{}, false, err
-			}
-
-			dep = overrideDep
-		}
-	} else {
-		dep, err = deps.Best(Dependency, version, context.Stack)
-		if err != nil {
-			return Contributor{}, false, err
-		}
+	dep, err := deps.Best(Dependency, version, context.Stack)
+	if err != nil {
+		return Contributor{}, false, err
 	}
 
 	contributor := Contributor{layer: context.Layers.DependencyLayer(dep), BuildpackYAML: buildpackYAML}
