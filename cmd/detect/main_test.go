@@ -23,7 +23,6 @@ func TestUnitDetect(t *testing.T) {
 func testDetect(t *testing.T, when spec.G, it spec.S) {
 	var (
 		factory              *test.DetectFactory
-		Expect               func(interface{}, ...interface{}) Assertion
 		buildpackYamlVersion = "1.2.3"
 		nvmrcVersion         = "4.5.6"
 		buildpackYAMLString  = fmt.Sprintf("nodejs:\n  version: %s", buildpackYamlVersion)
@@ -31,11 +30,10 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		factory = test.NewDetectFactory(t)
-		Expect = NewWithT(t).Expect
 	})
 
 	it("always passes", func() {
-		runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, Expect)
+		runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, t)
 	})
 
 	when("there is a buildpack.yml", func() {
@@ -45,7 +43,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		it("should request the node version in the buildpack.yml", func() {
 			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
-			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
 
@@ -56,7 +54,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		it("should request the node version in the .nvmrc file", func() {
 			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
-			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
 
@@ -68,7 +66,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		it("should request the node version in the buildpack.yml", func() {
 			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
-			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
 
@@ -80,12 +78,14 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		it("should request the node version in the .nvmrc", func() {
 			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
-			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
 }
 
-func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.BuildPlan, Expect func(interface{}, ...interface{}) Assertion) {
+func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.BuildPlan, t *testing.T) {
+	Expect := NewWithT(t).Expect
+
 	code, err := runDetect(factory.Detect)
 	Expect(err).NotTo(HaveOccurred())
 
