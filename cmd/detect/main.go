@@ -29,18 +29,38 @@ func main() {
 }
 
 func runDetect(context detect.Detect) (int, error) {
+	version := ""
 	nvmrcPath := filepath.Join(context.Application.Root, ".nvmrc")
-	exists, err := helper.FileExists(nvmrcPath)
+	nvmrcExists, err := helper.FileExists(nvmrcPath)
 	if err != nil {
 		return context.Fail(), err
 	}
 
-	if exists {
-		version, err := nvmrc.GetVersion(nvmrcPath, context.Logger)
+	if nvmrcExists {
+		version, err = nvmrc.GetVersion(nvmrcPath, context.Logger)
 		if err != nil {
 			return context.Fail(), err
 		}
 
+	}
+
+	buildpackYamlPath := filepath.Join(context.Application.Root, "buildpack.yml")
+	buildpackYamlExists, err := helper.FileExists(buildpackYamlPath)
+	if err != nil {
+		return detect.FailStatusCode, err
+	}
+
+	if buildpackYamlExists {
+		buildpackYamlVersion, err := helper.ReadBuildpackYamlVersion(buildpackYamlPath, "nodejs")
+		if err != nil {
+			return detect.FailStatusCode, err
+		}
+		if buildpackYamlVersion != "" {
+			version = buildpackYamlVersion
+		}
+	}
+
+	if version != "" {
 		return context.Pass(buildplan.BuildPlan{
 			node.Dependency: {
 				Version:  version,

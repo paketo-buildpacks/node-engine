@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/buildpack/libbuildpack/buildplan"
-	"github.com/cloudfoundry/nodejs-cnb/node"
+	"fmt"
 	"path/filepath"
 	"testing"
+
+	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/cloudfoundry/nodejs-cnb/node"
 
 	. "github.com/onsi/gomega"
 
@@ -19,27 +21,71 @@ func TestUnitDetect(t *testing.T) {
 }
 
 func testDetect(t *testing.T, when spec.G, it spec.S) {
+	var (
+		factory              *test.DetectFactory
+		Expect               func(interface{}, ...interface{}) Assertion
+		buildpackYamlVersion = "1.2.3"
+		nvmrcVersion         = "4.5.6"
+		buildpackYAMLString  = fmt.Sprintf("nodejs:\n  version: %s", buildpackYamlVersion)
+	)
+
 	it.Before(func() {
-		RegisterTestingT(t)
+		factory = test.NewDetectFactory(t)
+		Expect = NewWithT(t).Expect
 	})
 
 	it("always passes", func() {
-		f := test.NewDetectFactory(t)
-		runDetectAndExpectBuildplan(f, buildplan.BuildPlan{})
+		runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, Expect)
+	})
+
+	when("there is a buildpack.yml", func() {
+		it.Before(func() {
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), buildpackYAMLString)
+		})
+
+		it("should request the node version in the buildpack.yml", func() {
+			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+		})
 	})
 
 	when("there is an .nvmrc", func() {
-		it("should request the node version in the .nvmrc file", func() {
-			f := test.NewDetectFactory(t)
+		it.Before(func() {
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, ".nvmrc"), nvmrcVersion)
+		})
 
-			test.WriteFile(t, filepath.Join(f.Detect.Application.Root, ".nvmrc"), "8.15.0")
-			buildplan := getStandardBuildplanWithNodeVersion("8.15.0")
-			runDetectAndExpectBuildplan(f, buildplan)
+		it("should request the node version in the .nvmrc file", func() {
+			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+		})
+	})
+
+	when("there is a buildpack.yml and a .nvmrc", func() {
+		it.Before(func() {
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), buildpackYAMLString)
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, ".nvmrc"), nvmrcVersion)
+		})
+
+		it("should request the node version in the buildpack.yml", func() {
+			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
+		})
+	})
+
+	when("there is an empty buildpack.yml and a .nvmrc", func() {
+		it.Before(func() {
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "")
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, ".nvmrc"), nvmrcVersion)
+		})
+
+		it("should request the node version in the .nvmrc", func() {
+			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			runDetectAndExpectBuildplan(factory, buildPlan, Expect)
 		})
 	})
 }
 
-func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.BuildPlan) {
+func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.BuildPlan, Expect func(interface{}, ...interface{}) Assertion) {
 	code, err := runDetect(factory.Detect)
 	Expect(err).NotTo(HaveOccurred())
 
