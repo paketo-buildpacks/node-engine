@@ -18,7 +18,6 @@ package buildpack
 
 import (
 	"fmt"
-	"github.com/buildpack/libbuildpack/stack"
 	"path/filepath"
 
 	"github.com/buildpack/libbuildpack/buildpack"
@@ -39,11 +38,6 @@ type Buildpack struct {
 	CacheRoot string
 
 	logger logger.Logger
-}
-
-// NewBuildpack creates a new instance of Buildpack from a specified buildpack.Buildpack.
-func NewBuildpack(buildpack buildpack.Buildpack, logger logger.Logger) Buildpack {
-	return Buildpack{buildpack, filepath.Join(buildpack.Root, cacheRoot), logger}
 }
 
 // Dependencies returns the collection of dependencies extracted from the generic buildpack metadata.
@@ -118,20 +112,7 @@ func (b Buildpack) String() string {
 		b.Buildpack, b.CacheRoot, b.logger)
 }
 
-func (b Buildpack) RuntimeDependency(id, version string, stack stack.Stack) (Dependency, error) {
-	var err error
-
-	if version == "" || version == "default" {
-		version, err = b.DefaultVersion(id)
-		if err != nil {
-			return Dependency{}, err
-		}
-	}
-
-	deps, err := b.Dependencies()
-	if err != nil {
-		return Dependency{}, err
-	}
-
-	return deps.Best(id, version, stack)
+// NewBuildpack creates a new instance of Buildpack from a specified buildpack.Buildpack.
+func NewBuildpack(buildpack buildpack.Buildpack, logger logger.Logger) Buildpack {
+	return Buildpack{buildpack, filepath.Join(buildpack.Root, cacheRoot), logger}
 }
