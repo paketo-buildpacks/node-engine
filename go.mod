@@ -1,4 +1,4 @@
-module github.com/cloudfoundry/nodejs-engine-cnb
+module github.com/cloudfoundry/node-engine-cnb
 
 require (
 	github.com/Masterminds/semver v1.4.2
