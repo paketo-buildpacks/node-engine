@@ -50,14 +50,6 @@ version = "8.16.0"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "81e871767a33ad4dd275db81bd9a7143e697c1477f5fa1a268b776dc9499fa1b"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs2"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.0-linux-x64-cflinuxfs2-81e87176.tgz"
-version = "8.16.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
 sha256 = "6c24afa448a7552650d7a768e7ad782fcbf11b4f077a7c810e6c76320eafb4aa"
 source = "https://nodejs.org/dist/v8.16.0/node-v8.16.0.tar.gz"
 source_sha256 = "a1a885add3e511177f05676f0834df710886b68cb559b893169f8674a23adfcf"
