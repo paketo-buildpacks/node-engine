@@ -1,3 +1,34 @@
+v0.0.11 Jun 07, 2019
+=====================
+
+* update module name in go.mod
+  (https://www.pivotaltracker.com/story/show/163880513)
+
+* update node dependency name to 'Node Engine'
+  (https://www.pivotaltracker.com/story/show/163880513)
+
+* Update buildpack id to node-engine-cnb
+  (https://www.pivotaltracker.com/story/show/163880513)
+
+* Read version from buildpack.yml if it exists
+  - Buildpack.yml version overwrites the nvmrc version, if it exists
+  - In the buildpack.yml, we look for the nodejs key
+  - Use RuntimeVersion method in NewContributor to read default versions, if they exists
+  (https://www.pivotaltracker.com/story/show/165888940)
+
+* Add node 12.4.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/166445141)
+
+* Add node 10.16.0, remove node 10.15.2
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/166317034)
+
+* Add node 12.3.1, remove node 12.3.0
+  for stack(s) io.buildpacks.stacks.bionic, org.cloudfoundry.stacks.cflinuxfs3
+  (https://www.pivotaltracker.com/story/show/166194213)
+  (https://www.pivotaltracker.com/story/show/166165638)
+
 v0.0.10 May 13, 2019
 =====================
 

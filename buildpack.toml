@@ -2,7 +2,7 @@
 [buildpack]
 id = "org.cloudfoundry.node-engine"
 name = "Node Engine Buildpack"
-version = "0.0.10"
+version = "0.0.11"
 
 [metadata]
 include_files = ["bin/build","bin/detect","buildpack.toml"]
