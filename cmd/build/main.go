@@ -7,7 +7,7 @@ import (
 	"github.com/buildpack/libbuildpack/buildplan"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
-	"github.com/cloudfoundry/nodejs-cnb/node"
+	"github.com/cloudfoundry/nodejs-engine-cnb/node"
 )
 
 func main() {

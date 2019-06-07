@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/libcfbuildpack/helper"
-	"github.com/cloudfoundry/nodejs-cnb/node"
-	"github.com/cloudfoundry/nodejs-cnb/nvmrc"
+	"github.com/cloudfoundry/nodejs-engine-cnb/node"
+	"github.com/cloudfoundry/nodejs-engine-cnb/nvmrc"
 
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/detect"
