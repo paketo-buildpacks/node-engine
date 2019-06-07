@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/buildpack/libbuildpack/buildplan"
-	"github.com/cloudfoundry/nodejs-engine-cnb/node"
+	"github.com/cloudfoundry/node-engine-cnb/node"
 
 	. "github.com/onsi/gomega"
 

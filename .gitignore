@@ -2,5 +2,5 @@
 *.tgz
 .idea
 .bin
-nodejs-engine-cnb_*
+node-engine-cnb_*
 /bin

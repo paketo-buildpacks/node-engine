@@ -1,7 +1,7 @@
 package node_test
 
 import (
-	"github.com/cloudfoundry/nodejs-engine-cnb/node"
+	"github.com/cloudfoundry/node-engine-cnb/node"
 	"os"
 	"path/filepath"
 	"testing"

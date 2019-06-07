@@ -1,6 +1,6 @@
 
 [buildpack]
-id = "org.cloudfoundry.nodejs-engine"
+id = "org.cloudfoundry.node-engine"
 name = "Node Engine Buildpack"
 version = "0.0.10"
 
