@@ -18,7 +18,6 @@ package helper
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -139,10 +138,4 @@ type service struct {
 
 	// Tags is the collection of tags of the service.
 	Tags []string `json:"tags"`
-}
-
-// String makes service satisfy the Stringer interface.
-func (s service) String() string {
-	return fmt.Sprintf("Service{ BindingName: %s, Credentials: %s, InstanceName: %s, Label: %s, Tags: %s }",
-		s.BindingName, s.Credentials, s.InstanceName, s.Label, s.Tags)
 }

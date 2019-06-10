@@ -28,11 +28,6 @@ type Version struct {
 	*semver.Version
 }
 
-// String makes Version satisfy the Stringer interface.
-func (v Version) String() string {
-	return fmt.Sprintf("Version{ Version: %s }", v.Version)
-}
-
 // MarshalText makes Version satisfy the encoding.TextMarshaler interface.
 func (v Version) MarshalText() ([]byte, error) {
 	return []byte(v.Version.Original()), nil

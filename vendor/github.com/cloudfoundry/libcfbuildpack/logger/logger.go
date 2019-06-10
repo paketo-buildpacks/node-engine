@@ -82,11 +82,6 @@ func (l Logger) PrettyIdentity(v Identifiable) string {
 	return sb.String()
 }
 
-// String makes Logger satisfy the Stringer interface.
-func (l Logger) String() string {
-	return fmt.Sprintf("Logger{ Logger: %s }", l.Logger)
-}
-
 // SubsequentLine prints log message with the subsequent line indent.
 func (l Logger) SubsequentLine(format string, args ...interface{}) {
 	if !l.IsInfoEnabled() {

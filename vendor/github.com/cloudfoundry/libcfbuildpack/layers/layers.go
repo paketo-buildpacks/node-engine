@@ -81,12 +81,6 @@ func (l Layers) Layer(name string) Layer {
 	return Layer{l.Layers.Layer(name), l.logger, l.TouchedLayers}
 }
 
-// String makes Layers satisfy the Stringer interface.
-func (l Layers) String() string {
-	return fmt.Sprintf("Layers{ Layers: %s, DependencyBuildPlans: %s, TouchedLayers: %s, buildpack: %s, buildpackCache: %s, logger: %s }",
-		l.Layers, l.DependencyBuildPlans, l.TouchedLayers, l.buildpack, l.buildpackCache, l.logger)
-}
-
 // WriteApplicationMetadata writes application metadata to the filesystem.
 func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 	if len(metadata.Slices) > 0 {

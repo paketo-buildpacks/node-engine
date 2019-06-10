@@ -17,7 +17,6 @@
 package layers
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -70,12 +69,6 @@ func (t TouchedLayers) Cleanup() error {
 	}
 
 	return nil
-}
-
-// String makes TouchedLayers satisfy the Stringer interface.
-func (t TouchedLayers) String() string {
-	return fmt.Sprintf("TouchedLayers{ Root: %s, logger: %s, touched: %s }",
-		t.Root, t.logger, t.touched)
 }
 
 func (t TouchedLayers) candidates() (internal.Set, error) {

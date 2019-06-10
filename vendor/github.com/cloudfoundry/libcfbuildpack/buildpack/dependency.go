@@ -18,6 +18,7 @@ package buildpack
 
 import (
 	"fmt"
+
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -73,12 +74,6 @@ func (d Dependency) Identity() (string, string) {
 	}
 
 	return d.Name, ""
-}
-
-// String makes Dependency satisfy the Stringer interface.
-func (d Dependency) String() string {
-	return fmt.Sprintf("Dependency{ ID: %s, Name: %s, Version: %s, URI: %s, SHA256: %s, Stacks: %s, Licenses: %s }",
-		d.ID, d.Name, d.Version, d.URI, d.SHA256, d.Stacks, d.Licenses)
 }
 
 // Validate ensures that the dependency is valid.

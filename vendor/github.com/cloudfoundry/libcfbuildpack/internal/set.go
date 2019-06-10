@@ -16,11 +16,6 @@
 
 package internal
 
-import (
-	"fmt"
-	"strings"
-)
-
 // Set represents the mathematical type set.
 type Set struct {
 	contents map[interface{}]struct{}
@@ -72,17 +67,6 @@ func (s Set) Iterator() Iterator {
 // Size returns the number of elements in the set.
 func (s Set) Size() int {
 	return len(s.contents)
-}
-
-// String makes Set satisfy the Stringer interface.
-func (s Set) String() string {
-	var entries []string
-
-	for k, _ := range s.contents {
-		entries = append(entries, fmt.Sprintf("%v", k))
-	}
-
-	return fmt.Sprintf("Set{ %s }", strings.Join(entries, ", "))
 }
 
 // NewSet creates an initialized and empty Set.

@@ -17,7 +17,6 @@
 package layers
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -61,12 +60,6 @@ func (l HelperLayer) Contribute(contributor HelperLayerContributor, flags ...Fla
 
 	l.contributeToBuildPlan()
 	return nil
-}
-
-// String makes HelperLayer satisfy the Stringer interface.
-func (l HelperLayer) String() string {
-	return fmt.Sprintf("HelperLayer{ Layer: %s, ID: %s, buildpack: %s, dependencyBuildPlans: %s, name: %s, logger: %s }",
-		l.Layer, l.ID, l.buildpack, l.dependencyBuildPlans, l.name, l.logger)
 }
 
 func (l *HelperLayer) contributeToBuildPlan() {

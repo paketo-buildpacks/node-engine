@@ -18,8 +18,9 @@ package buildpack
 
 import (
 	"fmt"
-	"github.com/buildpack/libbuildpack/stack"
 	"path/filepath"
+
+	"github.com/buildpack/libbuildpack/stack"
 
 	"github.com/buildpack/libbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
@@ -110,12 +111,6 @@ func (b Buildpack) IncludeFiles() ([]string, error) {
 func (b Buildpack) PrePackage() (string, bool) {
 	p, ok := b.Metadata["pre_package"].(string)
 	return p, ok
-}
-
-// String makes Buildpack satisfy the Stringer interface.
-func (b Buildpack) String() string {
-	return fmt.Sprintf("Buildpack{ Buildpack: %s, CacheRoot: %s, logger: %s }",
-		b.Buildpack, b.CacheRoot, b.logger)
 }
 
 func (b Buildpack) RuntimeDependency(id, version string, stack stack.Stack) (Dependency, error) {

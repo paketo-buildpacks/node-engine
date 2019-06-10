@@ -90,12 +90,6 @@ func (l DownloadLayer) Artifact() (string, error) {
 	return artifact, nil
 }
 
-// String makes DownloadLayer satisfy the Stringer interface.
-func (l DownloadLayer) String() string {
-	return fmt.Sprintf("DownloadLayer{ Layer: %s, cacheLayer:%s, dependency: %s, info: %s, logger: %s }",
-		l.Layer, l.cacheLayer, l.dependency, l.info, l.logger)
-}
-
 func (l DownloadLayer) download(file string) error {
 	req, err := http.NewRequest("GET", l.dependency.URI, nil)
 	if err != nil {

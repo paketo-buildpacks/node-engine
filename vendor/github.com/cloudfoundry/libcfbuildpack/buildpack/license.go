@@ -29,11 +29,6 @@ type License struct {
 	URI string `mapstruct:"uri" toml:"uri"`
 }
 
-// String makes License satisfy the Stringer interface.
-func (l License) String() string {
-	return fmt.Sprintf("License{ Type: %s, URI: %s }", l.Type, l.URI)
-}
-
 // Validate ensures that license has at least one of type or uri
 func (l License) Validate() error {
 	if "" == l.Type && "" == l.URI {

@@ -34,11 +34,6 @@ type ApplicationRoute struct {
 	URI string `json:"uri"`
 }
 
-// String makes ApplicationRoute satisfy the Stringer interface.
-func (a ApplicationRoute) String() string {
-	return fmt.Sprintf("ApplicationRoute{ Port: %d, URI: %s }", a.Port, a.URI)
-}
-
 // DefaultApplicationRoutes creates a new instance of ApplicationRoutes, extracting the value from the
 // CNB_APP_ROUTES environment variable.
 func DefaultApplicationRoutes() (ApplicationRoutes, error) {

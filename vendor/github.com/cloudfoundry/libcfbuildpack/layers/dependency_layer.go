@@ -17,7 +17,6 @@
 package layers
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -69,12 +68,6 @@ func (l DependencyLayer) Contribute(contributor DependencyLayerContributor, flag
 
 	l.contributeToBuildPlan()
 	return nil
-}
-
-// String makes DependencyLayer satisfy the Stringer interface.
-func (l DependencyLayer) String() string {
-	return fmt.Sprintf("DependencyLayer{ Layer: %s, Dependency: %s, dependencyBuildPlans: %s, downloadLayer: %s, logger: %s }",
-		l.Layer, l.Dependency, l.dependencyBuildPlans, l.downloadLayer, l.logger)
 }
 
 func (l *DependencyLayer) contributeToBuildPlan() {
