@@ -17,7 +17,7 @@ fi
 if [[ $1 == "-a" ]] || [[ $2 == "-a" ]]; then #package as archive
     args="${args} -archive"
 fi
-eval "$args $full_path"
+eval "${args}" "${full_path}"
 
 if [[ -n "$BP_REWRITE_HOST" ]]; then
     sed -i '' -e "s|^uri = \"https:\/\/buildpacks\.cloudfoundry\.org\(.*\)\"$|uri = \"http://$BP_REWRITE_HOST\1\"|g" "$full_path/buildpack.toml"
