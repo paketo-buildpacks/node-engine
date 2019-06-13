@@ -97,7 +97,7 @@ func (l DownloadLayer) download(file string) error {
 	}
 
 	req.Header.Set("User-Agent", fmt.Sprintf("%s/%s", l.info.ID, l.info.Version))
-	t := &http.Transport{}
+	t := &http.Transport{Proxy: http.ProxyFromEnvironment}
 	t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
 
 	client := http.Client{Transport: t}
