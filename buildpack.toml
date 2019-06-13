@@ -8,7 +8,7 @@ version = "0.0.11"
 include_files = ["bin/build","bin/detect","buildpack.toml"]
 pre_package = "./scripts/build.sh"
 
-[metadata.default_versions]
+[metadata.default-versions]
 node = "10.15.3"
 
 [[metadata.dependencies]]
