@@ -156,11 +156,11 @@ version = "12.3.1"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "0fe753f4a46d1509a872dc097962b4e8e47e128aaaf075415e591f5f5bb0aa62"
+sha256 = "15ae929b337203a1748dadb10c6ef5035332cf96c681f9752cff2697f2ea2b4f"
 source = "https://nodejs.org/dist/v12.4.0/node-v12.4.0.tar.gz"
 source_sha256 = "cf39befb8ea486363cac6f297d8f451fd0d5dd8ad21dca51e9c2ea86b242baa0"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.4.0-linux-x64-cflinuxfs3-0fe753f4.tgz"
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.4.0-linux-x64-cflinuxfs3-15ae929b.tgz"
 version = "12.4.0"
 
 [[metadata.dependency_deprecation_dates]]
@@ -174,6 +174,12 @@ date = 2019-06-01T00:00:00Z
 link = "https://github.com/nodejs/Release"
 name = "node"
 version_line = "11.x.x"
+
+[[metadata.dependency_deprecation_dates]]
+date = 2020-04-01T00:00:00Z
+link = "https://github.com/nodejs/Release"
+name = "node"
+version_line = "12.x.x"
 
 [[metadata.dependency_deprecation_dates]]
 date = 2019-12-01T00:00:00Z
