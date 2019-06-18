@@ -40,21 +40,21 @@ version = "8.16.0"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "81e871767a33ad4dd275db81bd9a7143e697c1477f5fa1a268b776dc9499fa1b"
+sha256 = "f190a0786c817d7749c3ec6e294f284104cd9a594e1989c59cafe08b41fe347c"
 source = "https://nodejs.org/dist/v8.16.0/node-v8.16.0.tar.gz"
 source_sha256 = "a1a885add3e511177f05676f0834df710886b68cb559b893169f8674a23adfcf"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs2"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.0-linux-x64-cflinuxfs2-81e87176.tgz"
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.0-linux-x64-cflinuxfs2-f190a078.tgz"
 version = "8.16.0"
 
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "6c24afa448a7552650d7a768e7ad782fcbf11b4f077a7c810e6c76320eafb4aa"
+sha256 = "319b5cd2ca0172c4d427fd4f67df858756f04dff04f92670a4658703b9f03a75"
 source = "https://nodejs.org/dist/v8.16.0/node-v8.16.0.tar.gz"
 source_sha256 = "a1a885add3e511177f05676f0834df710886b68cb559b893169f8674a23adfcf"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.0-linux-x64-cflinuxfs3-6c24afa4.tgz"
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.0-linux-x64-cflinuxfs3-319b5cd2.tgz"
 version = "8.16.0"
 
 [[metadata.dependencies]]
@@ -162,6 +162,12 @@ source_sha256 = "cf39befb8ea486363cac6f297d8f451fd0d5dd8ad21dca51e9c2ea86b242baa
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.4.0-linux-x64-cflinuxfs3-0fe753f4.tgz"
 version = "12.4.0"
+
+[[metadata.dependency_deprecation_dates]]
+date = 2019-12-01T00:00:00Z
+link = "https://github.com/nodejs/Release"
+name = "node"
+version_line = "8.x.x"
 
 [[stacks]]
 id = "org.cloudfoundry.stacks.cflinuxfs3"
