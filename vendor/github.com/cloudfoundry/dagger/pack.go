@@ -24,13 +24,25 @@ func PackBuild(appDir string, buildpacks ...string) (*App, error) {
 	return PackBuildNamedImage(RandStringRunes(16), appDir, buildpacks...)
 }
 
+func PackBuildWithEnv(appDir string, env map[string]string, buildpacks ...string) (*App, error) {
+	return PackBuildNamedImageWithEnv(RandStringRunes(16), appDir, env, buildpacks...)
+}
+
 // This pack builds an app from appDir into appImageName, to allow specifying an image name in a test
 func PackBuildNamedImage(appImage, appDir string, bpPaths ...string) (*App, error) {
+	return PackBuildNamedImageWithEnv(appImage, appDir, nil, bpPaths...)
+}
+
+func PackBuildNamedImageWithEnv(appImage, appDir string, env map[string]string, bpPaths ...string) (*App, error) {
 	buildLogs := &bytes.Buffer{}
 
 	cmd := exec.Command("pack", "build", appImage, "--builder", TestBuilderImage)
 	for _, bp := range bpPaths {
 		cmd.Args = append(cmd.Args, "--buildpack", bp)
+	}
+
+	for key, val := range env {
+		cmd.Args = append(cmd.Args, "-e", fmt.Sprintf("%s=%s", key, val))
 	}
 
 	cmd.Dir = appDir
