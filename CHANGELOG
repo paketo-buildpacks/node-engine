@@ -1,3 +1,9 @@
+v0.0.12 Jun 18, 2019
+=====================
+
+* Rename default_versions to default-versions in buildpack.toml
+  (https://www.pivotaltracker.com/story/show/163528537)
+
 v0.0.11 Jun 07, 2019
 =====================
 
