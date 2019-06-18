@@ -86,11 +86,11 @@ version = "10.16.0"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "41a2ef4998578e21f14f3678fb2535c58aafcde70121ba8b19622d054cc1e398"
+sha256 = "af5f50f0ddf46c9f2cc541137bcc9d88a8c51cafa84f7531e1851256718619ad"
 source = "https://nodejs.org/dist/v10.16.0/node-v10.16.0.tar.gz"
 source_sha256 = "d00f1ffdb0a7413eaaf3afc393fb652ea713db135dcd3ccf6809370a07395713"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.16.0-linux-x64-cflinuxfs3-41a2ef49.tgz"
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.16.0-linux-x64-cflinuxfs3-af5f50f0.tgz"
 version = "10.16.0"
 
 [[metadata.dependencies]]
@@ -162,6 +162,12 @@ source_sha256 = "cf39befb8ea486363cac6f297d8f451fd0d5dd8ad21dca51e9c2ea86b242baa
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.4.0-linux-x64-cflinuxfs3-0fe753f4.tgz"
 version = "12.4.0"
+
+[[metadata.dependency_deprecation_dates]]
+date = 2021-04-01T00:00:00Z
+link = "https://github.com/nodejs/Release"
+name = "node"
+version_line = "10.x.x"
 
 [[metadata.dependency_deprecation_dates]]
 date = 2019-12-01T00:00:00Z
