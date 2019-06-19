@@ -81,6 +81,23 @@ func (l Layers) Layer(name string) Layer {
 	return Layer{l.Layers.Layer(name), l.logger, l.TouchedLayers}
 }
 
+// MultiDependencyLayer returns a DependencyLayer unique to a collection of dependencies.
+func (l Layers) MultiDependencyLayer(name string, dependencies []buildpack.Dependency) MultiDependencyLayer {
+	var dl []DownloadLayer
+
+	for _, d := range dependencies {
+		dl = append(dl, l.DownloadLayer(d))
+	}
+
+	return MultiDependencyLayer{
+		l.Layer(name),
+		dependencies,
+		l.DependencyBuildPlans,
+		dl,
+		l.logger,
+	}
+}
+
 // WriteApplicationMetadata writes application metadata to the filesystem.
 func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 	if len(metadata.Slices) > 0 {
