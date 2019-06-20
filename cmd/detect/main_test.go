@@ -26,6 +26,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		buildpackYamlVersion = "1.2.3"
 		nvmrcVersion         = "4.5.6"
 		buildpackYAMLString  = fmt.Sprintf("nodejs:\n  version: %s", buildpackYamlVersion)
+		buildPlan            buildplan.BuildPlan
 	)
 
 	it.Before(func() {
@@ -42,7 +43,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -53,7 +54,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the .nvmrc file", func() {
-			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -65,20 +66,30 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan := getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
 
 	when("there is an empty buildpack.yml and a .nvmrc", func() {
 		it.Before(func() {
-			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "")
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "---\n")
 			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, ".nvmrc"), nvmrcVersion)
 		})
 
 		it("should request the node version in the .nvmrc", func() {
-			buildPlan := getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
+		})
+	})
+
+	when("there is a buildpack.yml with an empty version", func() {
+		it.Before(func() {
+			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "nodejs:\n  version:  \n")
+		})
+
+		it.Focus("should not overwrite an existing version in the build plan", func() {
+			runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, t)
 		})
 	})
 }

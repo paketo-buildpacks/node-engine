@@ -1,11 +1,8 @@
 package node
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	yaml "gopkg.in/yaml.v2"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -15,7 +12,8 @@ import (
 const Dependency = "node"
 
 type Config struct {
-	OptimizeMemory bool `yaml:"optimize-memory"`
+	OptimizeMemory bool   `yaml:"optimize-memory"`
+	Version        string `yaml:"version"`
 }
 
 type BuildpackYAML struct {
@@ -124,28 +122,16 @@ func (c Contributor) GetLayer() layers.DependencyLayer {
 }
 
 func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
-	buildpackYAML, configFile := BuildpackYAML{}, filepath.Join(appRoot, "buildpack.yml")
+	var err error
+	buildpackYAML := BuildpackYAML{}
+	bpYamlPath := filepath.Join(appRoot, "buildpack.yml")
 
-	if exists, err := helper.FileExists(configFile); err != nil {
+	if exists, err := helper.FileExists(bpYamlPath); err != nil {
 		return BuildpackYAML{}, err
 	} else if exists {
-		file, err := os.Open(configFile)
-		if err != nil {
-			return BuildpackYAML{}, err
-		}
-		defer file.Close()
-
-		contents, err := ioutil.ReadAll(file)
-		if err != nil {
-			return BuildpackYAML{}, err
-		}
-
-		err = yaml.Unmarshal(contents, &buildpackYAML)
-		if err != nil {
-			return BuildpackYAML{}, err
-		}
+		err = helper.ReadBuildpackYaml(bpYamlPath, &buildpackYAML)
 	}
-	return buildpackYAML, nil
+	return buildpackYAML, err
 }
 
 func memoryAvailable() string {

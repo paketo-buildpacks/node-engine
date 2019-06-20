@@ -51,12 +51,14 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if buildpackYamlExists {
-		buildpackYamlVersion, err := helper.ReadBuildpackYamlVersion(buildpackYamlPath, "nodejs")
+		bpYml := &node.BuildpackYAML{}
+		err := helper.ReadBuildpackYaml(buildpackYamlPath, bpYml)
 		if err != nil {
 			return detect.FailStatusCode, err
 		}
-		if buildpackYamlVersion != "" {
-			version = buildpackYamlVersion
+
+		if bpYml.Config.Version != "" {
+			version = bpYml.Config.Version
 		}
 	}
 
