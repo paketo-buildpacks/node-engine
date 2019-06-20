@@ -22,15 +22,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type BuildpackYaml interface {
-	Version() string
-	Config() struct{}
-}
-
 func ReadBuildpackYaml(buildpackYAMLPath string, config interface{}) error {
 	f, err := os.Open(buildpackYAMLPath)
 	if err != nil {
 		return err
+	}
+	fi, err := os.Stat(buildpackYAMLPath)
+	if err != nil {
+		return err
+	}
+
+	size := fi.Size()
+	if size == 0 {
+		return nil
 	}
 
 	dec := yaml.NewDecoder(f)
