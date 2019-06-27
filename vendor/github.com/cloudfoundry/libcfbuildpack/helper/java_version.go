@@ -22,7 +22,12 @@ import (
 
 var java9, _ = semver.NewVersion("9")
 
-// BeforeJava9 returns true if a version is before 9.0.0 and false if after.
+// After Java8 returns true if a version is greater than or equal to 8.0.0 and false if less.
+func AfterJava8(version *semver.Version) bool {
+	return !BeforeJava9(version)
+}
+
+// BeforeJava9 returns true if a version is less 9.0.0 and false if greater.
 func BeforeJava9(version *semver.Version) bool {
 	return version.LessThan(java9)
 }
