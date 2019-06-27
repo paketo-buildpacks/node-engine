@@ -96,42 +96,6 @@ version = "10.16.0"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "23cafb97f7e299c125b3c45cef3f7cb08ffd37e1aa9372367e715d89a1fa33ca"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v11.13.0/node-v11.13.0-linux-x64.tar.gz"
-version = "11.13.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
-sha256 = "8e548206203aefb9942f04de4f69c61b8345939529ef7d42067b62629e794629"
-source = "https://nodejs.org/dist/v11.13.0/node-v11.13.0.tar.gz"
-source_sha256 = "4c29d24de0e6d2bdf7fbac6d37938696a124501d3710b7f6ecdadb0ef5925fb2"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-11.13.0-linux-x64-cflinuxfs3-8e548206.tgz"
-version = "11.13.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
-sha256 = "98bd18051cbdb39bbcda1ab169ca3fd3935d87e9cfc36e1b6fd6f609d46856bb"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v11.15.0/node-v11.15.0-linux-x64.tar.gz"
-version = "11.15.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
-sha256 = "9e0e6f99dfc5df927906ed4d6b6f002db957416a6ba93cd0a04ad4607d096e2b"
-source = "https://nodejs.org/dist/v11.15.0/node-v11.15.0.tar.gz"
-source_sha256 = "2045ace2fcf130b0f18b82b027015dd31b262c2c97fe9bf2533227c52b59c01c"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-11.15.0-linux-x64-cflinuxfs3-9e0e6f99.tgz"
-version = "11.15.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
 sha256 = "ba6afb9967ea6934d0807e0f79da80e063601d91c98da12bda3cf4675720bfb2"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v12.2.0/node-v12.2.0-linux-x64.tar.gz"
@@ -170,12 +134,6 @@ date = 2021-04-01T00:00:00Z
 link = "https://github.com/nodejs/Release"
 name = "node"
 version_line = "10.x.x"
-
-[[metadata.dependency_deprecation_dates]]
-date = 2019-06-01T00:00:00Z
-link = "https://github.com/nodejs/Release"
-name = "node"
-version_line = "11.x.x"
 
 [[metadata.dependency_deprecation_dates]]
 date = 2020-04-01T00:00:00Z
