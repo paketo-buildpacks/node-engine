@@ -24,6 +24,8 @@ import (
 	"github.com/fatih/color"
 )
 
+var identityColor = color.New(color.FgBlue)
+
 // LaunchLayer is an extension to libbuildpack.LaunchLayer that allows additional functionality to be added
 type Layer struct {
 	layers.Layer
@@ -38,7 +40,7 @@ type Layer struct {
 // delimitation.  If delimitation is important during concatenation, callers are required to add it.
 func (l Layer) AppendBuildEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to build", name)
+	l.Logger.Body("Writing %s to build", name)
 	return l.Layer.AppendBuildEnv(name, format, args...)
 }
 
@@ -46,7 +48,7 @@ func (l Layer) AppendBuildEnv(name string, format string, args ...interface{}) e
 // delimitation.  If delimitation is important during concatenation, callers are required to add it.
 func (l Layer) AppendLaunchEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to launch", name)
+	l.Logger.Body("Writing %s to launch", name)
 	return l.Layer.AppendLaunchEnv(name, format, args...)
 }
 
@@ -54,7 +56,7 @@ func (l Layer) AppendLaunchEnv(name string, format string, args ...interface{}) 
 // delimitation.  If delimitation is important during concatenation, callers are required to add it.
 func (l Layer) AppendSharedEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to shared", name)
+	l.Logger.Body("Writing %s to shared", name)
 	return l.Layer.AppendSharedEnv(name, format, args...)
 }
 
@@ -62,7 +64,7 @@ func (l Layer) AppendSharedEnv(name string, format string, args ...interface{}) 
 // OS path delimiter.
 func (l Layer) AppendPathBuildEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to build", name)
+	l.Logger.Body("Writing %s to build", name)
 	return l.Layer.AppendPathBuildEnv(name, format, args...)
 }
 
@@ -70,7 +72,7 @@ func (l Layer) AppendPathBuildEnv(name string, format string, args ...interface{
 // the OS path delimiter.
 func (l Layer) AppendPathLaunchEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to launch", name)
+	l.Logger.Body("Writing %s to launch", name)
 	return l.Layer.AppendPathLaunchEnv(name, format, args...)
 }
 
@@ -78,28 +80,28 @@ func (l Layer) AppendPathLaunchEnv(name string, format string, args ...interface
 // the OS path delimiter.
 func (l Layer) AppendPathSharedEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to shared", name)
+	l.Logger.Body("Writing %s to shared", name)
 	return l.Layer.AppendPathSharedEnv(name, format, args...)
 }
 
 // OverrideBuildEnv overrides any existing value for an environment variable with this value.
 func (l Layer) OverrideBuildEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to build", name)
+	l.Logger.Body("Writing %s to build", name)
 	return l.Layer.OverrideBuildEnv(name, format, args...)
 }
 
 // OverrideLaunchEnv overrides any existing value for an environment variable with this value.
 func (l Layer) OverrideLaunchEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to launch", name)
+	l.Logger.Body("Writing %s to launch", name)
 	return l.Layer.OverrideLaunchEnv(name, format, args...)
 }
 
 // OverrideSharedEnv overrides any existing value for an environment variable with this value.
 func (l Layer) OverrideSharedEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing %s to shared", name)
+	l.Logger.Body("Writing %s to shared", name)
 	return l.Layer.OverrideSharedEnv(name, format, args...)
 }
 
@@ -118,13 +120,13 @@ func (l Layer) Contribute(expected logger.Identifiable, contributor LayerContrib
 	}
 
 	if matches {
-		l.Logger.FirstLine("%s: %s cached layer",
-			l.Logger.PrettyIdentity(expected), color.GreenString("Reusing"))
+		l.Logger.Header("%s: %s cached layer",
+			l.prettyIdentity(expected), color.GreenString("Reusing"))
 		return l.WriteMetadata(expected, flags...)
 	}
 
-	l.Logger.FirstLine("%s: %s to layer",
-		l.Logger.PrettyIdentity(expected), color.YellowString("Contributing"))
+	l.Logger.Header("%s: %s to layer",
+		l.prettyIdentity(expected), color.YellowString("Contributing"))
 
 	if err := contributor(l); err != nil {
 		l.Logger.Debug("Error during contribution")
@@ -168,6 +170,20 @@ func (l Layer) Touch() {
 // WriteProfile writes a file to profile.d with this value.
 func (l Layer) WriteProfile(file string, format string, args ...interface{}) error {
 	l.Touch()
-	l.Logger.SubsequentLine("Writing .profile.d/%s", file)
+	l.Logger.Body("Writing .profile.d/%s", file)
 	return l.Layer.WriteProfile(file, format, args...)
+}
+
+func (Layer) prettyIdentity(v logger.Identifiable) string {
+	if v == nil {
+		return ""
+	}
+
+	name, description := v.Identity()
+
+	if description == "" {
+		return identityColor.Sprint(name)
+	}
+
+	return identityColor.Sprintf("%s %s", name, description)
 }

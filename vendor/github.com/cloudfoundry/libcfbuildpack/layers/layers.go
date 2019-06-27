@@ -84,11 +84,11 @@ func (l Layers) Layer(name string) Layer {
 // WriteApplicationMetadata writes application metadata to the filesystem.
 func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 	if len(metadata.Slices) > 0 {
-		l.logger.FirstLine("%d application slices", len(metadata.Slices))
+		l.logger.Header("%d application slices", len(metadata.Slices))
 	}
 
 	if len(metadata.Processes) > 0 {
-		l.logger.FirstLine("Process types:")
+		l.logger.Header("Process types:")
 
 		p := metadata.Processes
 		sort.Slice(p, func(i int, j int) bool {
@@ -97,8 +97,8 @@ func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 
 		max := l.maximumTypeLength(p)
 		for _, p := range p {
-			format := fmt.Sprintf("%%s:%%-%ds %%s", max-len(p.Type))
-			l.logger.SubsequentLine(format, color.CyanString(p.Type), "", p.Command)
+			format := fmt.Sprintf("%%s%%s:%%-%ds %%s", max-len(p.Type))
+			l.logger.Info(format, logger.BodyIndent, color.CyanString(p.Type), "", p.Command)
 		}
 	}
 
@@ -107,7 +107,7 @@ func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 
 // WritePersistentMetadata writes persistent metadata to the filesystem.
 func (l Layers) WritePersistentMetadata(metadata interface{}) error {
-	l.logger.SubsequentLine("Writing persistent metadata")
+	l.logger.Body("Writing persistent metadata")
 	return l.Layers.WritePersistentMetadata(metadata)
 }
 

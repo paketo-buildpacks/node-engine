@@ -16,8 +16,32 @@
 
 package logger
 
+import (
+	"strings"
+)
+
 // Identifiable is an interface that indicates that a type has an identity.
 type Identifiable interface {
 	// Identity is the method that returns the required name and optional description that make up identity.
 	Identity() (name string, description string)
+}
+
+// PrettyIdentity formats a standard pretty identity of a type.
+func PrettyIdentity(v Identifiable) string {
+	if v == nil {
+		return ""
+	}
+
+	var sb strings.Builder
+
+	name, description := v.Identity()
+
+	_, _ = sb.WriteString(name)
+
+	if description != "" {
+		_, _ = sb.WriteString(" ")
+		_, _ = sb.WriteString(description)
+	}
+
+	return sb.String()
 }
