@@ -123,8 +123,24 @@ func (l Logger) BodyWarning(format string, args ...interface{}) {
 	l.Body(warning.Sprintf(format, args...))
 }
 
-// PrettyIdentity formats a standard pretty identity of a type.
 func (l Logger) prettyIdentity(v Identifiable) string {
+	if v == nil {
+		return ""
+	}
+
+	name, description := v.Identity()
+
+	if description == "" {
+		return nameColor.Sprint(name)
+	}
+
+	return fmt.Sprintf("%s %s", nameColor.Sprint(name), descriptionColor.Sprint(description))
+}
+
+// PrettyIdentity formats a standard pretty identity of a type.
+//
+// Deprecated: Use Title
+func (l Logger) PrettyIdentity(v Identifiable) string {
 	if v == nil {
 		return ""
 	}
