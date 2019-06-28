@@ -133,6 +133,6 @@ func (b Buildpack) RuntimeDependency(id, version string, stack stack.Stack) (Dep
 
 // String makes Buildpack satisfy the Stringer interface.
 func (b Buildpack) String() string {
-	return fmt.Sprintf("Buildpack{ Buildpack: %s, CacheRoot: %s, logger: %s }",
+	return fmt.Sprintf("Buildpack{ Buildpack: %#v, CacheRoot: %s, logger: %#v }",
 		b.Buildpack, b.CacheRoot, b.logger)
 }
