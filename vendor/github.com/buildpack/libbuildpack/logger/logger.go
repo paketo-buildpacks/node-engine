@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,11 +64,6 @@ func (l Logger) IsDebugEnabled() bool {
 // IsInfoEnabled returns true if info logging is enabled, false otherwise.
 func (l Logger) IsInfoEnabled() bool {
 	return l.info != nil
-}
-
-// String makes Logger satisfy the Stringer interface.
-func (l Logger) String() string {
-	return fmt.Sprintf("Logger{ debug: %t, info: %t }", l.debug != nil, l.info != nil)
 }
 
 // DefaultLogger creates a new instance of Logger, suppressing debug output unless BP_DEBUG is set.

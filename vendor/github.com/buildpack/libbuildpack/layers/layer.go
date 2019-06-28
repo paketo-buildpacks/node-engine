@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -88,11 +88,6 @@ func (l Layer) OverrideSharedEnv(name string, format string, args ...interface{}
 	return l.addSharedEnvFile(fmt.Sprintf("%s.override", name), format, args...)
 }
 
-// String makes Layer satisfy the Stringer interface.
-func (l Layer) String() string {
-	return fmt.Sprintf("Layer{ Root: %s, Metadata: %s, logger: %s }", l.Root, l.Metadata, l.logger)
-}
-
 // ReadMetadata reads arbitrary layer metadata from the filesystem.
 func (l Layer) ReadMetadata(metadata interface{}) error {
 	exists, err := internal.FileExists(l.Metadata)
@@ -152,7 +147,7 @@ func (l Layer) WriteMetadata(metadata interface{}, flags ...Flag) error {
 		}
 	}
 
-	l.logger.Debug("Writing layer metadata: %s <= %s", l.Metadata, lm)
+	l.logger.Debug("Writing layer metadata: %s <= %#v", l.Metadata, lm)
 	return internal.WriteTomlFile(l.Metadata, 0644, lm)
 }
 
@@ -194,10 +189,4 @@ type layerMetadata struct {
 	Cache    bool        `toml:"cache"`
 	Launch   bool        `toml:"launch"`
 	Metadata interface{} `toml:"metadata"`
-}
-
-// String makes layerMetadata satisfy the Stringer interface.
-func (l layerMetadata) String() string {
-	return fmt.Sprintf("layerMetadata{ Build: %t, Cache: %t, Launch: %t, Metadata: %s }",
-		l.Build, l.Cache, l.Launch, l.Metadata)
 }

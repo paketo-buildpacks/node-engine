@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,6 @@
 package build
 
 import (
-	"fmt"
-
 	"github.com/buildpack/libbuildpack/application"
 	"github.com/buildpack/libbuildpack/buildpack"
 	"github.com/buildpack/libbuildpack/buildplan"
@@ -67,12 +65,6 @@ type Build struct {
 func (b Build) Failure(code int) int {
 	b.Logger.Debug("Build failed. Exiting with %d.", code)
 	return code
-}
-
-// String makes Build satisfy the Stringer interface.
-func (b Build) String() string {
-	return fmt.Sprintf("Build{ Application: %s, Buildpack: %s, BuildPlan: %s, BuildPlanWriter: %v, Layers: %s, Logger: %s, Platform: %s, Services: %s, Stack: %s }",
-		b.Application, b.Buildpack, b.BuildPlan, b.BuildPlanWriter, b.Layers, b.Logger, b.Platform, b.Services, b.Stack)
 }
 
 // Success signals a successful build by exiting with a zero status code.

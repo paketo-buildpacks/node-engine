@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,6 @@
 
 package layers
 
-import (
-	"fmt"
-)
-
 // Slices is a collection of Slice instances.
 type Slices []Slice
 
@@ -27,9 +23,4 @@ type Slices []Slice
 type Slice struct {
 	// Paths are the contents of the slice.
 	Paths []string `toml:"paths"`
-}
-
-// String makes Slice satisfy the Stringer interface.
-func (s Slice) String() string {
-	return fmt.Sprintf("Slice{ Paths: %s }", s.Paths)
 }

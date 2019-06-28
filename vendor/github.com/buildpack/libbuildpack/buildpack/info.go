@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,6 @@
  */
 
 package buildpack
-
-import (
-	"fmt"
-)
 
 // Info is information about the buildpack.
 type Info struct {
@@ -30,9 +26,4 @@ type Info struct {
 
 	// Version is the semver-compliant version of the buildpack.
 	Version string `toml:"version"`
-}
-
-// String makes Info satisfy the Stringer interface.
-func (i Info) String() string {
-	return fmt.Sprintf("Info{ ID: %s, Name: %s, Version: %s }", i.ID, i.Name, i.Version)
 }

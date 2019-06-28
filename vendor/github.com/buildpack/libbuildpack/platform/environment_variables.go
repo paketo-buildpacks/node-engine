@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,9 @@
 package platform
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/buildpack/libbuildpack/logger"
 )
@@ -38,17 +36,6 @@ func (e EnvironmentVariables) SetAll() error {
 	}
 
 	return nil
-}
-
-// String makes EnvironmentVariables satisfy the Stringer interface.
-func (e EnvironmentVariables) String() string {
-	var entries []string
-
-	for k, v := range e {
-		entries = append(entries, fmt.Sprintf("%s: %s", k, v))
-	}
-
-	return fmt.Sprintf("EnvironmentVariables{ %s }", strings.Join(entries, ", "))
 }
 
 func environmentVariables(root string, logger logger.Logger) (EnvironmentVariables, error) {

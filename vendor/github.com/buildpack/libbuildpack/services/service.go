@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,6 @@
  */
 
 package services
-
-import (
-	"fmt"
-)
 
 // Service represents a service bound to the application.
 type Service struct {
@@ -39,10 +35,4 @@ type Service struct {
 
 	// Tags is the collection of tags of the service.
 	Tags []string `json:"tags"`
-}
-
-// String makes Service satisfy the Stringer interface.
-func (s Service) String() string {
-	return fmt.Sprintf("Service{ BindingName: %s, Credentials: %s, InstanceName: %s, Label: %s, Plan: %s, Tags: %s }",
-		s.BindingName, s.Credentials, s.InstanceName, s.Label, s.Plan, s.Tags)
 }

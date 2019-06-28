@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,12 +44,6 @@ type Buildpack struct {
 	logger logger.Logger
 }
 
-// String makes Buildpack satisfy the Stringer interface.
-func (b Buildpack) String() string {
-	return fmt.Sprintf("Buildpack{ Info: %s, Metadata: %s, Root: %s, Stacks: %s, logger: %s }",
-		b.Info, b.Metadata, b.Root, b.Stacks, b.logger)
-}
-
 // New creates an instance of Buildpack given a root dir and a logger extracting the contents of the buildpack.toml file in the root
 // of the buildpack.
 func New(rootDir string, logger logger.Logger) (Buildpack, error) {
@@ -63,7 +57,7 @@ func New(rootDir string, logger logger.Logger) (Buildpack, error) {
 		return Buildpack{}, err
 	}
 
-	logger.Debug("Buildpack: %s", b)
+	logger.Debug("Buildpack: %#v", b)
 	return b, nil
 }
 
@@ -87,7 +81,7 @@ func DefaultBuildpack(logger logger.Logger) (Buildpack, error) {
 		return Buildpack{}, err
 	}
 
-	logger.Debug("Buildpack: %s", b)
+	logger.Debug("Buildpack: %#v", b)
 	return b, nil
 }
 

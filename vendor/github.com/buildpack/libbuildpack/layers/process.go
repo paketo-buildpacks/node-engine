@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,6 @@
  */
 
 package layers
-
-import (
-	"fmt"
-)
 
 // Processes is a collection of Process instances.
 type Processes []Process
@@ -30,9 +26,4 @@ type Process struct {
 
 	// Command is the command of the process.
 	Command string `toml:"command"`
-}
-
-// String makes Process satisfy the Stringer interface.
-func (p Process) String() string {
-	return fmt.Sprintf("Process{ Type: %s, Command: %s }", p.Type, p.Command)
 }

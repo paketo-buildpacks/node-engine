@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,11 +36,6 @@ type Layers struct {
 func (l Layers) Layer(name string) Layer {
 	metadata := filepath.Join(l.Root, fmt.Sprintf("%s.toml", name))
 	return Layer{filepath.Join(l.Root, name), metadata, l.logger}
-}
-
-// String makes Layers satisfy the Stringer interface.
-func (l Layers) String() string {
-	return fmt.Sprintf("Layers{ Root: %s, logger: %s }", l.Root, l.logger)
 }
 
 // WriteApplicationMetadata writes application metadata to the filesystem.
