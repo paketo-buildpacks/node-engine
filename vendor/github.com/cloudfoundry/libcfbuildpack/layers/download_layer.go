@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cloudfoundry/libcfbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -73,7 +74,7 @@ func (l DownloadLayer) Artifact() (string, error) {
 		return "", err
 	}
 
-	l.logger.Body("%s from %s", color.YellowString("Downloading"), l.dependency.URI)
+	l.logger.Body("%s from %s", color.YellowString("Downloading"), strings.ReplaceAll(l.dependency.URI, "%", "%%"))
 	if err := l.download(artifact); err != nil {
 		return "", err
 	}
