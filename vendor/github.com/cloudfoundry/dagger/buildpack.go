@@ -47,6 +47,10 @@ func FindBPRoot() (string, error) {
 }
 
 func PackageBuildpack(root string) (string, error) {
+	if bpPackagedPath := os.Getenv("BP_PACKAGED_PATH"); bpPackagedPath != "" {
+		return bpPackagedPath, nil
+	}
+
 	path, err := filepath.Abs(root)
 	if err != nil {
 		return "", err

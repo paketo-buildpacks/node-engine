@@ -86,7 +86,7 @@ docker:
 
 			if strings.TrimSpace(string(status)) == "unhealthy" {
 				logs, _ := a.Logs()
-				return errors.Errorf("app failed to start: \n%s\n", a.fixtureName, logs)
+				return errors.Errorf("app failed to start: %s\n%s\n", a.fixtureName, logs)
 			}
 
 			if strings.TrimSpace(string(status)) == "healthy" {

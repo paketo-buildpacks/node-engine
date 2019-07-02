@@ -14,7 +14,7 @@ github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
-# github.com/cloudfoundry/dagger v0.0.0-20190618191508-11a2fd493334
+# github.com/cloudfoundry/dagger v0.0.0-20190702204901-6f86432fd00d
 github.com/cloudfoundry/dagger
 # github.com/cloudfoundry/libcfbuildpack v1.76.0
 github.com/cloudfoundry/libcfbuildpack/build
@@ -61,7 +61,7 @@ github.com/sclevine/spec
 github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
-# golang.org/x/net v0.0.0-20190620200207-3b0461eec859
+# golang.org/x/net v0.0.0-20190628185345-da137c7871d7
 golang.org/x/net/html/charset
 golang.org/x/net/html
 golang.org/x/net/context/ctxhttp
