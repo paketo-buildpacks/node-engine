@@ -9,16 +9,34 @@ PACKAGE_DIR=${PACKAGE_DIR:-"${PWD##*/}_$(openssl rand -hex 4)"}
 full_path=$(realpath "$PACKAGE_DIR")
 args=".bin/packager -uncached"
 
-if [[ $1 == "-c" ]] || [[ $2 == "-c" ]]; then #package as cached
+while getopts "acv:" arg
+do
+    case $arg in
+    a) archive=true;;
+    c) cached=true;;
+    v) version="${OPTARG}";;
+    esac
+done
+
+if [[ ! -z "$cached" ]]; then #package as cached
     full_path="$full_path-cached"
     args=".bin/packager"
 fi
 
-if [[ $1 == "-a" ]] || [[ $2 == "-a" ]]; then #package as archive
+if [[ ! -z "$archive" ]]; then #package as archive
     args="${args} -archive"
 fi
+
+if [[ -z "$version" ]]; then #version not provided, use latest git tag
+    git_tag=$(git describe --abbrev=0 --tags)
+    version=${git_tag:1}
+fi
+
+go run -ldflags="-X main.VersionString=${version}" scripts/template.go
+
 eval "${args}" "${full_path}"
 
 if [[ -n "$BP_REWRITE_HOST" ]]; then
     sed -i '' -e "s|^uri = \"https:\/\/buildpacks\.cloudfoundry\.org\(.*\)\"$|uri = \"http://$BP_REWRITE_HOST\1\"|g" "$full_path/buildpack.toml"
 fi
+
