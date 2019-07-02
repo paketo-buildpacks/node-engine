@@ -29,7 +29,7 @@ func main() {
 
 	err = template.Execute(f, v)
 	if err != nil {
-		log.Fatal(fmt.Errorf("failed to write template to buildpack.toml : %s", err)
+		log.Fatal(fmt.Errorf("failed to write template to buildpack.toml : %s", err))
 	}
 
 }
