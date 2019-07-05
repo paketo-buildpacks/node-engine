@@ -5,8 +5,8 @@ github.com/Masterminds/semver v1.4.2 h1:WBLTQ37jOCzSLtXNdoo8bNM8876KhNqOKvrlGITg
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
 github.com/buildpack/libbuildpack v1.19.0 h1:HUkaIwuGmPbQhujBjYNpd+E4f0NdAgAgHq7skydiL5s=
 github.com/buildpack/libbuildpack v1.19.0/go.mod h1:oxgSTzPbWscHs27iuYrctEZpSak2m/qPThA+9JM0Boo=
-github.com/cloudfoundry/dagger v0.0.0-20190702204901-6f86432fd00d h1:vpKkm7GEKaSGn1whjthGausas9/lomcZqh8cGMc7ZmA=
-github.com/cloudfoundry/dagger v0.0.0-20190702204901-6f86432fd00d/go.mod h1:PXeUHc4d2vAVO/31jFE6uD09w/yFfzs4kcayAVEvnEI=
+github.com/cloudfoundry/dagger v0.0.0-20190705203005-020f9ac2f14e h1:5uEL2c5gNnF3KPZCNIfeVnvHubRkiOi+HYlhz/TJ8fs=
+github.com/cloudfoundry/dagger v0.0.0-20190705203005-020f9ac2f14e/go.mod h1:PXeUHc4d2vAVO/31jFE6uD09w/yFfzs4kcayAVEvnEI=
 github.com/cloudfoundry/libcfbuildpack v1.76.0 h1:oMTv35mjk5Jogzy2sshVXHyolDWnWHMfANQ0UooXJq0=
 github.com/cloudfoundry/libcfbuildpack v1.76.0/go.mod h1:QGm+nzixn579dvQNlS7ZQET541y2hEpZ0/5uNxkQ04Y=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
