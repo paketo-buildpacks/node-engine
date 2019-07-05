@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PACK_VERSION=latest
+BP_PACKAGED_PATH=${BP_PACKAGED_PATH:-""}
 usage() {
     echo "Usage:   install_tools.sh <version: optional>"
     echo "Example: install_tools.sh 0.0.9"
@@ -108,5 +109,7 @@ mkdir -p .bin
 export PATH=$(pwd)/.bin:$PATH
 
 install_pack
-install_packager
+if [[ -z "${BP_PACKAGED_PATH}" ]]; then
+    install_packager
+fi
 
