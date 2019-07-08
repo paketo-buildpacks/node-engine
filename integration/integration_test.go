@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -26,8 +25,8 @@ func TestIntegration(t *testing.T) {
 	npmBP, err = dagger.GetLatestBuildpack("npm-cnb")
 	Expect(err).ToNot(HaveOccurred())
 	defer func() {
-		os.RemoveAll(bp)
-		os.RemoveAll(npmBP)
+		dagger.DeleteBuildpack(bp)
+		dagger.DeleteBuildpack(npmBP)
 	}()
 
 	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
