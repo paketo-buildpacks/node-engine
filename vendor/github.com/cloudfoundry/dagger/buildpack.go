@@ -34,7 +34,13 @@ func FindBPRoot() (string, error) {
 		if dir == "/" {
 			return "", fmt.Errorf("could not find buildpack.toml in the directory hierarchy")
 		}
+		// TODO: Take out after transition all cnbs to buildpack.toml.tmpl
 		if exist, err := helper.FileExists(filepath.Join(dir, "buildpack.toml")); err != nil {
+			return "", err
+		} else if exist {
+			return dir, nil
+		}
+		if exist, err := helper.FileExists(filepath.Join(dir, "buildpack.toml.tmpl")); err != nil {
 			return "", err
 		} else if exist {
 			return dir, nil
