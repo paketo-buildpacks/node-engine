@@ -72,7 +72,7 @@ func (m *haveApplicationMetadataMatcher) path(actual interface{}) (string, error
 		return "", fmt.Errorf("HaveApplicationMetadata matcher expects a layers")
 	}
 
-	return filepath.Join(v.Interface().(string), "app.toml"), nil
+	return filepath.Join(v.Interface().(string), "launch.toml"), nil
 }
 
 func (m *haveApplicationMetadataMatcher) getMetadata(actual interface{}) (layers.Metadata, error) {

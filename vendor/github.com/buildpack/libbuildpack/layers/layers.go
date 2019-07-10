@@ -40,14 +40,7 @@ func (l Layers) Layer(name string) Layer {
 
 // WriteApplicationMetadata writes application metadata to the filesystem.
 func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
-	f := filepath.Join(l.Root, "launch.toml") // TODO: Remove once launch.toml removed from lifecycle
-
-	l.logger.Debug("Writing application metadata: %s <= %s", f, metadata)
-	if err := internal.WriteTomlFile(f, 0644, metadata); err != nil {
-		return err
-	}
-
-	f = filepath.Join(l.Root, "app.toml")
+	f := filepath.Join(l.Root, "launch.toml")
 
 	l.logger.Debug("Writing application metadata: %s <= %s", f, metadata)
 	return internal.WriteTomlFile(f, 0644, metadata)
