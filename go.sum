@@ -11,8 +11,8 @@ github.com/cloudfoundry/dagger v0.0.0-20190708210935-79ba5190b629 h1:Ij34QrApV5n
 github.com/cloudfoundry/dagger v0.0.0-20190708210935-79ba5190b629/go.mod h1:PXeUHc4d2vAVO/31jFE6uD09w/yFfzs4kcayAVEvnEI=
 github.com/cloudfoundry/libcfbuildpack v1.76.0 h1:oMTv35mjk5Jogzy2sshVXHyolDWnWHMfANQ0UooXJq0=
 github.com/cloudfoundry/libcfbuildpack v1.76.0/go.mod h1:QGm+nzixn579dvQNlS7ZQET541y2hEpZ0/5uNxkQ04Y=
-github.com/cloudfoundry/libcfbuildpack v1.77.0 h1:0efgQEcrRhbzp9vQAwik7HDNqudcqbjJ4qI7rRhEqL8=
-github.com/cloudfoundry/libcfbuildpack v1.77.0/go.mod h1:nqxdAEdvcSYRZqsFL+uV1+coatU1pqz3EyPST4/e8Ls=
+github.com/cloudfoundry/libcfbuildpack v1.78.0 h1:EznvBkxmyj5nF9jhFHyeR6fiFdd0cvjm8PRVfAelhQ0=
+github.com/cloudfoundry/libcfbuildpack v1.78.0/go.mod h1:nqxdAEdvcSYRZqsFL+uV1+coatU1pqz3EyPST4/e8Ls=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
