@@ -100,7 +100,7 @@ func (l Logger) Body(format string, args ...interface{}) {
 
 	l.Info(color.New(color.Faint).Sprint(
 		strings.ReplaceAll(
-			lines.ReplaceAllString(fmt.Sprintf(format, args...), BodyIndent),
+			l.BodyIndent(format, args...),
 			fmt.Sprintf("\x1b[%dm", color.Reset),
 			fmt.Sprintf("\x1b[%dm\x1b[%dm", color.Reset, color.Faint))))
 }
@@ -112,6 +112,11 @@ func (l Logger) BodyError(format string, args ...interface{}) {
 	}
 
 	l.Body(error.Sprintf(format, args...))
+}
+
+// BodyIndent indents each line of a log message to the BodyIndent offset.
+func (l Logger) BodyIndent(format string, args ...interface{}) string {
+	return lines.ReplaceAllString(fmt.Sprintf(format, args...), BodyIndent)
 }
 
 // BodyWarning prints the log message colored yellow and bold with each line indented four spaces.
