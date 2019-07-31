@@ -88,7 +88,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "nodejs:\n  version:  \n")
 		})
 
-		it.Focus("should not overwrite an existing version in the build plan", func() {
+		it("should not overwrite an existing version in the build plan", func() {
 			runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, t)
 		})
 	})
