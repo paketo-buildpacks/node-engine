@@ -32,7 +32,7 @@ if [[ -z "$version" ]]; then #version not provided, use latest git tag
     version=${git_tag:1}
 fi
 
-go run -ldflags="-X main.VersionString=${version}" scripts/template.go
+args="${args} -version ${version}"
 
 eval "${args}" "${full_path}"
 
