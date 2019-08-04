@@ -1,6 +1,7 @@
 package node_test
 
 import (
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/node-engine-cnb/node"
 	"os"
 	"path/filepath"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/cloudfoundry/libcfbuildpack/layers"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/sclevine/spec/report"
 
 	"github.com/cloudfoundry/libcfbuildpack/test"
@@ -34,7 +34,7 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 
 	when("node.NewContributor", func() {
 		it("returns true if a build plan exists", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{})
+			f.AddPlan(buildpackplan.Plan{Name: node.Dependency})
 
 			_, willContribute, err := node.NewContributor(f.Build)
 			Expect(err).NotTo(HaveOccurred())
@@ -50,7 +50,7 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 
 	when("Contribute", func() {
 		it("writes default env vars, installs the node dependency, writes profile scripts", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{})
+			f.AddPlan(buildpackplan.Plan{Name: node.Dependency})
 
 			nodeContributor, _, err := node.NewContributor(f.Build)
 			Expect(err).NotTo(HaveOccurred())
@@ -85,7 +85,7 @@ export MEMORY_AVAILABLE
 		it("uses the default version when a version is not requested", func() {
 			f.AddDependencyWithVersion(node.Dependency, "0.9", filepath.Join("testdata", "stub-node-default.tar.gz"))
 			f.SetDefaultVersion(node.Dependency, "0.9")
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{})
+			f.AddPlan(buildpackplan.Plan{Name: node.Dependency})
 
 			nodeContributor, _, err := node.NewContributor(f.Build)
 			Expect(err).NotTo(HaveOccurred())
@@ -96,8 +96,11 @@ export MEMORY_AVAILABLE
 		})
 
 		it("contributes node to the cache layer when included in the build plan", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{
-				Metadata: buildplan.Metadata{"build": true},
+			f.AddPlan(buildpackplan.Plan{
+				Name: node.Dependency,
+				Metadata: buildpackplan.Metadata{
+					"build": true,
+				},
 			})
 
 			nodeContributor, _, err := node.NewContributor(f.Build)
@@ -110,8 +113,11 @@ export MEMORY_AVAILABLE
 		})
 
 		it("contributes node to the launch layer when included in the build plan", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{
-				Metadata: buildplan.Metadata{"launch": true},
+			f.AddPlan(buildpackplan.Plan{
+				Name: node.Dependency,
+				Metadata: buildpackplan.Metadata{
+					"launch": true,
+				},
 			})
 
 			nodeContributor, _, err := node.NewContributor(f.Build)
@@ -124,9 +130,12 @@ export MEMORY_AVAILABLE
 		})
 
 		it("returns an error when unsupported version of node is included in the build plan", func() {
-			f.AddBuildPlan(node.Dependency, buildplan.Dependency{
-				Version:  "9000.0.0",
-				Metadata: buildplan.Metadata{"launch": true},
+			f.AddPlan(buildpackplan.Plan{
+				Name: node.Dependency,
+				Version: "9000.0.0",
+				Metadata: buildpackplan.Metadata{
+					"launch": true,
+				},
 			})
 
 			_, shouldContribute, err := node.NewContributor(f.Build)
@@ -143,8 +152,11 @@ export MEMORY_AVAILABLE
 			)
 
 			it.Before(func() {
-				f.AddBuildPlan(node.Dependency, buildplan.Dependency{
-					Metadata: buildplan.Metadata{"build": true},
+				f.AddPlan(buildpackplan.Plan{
+					Name: node.Dependency,
+					Metadata: buildpackplan.Metadata{
+						"build": true,
+					},
 				})
 
 				optimizeMemoryProfile = `export NODE_OPTIONS="--max_old_space_size=$(( $MEMORY_AVAILABLE * 75 / 100 ))"`

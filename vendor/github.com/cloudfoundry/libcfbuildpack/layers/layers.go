@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/buildpack/libbuildpack/layers"
 	"github.com/cloudfoundry/libcfbuildpack/buildpack"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"github.com/fatih/color"
 )
@@ -31,8 +31,8 @@ import (
 type Layers struct {
 	layers.Layers
 
-	// DependencyBuildPlans contains all contributed dependencies.
-	DependencyBuildPlans buildplan.BuildPlan
+	// Plans contains all contributed dependencies.
+	Plans *buildpackplan.Plans
 
 	// TouchedLayers registers the layers that have been touched during this execution.
 	TouchedLayers TouchedLayers
@@ -47,9 +47,9 @@ func (l Layers) DependencyLayer(dependency buildpack.Dependency) DependencyLayer
 	return DependencyLayer{
 		l.Layer(dependency.ID),
 		dependency,
-		l.DependencyBuildPlans,
 		l.DownloadLayer(dependency),
 		l.logger,
+		l.Plans,
 	}
 }
 
@@ -70,9 +70,9 @@ func (l Layers) HelperLayer(id string, name string) HelperLayer {
 		l.Layer(id),
 		id,
 		l.buildpack,
-		l.DependencyBuildPlans,
-		name,
 		l.logger,
+		name,
+		l.Plans,
 	}
 }
 
@@ -126,11 +126,11 @@ func (l Layers) maximumTypeLength(processes Processes) int {
 // NewLayers creates a new instance of Layers.
 func NewLayers(layers layers.Layers, buildpackCache layers.Layers, buildpack buildpack.Buildpack, logger logger.Logger) Layers {
 	return Layers{
-		Layers:               layers,
-		DependencyBuildPlans: make(buildplan.BuildPlan),
-		TouchedLayers:        NewTouchedLayers(layers.Root, logger),
-		buildpack:            buildpack,
-		buildpackCache:       buildpackCache,
-		logger:               logger,
+		Layers:         layers,
+		Plans:          &buildpackplan.Plans{},
+		TouchedLayers:  NewTouchedLayers(layers.Root, logger),
+		buildpack:      buildpack,
+		buildpackCache: buildpackCache,
+		logger:         logger,
 	}
 }

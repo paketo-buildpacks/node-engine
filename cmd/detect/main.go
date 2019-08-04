@@ -63,13 +63,21 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if version != "" {
-		return context.Pass(buildplan.BuildPlan{
-			node.Dependency: {
-				Version:  version,
-				Metadata: buildplan.Metadata{"launch": true},
+		return context.Pass(buildplan.Plan{
+			Provides: []buildplan.Provided{
+				{Name: node.Dependency},
+			},
+			Requires: []buildplan.Required{
+				{
+					Name:    node.Dependency,
+					Version: version,
+					Metadata: buildplan.Metadata{
+						"launch": true,
+					},
+				},
 			},
 		})
 	}
 
-	return context.Pass(buildplan.BuildPlan{})
+	return context.Pass()
 }
