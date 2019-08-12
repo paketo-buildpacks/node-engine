@@ -2,7 +2,7 @@
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.4.2
 github.com/Masterminds/semver
-# github.com/buildpack/libbuildpack v1.20.0
+# github.com/buildpack/libbuildpack v1.21.0
 github.com/buildpack/libbuildpack/buildplan
 github.com/buildpack/libbuildpack/internal
 github.com/buildpack/libbuildpack/build
@@ -10,18 +10,20 @@ github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/application
 github.com/buildpack/libbuildpack/buildpack
+github.com/buildpack/libbuildpack/buildpackplan
 github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20190708210935-79ba5190b629
 github.com/cloudfoundry/dagger
-# github.com/cloudfoundry/libcfbuildpack v1.79.1-0.20190802164909-f8808a55c67b
+# github.com/cloudfoundry/libcfbuildpack v1.82.0
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/detect
 github.com/cloudfoundry/libcfbuildpack/helper
 github.com/cloudfoundry/libcfbuildpack/layers
 github.com/cloudfoundry/libcfbuildpack/buildpack
+github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
@@ -61,7 +63,7 @@ github.com/sclevine/spec
 github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
-# golang.org/x/net v0.0.0-20190628185345-da137c7871d7
+# golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 golang.org/x/net/html/charset
 golang.org/x/net/html
 golang.org/x/net/context/ctxhttp
@@ -70,7 +72,7 @@ golang.org/x/net/context
 # golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.0.0-20190710143415-6ec70d6a5542
+# golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding

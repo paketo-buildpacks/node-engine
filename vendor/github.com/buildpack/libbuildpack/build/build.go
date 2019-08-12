@@ -19,7 +19,7 @@ package build
 import (
 	"github.com/buildpack/libbuildpack/application"
 	"github.com/buildpack/libbuildpack/buildpack"
-	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/buildpack/libbuildpack/buildpackplan"
 	"github.com/buildpack/libbuildpack/internal"
 	"github.com/buildpack/libbuildpack/layers"
 	"github.com/buildpack/libbuildpack/logger"
@@ -39,17 +39,14 @@ type Build struct {
 	// Buildpack represents the metadata associated with a buildpack.
 	Buildpack buildpack.Buildpack
 
-	// BuildPlan represents dependencies contributed by previous builds.
-	BuildPlan buildplan.BuildPlan
-
-	// BuildPlanWriter is the writer used to write the BuildPlan in Pass().
-	BuildPlanWriter buildplan.Writer
-
 	// Layers represents the launch layers contributed by a buildpack.
 	Layers layers.Layers
 
 	// Logger is used to write debug and info to the console.
 	Logger logger.Logger
+
+	// Plans represents required contributions.
+	Plans buildpackplan.Plans
 
 	// Platform represents components contributed by the platform to the buildpack.
 	Platform platform.Platform
@@ -59,6 +56,9 @@ type Build struct {
 
 	// Stack is the stack currently available to the application.
 	Stack stack.Stack
+
+	// Writer is the writer used to write the build plan in Success().
+	Writer buildpackplan.Writer
 }
 
 // Failure signals an unsuccessful build by exiting with a specified positive status code.
@@ -68,10 +68,10 @@ func (b Build) Failure(code int) int {
 }
 
 // Success signals a successful build by exiting with a zero status code.
-func (b Build) Success(buildPlan buildplan.BuildPlan) (int, error) {
+func (b Build) Success(plans ...buildpackplan.Plan) (int, error) {
 	b.Logger.Debug("Build success. Exiting with %d.", SuccessStatusCode)
 
-	if err := buildPlan.Write(b.BuildPlanWriter); err != nil {
+	if err := b.Writer(buildpackplan.Plans{Entries: plans}); err != nil {
 		return -1, err
 	}
 
@@ -100,18 +100,21 @@ func DefaultBuild() (Build, error) {
 		return Build{}, err
 	}
 
-	buildPlan := buildplan.BuildPlan{}
-	if err := buildPlan.Init(); err != nil {
+	plan, err := internal.Argument(3)
+	if err != nil {
 		return Build{}, err
 	}
-
-	buildPlanWriter := buildplan.DefaultWriter(3)
 
 	layersRoot, err := internal.Argument(1)
 	if err != nil {
 		return Build{}, err
 	}
 	layers := layers.NewLayers(layersRoot, logger)
+
+	plans, err := buildpackplan.DefaultPlans(plan, logger)
+	if err != nil {
+		return Build{}, err
+	}
 
 	platform, err := platform.DefaultPlatform(platformRoot, logger)
 	if err != nil {
@@ -128,15 +131,17 @@ func DefaultBuild() (Build, error) {
 		return Build{}, err
 	}
 
+	writer := buildpackplan.DefaultWriter(3)
+
 	return Build{
 		application,
 		buildpack,
-		buildPlan,
-		buildPlanWriter,
 		layers,
 		logger,
+		plans,
 		platform,
 		services,
 		stack,
+		writer,
 	}, nil
 }

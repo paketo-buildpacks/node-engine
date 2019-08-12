@@ -24,10 +24,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/buildpack/libbuildpack/buildplan"
+	"github.com/buildpack/libbuildpack/buildpackplan"
 	bpLayers "github.com/buildpack/libbuildpack/layers"
 	bpServices "github.com/buildpack/libbuildpack/services"
-	"github.com/buildpack/libbuildpack/stack"
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/buildpack"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -45,24 +44,13 @@ type BuildFactory struct {
 	// Home is the home directory to use.
 	Home string
 
-	// Output is the BuildPlan output at termination.
-	Output buildplan.BuildPlan
+	// Plans is the buildpack plans at termination.
+	Plans buildpackplan.Plans
 
 	// Runner is the used to capture commands executed outside the process.
 	Runner *Runner
 
 	t *testing.T
-}
-
-// AddBuildPlan adds an entry to a build plan.
-func (f *BuildFactory) AddBuildPlan(name string, dependency buildplan.Dependency) {
-	f.t.Helper()
-
-	if f.Build.BuildPlan == nil {
-		f.Build.BuildPlan = make(buildplan.BuildPlan)
-	}
-
-	f.Build.BuildPlan[name] = dependency
 }
 
 // AddDependency adds a dependency with version 1.0 to the buildpack metadata and copies a fixture into a cached
@@ -86,6 +74,12 @@ func (f *BuildFactory) AddDependencyWithDependency(dependency buildpack.Dependen
 func (f *BuildFactory) AddDependencyWithVersion(id string, version string, fixturePath string) {
 	f.t.Helper()
 	f.AddDependencyWithDependency(f.newDependency(id, version, filepath.Base(fixturePath)), fixturePath)
+}
+
+// AddPlan adds a plan to the Plans.
+func (f *BuildFactory) AddPlan(plan buildpackplan.Plan) {
+	f.t.Helper()
+	f.Build.Plans.Entries = append(f.Build.Plans.Entries, plan)
 }
 
 // SetDefaultVersion sets a default dependency version in the buildpack metadata
@@ -194,17 +188,17 @@ func NewBuildFactory(t *testing.T) *BuildFactory {
 	}
 	f.Build.Buildpack.Info.Version = "1.0"
 	f.Build.Buildpack.Root = filepath.Join(root, "buildpack")
-	f.Build.BuildPlanWriter = func(buildPlan buildplan.BuildPlan) error {
-		f.Output = buildPlan
-		return nil
-	}
 	f.Build.Layers = layers.NewLayers(
 		bpLayers.Layers{Root: filepath.Join(root, "layers")},
 		bpLayers.Layers{Root: filepath.Join(root, "buildpack-cache")}, f.Build.Buildpack, logger.Logger{})
 	f.Build.Platform.Root = filepath.Join(root, "platform")
 	f.Build.Runner = runner
 	f.Build.Services = services.Services{Services: bpServices.Services{}}
-	f.Build.Stack = stack.Stack("test-stack")
+	f.Build.Stack = "test-stack"
+	f.Build.Writer = func(plans buildpackplan.Plans) error {
+		f.Plans = plans
+		return nil
+	}
 
 	return &f
 }

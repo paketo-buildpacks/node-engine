@@ -20,8 +20,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/buildpack"
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
 )
 
@@ -32,10 +32,10 @@ type HelperLayer struct {
 	// ID is the id of the buildpack provided helper.
 	ID string
 
-	buildpack            buildpack.Buildpack
-	dependencyBuildPlans buildplan.BuildPlan
-	name                 string
-	logger               logger.Logger
+	buildpack buildpack.Buildpack
+	logger    logger.Logger
+	name      string
+	plans     *buildpackplan.Plans
 }
 
 // HelperLayerContributor defines a callback function that is called when a buildpack provided helper needs to be
@@ -65,13 +65,14 @@ func (l HelperLayer) Contribute(contributor HelperLayerContributor, flags ...Fla
 func (l *HelperLayer) contributeToBuildPlan() {
 	l.logger.Debug("Contributing %s to bill-of-materials", l.ID)
 
-	l.dependencyBuildPlans[l.ID] = buildplan.Dependency{
+	l.plans.Entries = append(l.plans.Entries, buildpackplan.Plan{
+		Name:    l.ID,
 		Version: l.buildpack.Info.Version,
-		Metadata: buildplan.Metadata{
+		Metadata: buildpackplan.Metadata{
 			"id":   l.buildpack.Info.ID,
 			"name": l.buildpack.Info.Name,
 		},
-	}
+	})
 }
 
 type marker struct {
