@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/node-engine-cnb/node"
 
+	"github.com/buildpack/libbuildpack/buildplan"
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/libcfbuildpack/detect"
@@ -26,7 +26,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		buildpackYamlVersion = "1.2.3"
 		nvmrcVersion         = "4.5.6"
 		buildpackYAMLString  = fmt.Sprintf("nodejs:\n  version: %s", buildpackYamlVersion)
-		buildPlan            buildplan.BuildPlan
+		buildPlan            buildplan.Plan
 	)
 
 	it.Before(func() {
@@ -34,7 +34,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	it("always passes", func() {
-		runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, t)
+		runDetectAndExpectBuildplan(factory, buildplan.Plan{Provides: []buildplan.Provided{{Name: node.Dependency}}}, t)
 	})
 
 	when("there is a buildpack.yml", func() {
@@ -82,19 +82,9 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
-
-	when("there is a buildpack.yml with an empty version", func() {
-		it.Before(func() {
-			test.WriteFile(t, filepath.Join(factory.Detect.Application.Root, "buildpack.yml"), "nodejs:\n  version:  \n")
-		})
-
-		it("should not overwrite an existing version in the build plan", func() {
-			runDetectAndExpectBuildplan(factory, buildplan.BuildPlan{}, t)
-		})
-	})
 }
 
-func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.BuildPlan, t *testing.T) {
+func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildplan.Plan, t *testing.T) {
 	Expect := NewWithT(t).Expect
 
 	code, err := runDetect(factory.Detect)
@@ -102,14 +92,17 @@ func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildpla
 
 	Expect(code).To(Equal(detect.PassStatusCode))
 
-	Expect(factory.Output).To(Equal(buildplan))
+	Expect(factory.Plans.Plan).To(Equal(buildplan))
 }
 
-func getStandardBuildplanWithNodeVersion(version string) buildplan.BuildPlan {
-	return buildplan.BuildPlan{
-		node.Dependency: buildplan.Dependency{
-			Version:  version,
-			Metadata: buildplan.Metadata{"launch": true},
-		},
+func getStandardBuildplanWithNodeVersion(version string) buildplan.Plan {
+	return buildplan.Plan{
+		Provides: []buildplan.Provided{{Name: node.Dependency}},
+		Requires: []buildplan.Required{{
+			Name:    node.Dependency,
+			Version: version,
+			Metadata: buildplan.Metadata{
+				"build": true,
+			}}},
 	}
 }

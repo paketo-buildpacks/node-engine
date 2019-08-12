@@ -33,7 +33,11 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 		return Contributor{}, false, err
 	}
 
-	plan, wantDependency := context.BuildPlan[Dependency]
+	plan, wantDependency, err := context.Plans.GetShallowMerged(Dependency)
+	if err != nil {
+		return Contributor{}, false, err
+	}
+
 	if !wantDependency {
 		return Contributor{}, false, nil
 	}
