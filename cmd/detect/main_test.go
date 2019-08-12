@@ -102,7 +102,7 @@ func getStandardBuildplanWithNodeVersion(version string) buildplan.Plan {
 			Name:    node.Dependency,
 			Version: version,
 			Metadata: buildplan.Metadata{
-				"build": true,
+				"launch": true,
 			}}},
 	}
 }
