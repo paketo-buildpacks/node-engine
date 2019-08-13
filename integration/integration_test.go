@@ -22,11 +22,8 @@ func TestIntegration(t *testing.T) {
 	Expect(err).ToNot(HaveOccurred())
 	bp, err = dagger.PackageBuildpack(root)
 	Expect(err).NotTo(HaveOccurred())
-	npmBP, err = dagger.GetLatestBuildpack("npm-cnb")
-	Expect(err).ToNot(HaveOccurred())
 	defer func() {
 		dagger.DeleteBuildpack(bp)
-		dagger.DeleteBuildpack(npmBP)
 	}()
 
 	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
@@ -39,12 +36,12 @@ func testIntegration(t *testing.T, _ spec.G, it spec.S) {
 	})
 
 	it("sets max_old_space_size when nodejs.optimize-memory is set in buildpack.yml", func() {
-		app, err := dagger.PackBuild(filepath.Join("testdata", "optimize_memory"), bp, npmBP)
+		app, err := dagger.PackBuild(filepath.Join("testdata", "optimize_memory"), bp)
 		Expect(err).ToNot(HaveOccurred())
 		app.Memory = "128m"
 		defer app.Destroy()
 
-		Expect(app.Start()).To(Succeed())
+		Expect(app.StartWithCommand("node server.js")).To(Succeed())
 
 		body, _, err := app.HTTPGet("/")
 		Expect(err).NotTo(HaveOccurred())
