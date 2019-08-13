@@ -34,6 +34,10 @@ type HealthCheck struct {
 }
 
 func (a *App) Start() error {
+	return a.StartWithCommand("")
+}
+
+func (a *App) StartWithCommand(startCmd string) error {
 	buf := &bytes.Buffer{}
 
 	if a.Env["PORT"] == "" {
@@ -64,6 +68,9 @@ func (a *App) Start() error {
 	}
 
 	args = append(args, a.ImageName)
+	if startCmd != "" {
+		args = append(args, startCmd)
+	}
 
 	cmd := exec.Command("docker", args...)
 	cmd.Stdout = buf
