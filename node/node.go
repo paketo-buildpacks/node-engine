@@ -41,7 +41,7 @@ func NewContributor(context build.Build) (Contributor, bool, error) {
 		return Contributor{}, false, err
 	}
 
-	plan, wantDependency, err := context.Plans.GetShallowMerged(Dependency)
+	plan, wantDependency, err := context.Plans.GetMerged("node", PriorityPlanMerge)
 	if err != nil {
 		return Contributor{}, false, err
 	}
