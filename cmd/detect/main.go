@@ -70,7 +70,7 @@ func runDetect(context detect.Detect) (int, error) {
 			Requires: []buildplan.Required{{
 				Name:     node.Dependency,
 				Version:  version,
-				Metadata: buildplan.Metadata{"launch": true, "version-source": versionSource},
+				Metadata: buildplan.Metadata{"launch": true, node.VersionSource: versionSource},
 			}},
 		})
 	}

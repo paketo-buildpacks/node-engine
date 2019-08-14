@@ -43,7 +43,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, "buildpack.yml")
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -54,7 +54,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the .nvmrc file", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, ".nvmrc")
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -66,7 +66,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, "buildpack.yml")
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -78,7 +78,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the .nvmrc", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion)
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, "buildpack.yml")
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -95,14 +95,15 @@ func runDetectAndExpectBuildplan(factory *test.DetectFactory, buildplan buildpla
 	Expect(factory.Plans.Plan).To(Equal(buildplan))
 }
 
-func getStandardBuildplanWithNodeVersion(version string) buildplan.Plan {
+func getStandardBuildplanWithNodeVersion(version, versionSource string) buildplan.Plan {
 	return buildplan.Plan{
 		Provides: []buildplan.Provided{{Name: node.Dependency}},
 		Requires: []buildplan.Required{{
 			Name:    node.Dependency,
 			Version: version,
 			Metadata: buildplan.Metadata{
-				"launch": true,
+				"launch":           true,
+				node.VersionSource: versionSource,
 			}}},
 	}
 }
