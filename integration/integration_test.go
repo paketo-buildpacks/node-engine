@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	bp, npmBP string
+	bp string
 )
 
 func TestIntegration(t *testing.T) {

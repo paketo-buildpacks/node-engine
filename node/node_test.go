@@ -26,6 +26,11 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 		f               *test.BuildFactory
 		stubNodeFixture = filepath.Join("testdata", "stub-node.tar.gz")
 	)
+	var testPriorityMerge = func(planA, planB, expected buildpackplan.Plan) {
+		output, err := node.PriorityPlanMerge(planA, planB)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(output).To(Equal(expected))
+	}
 
 	it.Before(func() {
 		RegisterTestingT(t)
@@ -186,4 +191,105 @@ export MEMORY_AVAILABLE
 			})
 		})
 	})
+
+	when("PriorityPlanMerge", func() {
+		var (
+			planA, planB, expected buildpackplan.Plan
+		)
+
+		when("version key is empty for both", func() {
+			it("leaves the version empty and merges metadata", func() {
+				planA := createNodeBuildPlan("", buildpackplan.Metadata{"key": "1"})
+				planB := createNodeBuildPlan("", buildpackplan.Metadata{"key": "2"})
+				expected := createNodeBuildPlan("", buildpackplan.Metadata{"key": "1,2"})
+
+				testPriorityMerge(planA, planB, expected)
+			})
+		})
+
+		when("version key is empty for one", func() {
+			it("picks the other version and merges metadata", func() {
+				planA := createNodeBuildPlan("", buildpackplan.Metadata{"key": "1"})
+				planB := createNodeBuildPlan("1", buildpackplan.Metadata{"key": "2"})
+				expected := createNodeBuildPlan("1", buildpackplan.Metadata{"key": "1,2"})
+
+				testPriorityMerge(planA, planB, expected)
+			})
+		})
+
+		when("both have versions and VersionSource key is unset for both", func() {
+			it("should pick latest version of the two", func() {
+				planA := createNodeBuildPlan("1.0", buildpackplan.Metadata{})
+				planB := createNodeBuildPlan("2.0", buildpackplan.Metadata{})
+				expected := createNodeBuildPlan("2.0", buildpackplan.Metadata{})
+				testPriorityMerge(planA, planB, expected)
+				testPriorityMerge(planB, planA, expected)
+
+				planA = createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: ""})
+				planB = createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: ""})
+				expected = createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: ""})
+				testPriorityMerge(planA, planB, expected)
+				testPriorityMerge(planB, planA, expected)
+			})
+
+		})
+
+		when("both have versions and VersionSource key is empty for one", func() {
+			it.Before(func() {
+				planA = createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: ""})
+				planB = createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: "package.json"})
+				expected = createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: "package.json"})
+			})
+			it("picks the version and source from the second input", func() {
+				testPriorityMerge(planA, planB, expected)
+			})
+
+			it("picks the version and source from the first input", func() {
+				testPriorityMerge(planB, planA, expected)
+			})
+		})
+
+		when("different priority versions", func() {
+			it.Before(func() {
+				planA = createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: "package.json"})
+				planB = createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: "buildpack.yml"})
+				expected = createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: "buildpack.yml"})
+			})
+
+			it("picks the version and source from the second input", func() {
+				testPriorityMerge(planA, planB, expected)
+			})
+
+			it("picks the version and source from the first input", func() {
+				testPriorityMerge(planB, planA, expected)
+			})
+		})
+
+		when("they are the same priority", func() {
+			it("picks the higher version", func() {
+				planA := createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: "buildpack.yml"})
+				planB := createNodeBuildPlan("1.0", buildpackplan.Metadata{node.VersionSource: "buildpack.yml"})
+				expected := createNodeBuildPlan("2.0", buildpackplan.Metadata{node.VersionSource: "buildpack.yml"})
+				testPriorityMerge(planA, planB, expected)
+				testPriorityMerge(planB, planA, expected)
+			})
+		})
+
+		when("different build and launch metadata are set", func() {
+			it("does an or-map of each key", func() {
+				planA := createNodeBuildPlan("", buildpackplan.Metadata{"build": true})
+				planB := createNodeBuildPlan("", buildpackplan.Metadata{"launch": "true", "build": false})
+				expected := createNodeBuildPlan("", buildpackplan.Metadata{"build": true, "launch": true})
+				testPriorityMerge(planA, planB, expected)
+			})
+		})
+	})
+}
+
+func createNodeBuildPlan(version string, metadata buildpackplan.Metadata) buildpackplan.Plan {
+	return buildpackplan.Plan{
+		Name:     node.Dependency,
+		Version:  version,
+		Metadata: metadata,
+	}
 }

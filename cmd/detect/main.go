@@ -29,7 +29,7 @@ func main() {
 }
 
 func runDetect(context detect.Detect) (int, error) {
-	version := ""
+	var version, versionSource string
 	nvmrcPath := filepath.Join(context.Application.Root, ".nvmrc")
 	nvmrcExists, err := helper.FileExists(nvmrcPath)
 	if err != nil {
@@ -37,6 +37,7 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if nvmrcExists {
+		versionSource = ".nvmrc"
 		version, err = nvmrc.GetVersion(nvmrcPath, context.Logger)
 		if err != nil {
 			return context.Fail(), err
@@ -51,6 +52,7 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if buildpackYamlExists {
+		versionSource = "buildpack.yml"
 		bpYml := &node.BuildpackYAML{}
 		err := helper.ReadBuildpackYaml(buildpackYamlPath, bpYml)
 		if err != nil {
@@ -68,7 +70,7 @@ func runDetect(context detect.Detect) (int, error) {
 			Requires: []buildplan.Required{{
 				Name:     node.Dependency,
 				Version:  version,
-				Metadata: buildplan.Metadata{"launch": true},
+				Metadata: buildplan.Metadata{"launch": true, "version-source": versionSource},
 			}},
 		})
 	}
