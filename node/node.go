@@ -10,7 +10,9 @@ import (
 )
 
 const Dependency = "node"
-const VersionSource = "version-source"
+const BuildpackYAMLSource = "buildpack.yml"
+const PackageJsonSource = "package.json"
+const NvmrcSource = ".nvmrc"
 
 type Config struct {
 	OptimizeMemory bool   `yaml:"optimize-memory"`
@@ -29,10 +31,10 @@ type Contributor struct {
 }
 
 var priorities = map[interface{}]int{
-	"buildpack.yml": 3,
-	"package.json":  2,
-	".nvmrc":        1,
-	"":              -1,
+	BuildpackYAMLSource: 3,
+	PackageJsonSource:   2,
+	NvmrcSource:         1,
+	"":                  -1,
 }
 
 func NewContributor(context build.Build) (Contributor, bool, error) {

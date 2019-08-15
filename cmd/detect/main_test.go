@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+
 	"github.com/cloudfoundry/node-engine-cnb/node"
 
 	"github.com/buildpack/libbuildpack/buildplan"
@@ -43,7 +45,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, "buildpack.yml")
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, node.BuildpackYAMLSource)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -54,7 +56,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the .nvmrc file", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, ".nvmrc")
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, node.NvmrcSource)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -66,7 +68,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the buildpack.yml", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, "buildpack.yml")
+			buildPlan = getStandardBuildplanWithNodeVersion(buildpackYamlVersion, node.BuildpackYAMLSource)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -78,7 +80,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("should request the node version in the .nvmrc", func() {
-			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, "buildpack.yml")
+			buildPlan = getStandardBuildplanWithNodeVersion(nvmrcVersion, node.BuildpackYAMLSource)
 			runDetectAndExpectBuildplan(factory, buildPlan, t)
 		})
 	})
@@ -102,8 +104,8 @@ func getStandardBuildplanWithNodeVersion(version, versionSource string) buildpla
 			Name:    node.Dependency,
 			Version: version,
 			Metadata: buildplan.Metadata{
-				"launch":           true,
-				node.VersionSource: versionSource,
+				"launch":                    true,
+				buildpackplan.VersionSource: versionSource,
 			}}},
 	}
 }

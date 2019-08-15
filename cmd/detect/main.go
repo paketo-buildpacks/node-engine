@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
+
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/node-engine-cnb/nvmrc"
@@ -37,7 +39,7 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if nvmrcExists {
-		versionSource = ".nvmrc"
+		versionSource = node.NvmrcSource
 		version, err = nvmrc.GetVersion(nvmrcPath, context.Logger)
 		if err != nil {
 			return context.Fail(), err
@@ -52,7 +54,7 @@ func runDetect(context detect.Detect) (int, error) {
 	}
 
 	if buildpackYamlExists {
-		versionSource = "buildpack.yml"
+		versionSource = node.BuildpackYAMLSource
 		bpYml := &node.BuildpackYAML{}
 		err := helper.ReadBuildpackYaml(buildpackYamlPath, bpYml)
 		if err != nil {
@@ -70,7 +72,7 @@ func runDetect(context detect.Detect) (int, error) {
 			Requires: []buildplan.Required{{
 				Name:     node.Dependency,
 				Version:  version,
-				Metadata: buildplan.Metadata{"launch": true, node.VersionSource: versionSource},
+				Metadata: buildplan.Metadata{"launch": true, buildpackplan.VersionSource: versionSource},
 			}},
 		})
 	}
