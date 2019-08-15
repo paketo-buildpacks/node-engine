@@ -1,15 +1,8 @@
 package node
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
-
-	"github.com/Masterminds/semver"
-
-	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
@@ -35,13 +28,20 @@ type Contributor struct {
 	layer              layers.DependencyLayer
 }
 
+var priorities = map[interface{}]int{
+	"buildpack.yml": 3,
+	"package.json":  2,
+	".nvmrc":        1,
+	"":              -1,
+}
+
 func NewContributor(context build.Build) (Contributor, bool, error) {
 	buildpackYAML, err := LoadBuildpackYAML(context.Application.Root)
 	if err != nil {
 		return Contributor{}, false, err
 	}
 
-	plan, wantDependency, err := context.Plans.GetMerged("node", PriorityPlanMerge)
+	plan, wantDependency, err := context.Plans.GetPriorityMerged(Dependency, priorities)
 	if err != nil {
 		return Contributor{}, false, err
 	}
@@ -144,143 +144,6 @@ func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
 		err = helper.ReadBuildpackYaml(bpYamlPath, &buildpackYAML)
 	}
 	return buildpackYAML, err
-}
-
-func PriorityPlanMerge(a, b buildpackplan.Plan) (buildpackplan.Plan, error) {
-	aVersion := a.Version
-	bVersion := b.Version
-	aSource := a.Metadata[VersionSource]
-	bSource := b.Metadata[VersionSource]
-
-	if aVersion == "" && bVersion == "" {
-		return mergePlans(a, b, "", nil)
-	} else if aVersion == "" {
-		return mergePlans(a, b, bVersion, bSource)
-	} else if bVersion == "" {
-		return mergePlans(a, b, aVersion, aSource)
-	}
-
-	aPriority := getPriority(aSource)
-	bPriority := getPriority(bSource)
-	if aPriority > bPriority {
-		return mergePlans(a, b, aVersion, aSource)
-	} else if aPriority == bPriority {
-		version, err := getHighestVersion(aVersion, bVersion)
-		if err != nil {
-			return buildpackplan.Plan{}, fmt.Errorf("failed to get the highest version between %s and %s: %v", aVersion, bVersion, err)
-		}
-		return mergePlans(a, b, version, aSource)
-	} else {
-		return mergePlans(a, b, bVersion, bSource)
-	}
-}
-
-func getHighestVersion(aVersion, bVersion string) (string, error) {
-	aSemver, err := semver.NewVersion(aVersion)
-	if err != nil {
-		return "", fmt.Errorf("failed to convert version %s to semver", aVersion)
-	}
-	bSemver, err := semver.NewVersion(bVersion)
-	if err != nil {
-		return "", fmt.Errorf("failed to convert version %s to semver", bVersion)
-	}
-	version := aVersion
-	if aSemver.LessThan(bSemver) {
-		version = bVersion
-	}
-
-	return version, nil
-}
-
-func getPriority(versionSource interface{}) int {
-	priorities := map[interface{}]int{
-		"buildpack.yml": 3,
-		"package.json":  2,
-		".nvmrc":        1,
-		"":              -1,
-	}
-	val, ok := priorities[versionSource]
-
-	// Any source is higher than empty string
-	if !ok {
-		val = 0
-	}
-	return val
-}
-
-func mergePlans(a, b buildpackplan.Plan, version string, versionSource interface{}) (buildpackplan.Plan, error) {
-	aBuildVal, err := getBooleanVal(a.Metadata["build"])
-	if err != nil {
-		return buildpackplan.Plan{}, errors.Wrapf(err, "could not determine 'build' metadata of %s", a.Name)
-	}
-
-	bBuildVal, err := getBooleanVal(b.Metadata["build"])
-	if err != nil {
-		return buildpackplan.Plan{}, errors.Wrapf(err, "could not determine 'build' metadata of %s", b.Name)
-	}
-
-	aLaunchVal, err := getBooleanVal(a.Metadata["launch"])
-	if err != nil {
-		return buildpackplan.Plan{}, errors.Wrapf(err, "could not determine 'launch' metadata of %s", a.Name)
-	}
-
-	bLaunchVal, err := getBooleanVal(b.Metadata["launch"])
-	if err != nil {
-		return buildpackplan.Plan{}, errors.Wrapf(err, "could not determine 'launch' metadata of %s", b.Name)
-	}
-
-	metadata := a.Metadata // NOTE: Mutating metadata also mutates a.Metadata
-	for key, val := range b.Metadata {
-		ignoreKeys := []string{VersionSource, "build", "launch"}
-		if !contains(ignoreKeys, key) && val != "" {
-			if aVal, ok := metadata[key]; ok && aVal != "" && aVal != val {
-				val = aVal.(string) + "," + val.(string)
-			}
-			metadata[key] = val
-		}
-	}
-
-	if versionSource != nil && versionSource != "" {
-		metadata[VersionSource] = versionSource
-	}
-
-	if aBuildVal || bBuildVal {
-		metadata["build"] = true
-	}
-
-	if aLaunchVal || bLaunchVal {
-		metadata["launch"] = true
-	}
-
-	return buildpackplan.Plan{
-		Name:     a.Name,
-		Version:  version,
-		Metadata: metadata,
-	}, nil
-}
-
-func contains(slice []string, val string) bool {
-	for _, x := range slice {
-		if x == val {
-			return true
-		}
-	}
-
-	return false
-}
-
-func getBooleanVal(val interface{}) (bool, error) {
-	if val == nil || val == "" {
-		return false, nil
-	}
-
-	if b, isString := val.(string); isString {
-		return b == "true", nil
-	} else if b, isBool := val.(bool); isBool {
-		return b, nil
-	}
-
-	return false, fmt.Errorf("could not get boolean value of %v", val)
 }
 
 func memoryAvailable() string {
