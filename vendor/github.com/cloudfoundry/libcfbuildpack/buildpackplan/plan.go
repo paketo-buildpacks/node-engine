@@ -27,6 +27,8 @@ type Plans struct {
 	buildpackplan.Plans
 }
 
+type MergeFunc func(a, b Plan) (Plan, error)
+
 // Get returns a collection of Plan's that have a given name.
 func (p Plans) Get(name string) []Plan {
 	var ps []Plan
@@ -43,7 +45,7 @@ func (p Plans) Get(name string) []Plan {
 // GetMerged returns a single Plan that is a merged version of all of the Plan's that have a given name. A merge
 // function is used to describe how two entries are merged together.  Returns true if any matching Plan's were found,
 // false otherwise.
-func (p Plans) GetMerged(name string, merge func(a, b Plan) (Plan, error)) (Plan, bool, error) {
+func (p Plans) GetMerged(name string, merge MergeFunc) (Plan, bool, error) {
 	m := Plan{}
 	var err error
 
@@ -67,6 +69,12 @@ func (p Plans) GetMerged(name string, merge func(a, b Plan) (Plan, error)) (Plan
 // is accomplished with the ShallowMerge function.  Returns true if any matching Plan's were found, false otherwise.
 func (p Plans) GetShallowMerged(name string) (Plan, bool, error) {
 	return p.GetMerged(name, ShallowMerge)
+}
+
+// GetPriorityMerged returns a single Plan that is a merged version of all of the Plan's that have a given name.  Merging
+// is accomplished with the PriorityMerge function.  Returns true if any matching Plan's were found, false otherwise.
+func (p Plans) GetPriorityMerged(name string, priorities map[interface{}]int) (Plan, bool, error) {
+	return p.GetMerged(name, PriorityMerge(priorities))
 }
 
 // Has returns whether there is a Plan with a given name.

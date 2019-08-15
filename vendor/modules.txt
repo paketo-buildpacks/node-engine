@@ -9,21 +9,21 @@ github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/internal
 github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/application
-github.com/buildpack/libbuildpack/buildpack
 github.com/buildpack/libbuildpack/buildpackplan
+github.com/buildpack/libbuildpack/buildpack
 github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20190813205748-e53989179538
 github.com/cloudfoundry/dagger
-# github.com/cloudfoundry/libcfbuildpack v1.82.0
+# github.com/cloudfoundry/libcfbuildpack v1.82.1-0.20190815154108-ebdea9feb73d
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/detect
 github.com/cloudfoundry/libcfbuildpack/helper
+github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/layers
 github.com/cloudfoundry/libcfbuildpack/buildpack
-github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
