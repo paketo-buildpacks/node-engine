@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -17,6 +18,14 @@ const (
 	DefaultBuildImage = "cloudfoundry/cnb-build:cflinuxfs3"
 	DefaultRunImage   = "cloudfoundry/cnb-run:cflinuxfs3"
 	TestBuilderImage  = "cfbuildpacks/spec-change-builder"
+	logBufferSize     = 1024
+)
+
+var (
+	logQueue                chan chan []byte
+	stdoutMutex             sync.Mutex
+	queueIsInitialized      bool
+	queueIsInitializedMutex sync.Mutex
 )
 
 // This returns the build logs as part of the error case
@@ -45,9 +54,22 @@ func PackBuildNamedImageWithEnv(appImage, appDir string, env map[string]string, 
 		cmd.Args = append(cmd.Args, "-e", fmt.Sprintf("%s=%s", key, val))
 	}
 
+	var w io.Writer
+	queueIsInitializedMutex.Lock()
+	if queueIsInitialized {
+		log := make(chan []byte, logBufferSize)
+		logQueue <- log
+		cw := newChanWriter(log)
+		w = cw
+		defer cw.Close()
+	} else {
+		w = os.Stdout
+	}
+	queueIsInitializedMutex.Unlock()
+
 	cmd.Dir = appDir
-	cmd.Stdout = io.MultiWriter(os.Stdout, buildLogs)
-	cmd.Stderr = io.MultiWriter(os.Stderr, buildLogs)
+	cmd.Stdout = io.MultiWriter(w, buildLogs)
+	cmd.Stderr = io.MultiWriter(w, buildLogs)
 	if err := cmd.Run(); err != nil {
 		return nil, errors.Wrap(err, buildLogs.String())
 	}
@@ -63,4 +85,55 @@ func PackBuildNamedImageWithEnv(appImage, appDir string, env map[string]string, 
 		fixtureName: appDir,
 	}
 	return app, nil
+}
+
+type chanWriter struct {
+	channel chan []byte
+}
+
+func newChanWriter(c chan []byte) *chanWriter {
+	return &chanWriter{c}
+}
+
+func (c *chanWriter) Write(p []byte) (n int, err error) {
+	c.channel <- append([]byte{}, p...) // Create a copy to avoid mutation of backing slice
+	return len(p), nil
+}
+
+func (c *chanWriter) Close() {
+	close(c.channel)
+}
+
+func SyncParallelOutput(f func()) {
+	startOutputStream()
+	defer stopOutputStream()
+	f()
+}
+
+func startOutputStream() {
+	fmt.Println("Starting to stream output...")
+	logQueue = make(chan chan []byte, 1024) // Arbitrary buffer size to reduce blocking
+	queueIsInitializedMutex.Lock()
+	queueIsInitialized = true
+	queueIsInitializedMutex.Unlock()
+	go printLoop()
+}
+
+func stopOutputStream() {
+	close(logQueue)
+	fmt.Println("Stopped streaming output.")
+}
+
+func printLoop() {
+	for log := range logQueue {
+		printLog(log)
+	}
+}
+
+func printLog(log chan []byte) {
+	for line := range log {
+		stdoutMutex.Lock()
+		fmt.Print(string(line))
+		stdoutMutex.Unlock()
+	}
 }
