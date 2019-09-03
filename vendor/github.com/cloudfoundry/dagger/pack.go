@@ -13,10 +13,11 @@ import (
 )
 
 const (
+	Tiny              = "org.cloudfoundry.stacks.tiny"
 	CFLinuxFS3        = "org.cloudfoundry.stacks.cflinuxfs3"
 	Bionic            = "io.buildpacks.stacks.bionic"
-	DefaultBuildImage = "cloudfoundry/cnb-build:cflinuxfs3"
-	DefaultRunImage   = "cloudfoundry/cnb-run:cflinuxfs3"
+	DefaultBuildImage = "cloudfoundry/build:full-cnb"
+	DefaultRunImage   = "cloudfoundry/run:full-cnb"
 	TestBuilderImage  = "cfbuildpacks/spec-change-builder"
 	logBufferSize     = 1024
 )
