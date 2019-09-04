@@ -97,24 +97,6 @@ version = "10.16.3"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "3991e5b65fbaab8d70cda813b9bc73dd3b4201aeef42bcb1c000a03869aa0610"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v12.9.0/node-v12.9.0-linux-x64.tar.gz"
-version = "12.9.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
-sha256 = "9f9ca6a05bb18fcd21de3d87b171c756e108089cd6ef02db260d728704ec325c"
-source = "https://nodejs.org/dist/v12.9.0/node-v12.9.0.tar.gz"
-source_sha256 = "88cb425086a87323288c8389e974e8c1001b81fe11c529e64592e8feb2d12f93"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.9.0-linux-x64-cflinuxfs3-9f9ca6a0.tgz"
-version = "12.9.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
 sha256 = "5488e9d9e860eb344726aabdc8f90d09e36602da38da3d16a7ee852fd9fbd91f"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v12.9.1/node-v12.9.1-linux-x64.tar.gz"
@@ -129,6 +111,24 @@ source_sha256 = "9150b2b3c728e022c596ab86188c685facc9f30f4c8e60c1a0f9d5a3e8e3653
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.9.1-linux-x64-cflinuxfs3-a22a1fc1.tgz"
 version = "12.9.1"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "3de23fd9f2145ff76d0583e7f57aa4ccead58b3fb991e215f862e779c9cdf151"
+stacks = ["io.buildpacks.stacks.bionic"]
+uri = "https://nodejs.org/dist/v12.10.0/node-v12.10.0-linux-x64.tar.gz"
+version = "12.10.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "d99cc0e35a0c79d830c388943c65ac7327955af9a5828e50da6cec67d719bb09"
+source = "https://nodejs.org/dist/v12.10.0/node-v12.10.0.tar.gz"
+source_sha256 = "371a3e39f1a14adbd7b37dee57641075ccfa240bd990630ff213298f16ad49b4"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.10.0-linux-x64-cflinuxfs3-d99cc0e3.tgz"
+version = "12.10.0"
 
 [[metadata.dependency_deprecation_dates]]
 date = 2021-04-01T00:00:00Z
