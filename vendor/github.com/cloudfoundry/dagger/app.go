@@ -44,7 +44,7 @@ func (a *App) StartWithCommand(startCmd string) error {
 		a.Env["PORT"] = "8080"
 	}
 
-	args := []string{"run", "-d", "-P"}
+	args := []string{"run", "-d", "-p", a.Env["PORT"], "-P"}
 	if a.Memory != "" {
 		args = append(args, "--memory", a.Memory)
 	}
@@ -76,7 +76,7 @@ func (a *App) StartWithCommand(startCmd string) error {
 	cmd.Stdout = buf
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("failed to run docker image: %s\n with command: %s", a.ImageName, args))
 	}
 	a.ContainerID = buf.String()[:12]
 
@@ -86,17 +86,24 @@ docker:
 	for {
 		select {
 		case <-ticker.C:
-			status, err := exec.Command("docker", "inspect", "-f", "{{.State.Health.Status}}", a.ContainerID).Output()
+			health, err := exec.Command("docker", "inspect", "-f", "{{.State.Health}}", a.ContainerID).CombinedOutput()
 			if err != nil {
-				return err
+				return errors.Wrap(err, fmt.Sprintf("failed to docker inspect health of container: %s\n with health status: %s\n", a.ContainerID, string(health)))
 			}
 
-			if strings.TrimSpace(string(status)) == "unhealthy" {
+			status := strings.TrimSuffix(string(health), "\n")
+			if status != "<nil>" {
+				// Split string by space and remove curly brace in front
+				status = strings.Split(string(status), " ")[0][1:]
+				status = strings.TrimSpace(status)
+			}
+
+			if status == "unhealthy" {
 				logs, _ := a.Logs()
 				return errors.Errorf("app failed to start: %s\n%s\n", a.fixtureName, logs)
 			}
 
-			if strings.TrimSpace(string(status)) == "healthy" {
+			if status == "healthy" || status == "<nil>" {
 				break docker
 			}
 		case <-timeOut:
@@ -108,7 +115,7 @@ docker:
 	cmd.Stdout = buf
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, "docker error: failed to get port")
+		return errors.Wrap(err, fmt.Sprintf("docker error: failed to get port from container: %s", a.ContainerID))
 	}
 	a.port = strings.TrimSpace(strings.Split(buf.String(), ":")[1])
 
