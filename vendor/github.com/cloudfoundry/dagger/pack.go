@@ -18,7 +18,7 @@ const (
 	Bionic            = "io.buildpacks.stacks.bionic"
 	DefaultBuildImage = "cloudfoundry/build:full-cnb"
 	DefaultRunImage   = "cloudfoundry/run:full-cnb"
-	TestBuilderImage  = "cfbuildpacks/spec-change-builder"
+	TestBuilderImage  = "cloudfoundry/cnb:cflinuxfs3"
 	logBufferSize     = 1024
 )
 

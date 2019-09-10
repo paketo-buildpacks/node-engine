@@ -117,7 +117,15 @@ docker:
 	if err := cmd.Run(); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("docker error: failed to get port from container: %s", a.ContainerID))
 	}
-	a.port = strings.TrimSpace(strings.Split(buf.String(), ":")[1])
+
+	ports := strings.Split(buf.String(), ":")
+
+	if len(ports) > 1 {
+		a.port = strings.TrimSpace(ports[1])
+	} else {
+		return fmt.Errorf("unable to get well formed port map from docker")
+	}
+
 
 	return nil
 }

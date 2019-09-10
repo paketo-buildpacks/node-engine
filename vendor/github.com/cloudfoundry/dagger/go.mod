@@ -8,3 +8,5 @@ require (
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7 // indirect
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
 )
+
+go 1.13
