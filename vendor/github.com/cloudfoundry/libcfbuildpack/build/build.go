@@ -74,10 +74,6 @@ func DefaultBuild() (Build, error) {
 		return Build{}, err
 	}
 
-	if err := b.Platform.EnvironmentVariables.SetAll(); err != nil {
-		return Build{}, err
-	}
-
 	logger := logger.Logger{Logger: b.Logger}
 	buildpack := buildpack.NewBuildpack(b.Buildpack, logger)
 	layers := layers.NewLayers(b.Layers, bp.NewLayers(buildpack.CacheRoot, b.Logger), buildpack, logger)

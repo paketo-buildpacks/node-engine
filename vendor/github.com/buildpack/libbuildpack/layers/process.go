@@ -26,4 +26,7 @@ type Process struct {
 
 	// Command is the command of the process.
 	Command string `toml:"command"`
+
+	// Command is exec'd directly by the os (no profile.d scripts run)
+	Direct bool `toml:"direct"`
 }

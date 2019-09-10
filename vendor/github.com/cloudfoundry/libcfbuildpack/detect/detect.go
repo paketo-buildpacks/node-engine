@@ -49,10 +49,6 @@ func DefaultDetect() (Detect, error) {
 		return Detect{}, err
 	}
 
-	if err := d.Platform.EnvironmentVariables.SetAll(); err != nil {
-		return Detect{}, err
-	}
-
 	logger := logger.Logger{Logger: d.Logger}
 	buildpack := buildpack.NewBuildpack(d.Buildpack, logger)
 	services := services.Services{Services: d.Services}

@@ -42,7 +42,7 @@ func (l Layers) Layer(name string) Layer {
 func (l Layers) WriteApplicationMetadata(metadata Metadata) error {
 	f := filepath.Join(l.Root, "launch.toml")
 
-	l.logger.Debug("Writing application metadata: %s <= %s", f, metadata)
+	l.logger.Debug("Writing application metadata: %s <= %v", f, metadata)
 	return internal.WriteTomlFile(f, 0644, metadata)
 }
 
