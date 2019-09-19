@@ -44,11 +44,11 @@ type Layers struct {
 
 // DependencyLayer returns a DependencyLayer unique to a dependency.
 func (l Layers) DependencyLayer(dependency buildpack.Dependency) DependencyLayer {
-	return l.DependencyLayerWithId(dependency.ID, dependency)
+	return l.DependencyLayerWithID(dependency.ID, dependency)
 }
 
-// DependencyLayerWithId returns a DependencyLayer unique to a dependency with an explicit id.
-func (l Layers) DependencyLayerWithId(id string, dependency buildpack.Dependency) DependencyLayer {
+// DependencyLayerWithID returns a DependencyLayer unique to a dependency with an explicit id.
+func (l Layers) DependencyLayerWithID(id string, dependency buildpack.Dependency) DependencyLayer {
 	return DependencyLayer{
 		l.Layer(id),
 		dependency,
