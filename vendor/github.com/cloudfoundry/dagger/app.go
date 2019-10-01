@@ -49,9 +49,10 @@ func (a *App) StartWithCommand(startCmd string) error {
 		args = append(args, "--memory", a.Memory)
 	}
 
-	if a.healthCheck.command != "" {
-		args = append(args, "--health-cmd", a.healthCheck.command)
+	if a.healthCheck.command == "" {
+		a.healthCheck.command = fmt.Sprintf("curl --fail http://localhost:%s || exit 1", a.Env["PORT"])
 	}
+	args = append(args, "--health-cmd", a.healthCheck.command)
 
 	if a.healthCheck.interval != "" {
 		args = append(args, "--health-interval", a.healthCheck.interval)
@@ -126,54 +127,78 @@ docker:
 		return fmt.Errorf("unable to get well formed port map from docker")
 	}
 
-
 	return nil
 }
 
 func (a *App) Destroy() error {
 	cntrExists, err := DockerArtifactExists(a.ContainerID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find container %s: %s", a.ContainerID, err)
 	}
+
 	if cntrExists {
 		cmd := exec.Command("docker", "stop", a.ContainerID)
 		if err := cmd.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to stop container %s: %s", a.ContainerID, err)
 		}
 
 		cmd = exec.Command("docker", "rm", a.ContainerID, "-f", "--volumes")
 		if err := cmd.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to remove container %s: %s", a.ContainerID, err)
 		}
 	}
 
 	imgExists, err := DockerArtifactExists(a.ImageName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find image %s: %s", a.ImageName, err)
 	}
 
 	if imgExists {
 		cmd := exec.Command("docker", "rmi", a.ImageName, "-f")
 		if err := cmd.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to remove image %s: %s", a.ImageName, err)
 		}
 	}
 
 	cacheExists, err := DockerArtifactExists(a.CacheImage)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find cache image %s: %s", a.CacheImage, err)
 	}
 
 	if cacheExists {
 		cmd := exec.Command("docker", "rmi", a.CacheImage, "-f")
 		if err := cmd.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to remove cache image %s: %s", a.CacheImage, err)
+		}
+	}
+
+	cacheBuildVolumeExists, err := DockerArtifactExists(fmt.Sprintf("%s.build", a.CacheImage))
+	if err != nil {
+		return fmt.Errorf("failed to find cache build volume %s.build: %s", a.CacheImage, err)
+	}
+
+	if cacheBuildVolumeExists {
+		cmd := exec.Command("docker", "volume", "rm", fmt.Sprintf("%s.build", a.CacheImage))
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to remove cache build volume %s.build: %s", a.CacheImage, err)
+		}
+	}
+
+	cacheLaunchVolumeExists, err := DockerArtifactExists(fmt.Sprintf("%s.launch", a.CacheImage))
+	if err != nil {
+		return fmt.Errorf("failed to find cache launch volume %s.launch: %s", a.CacheImage, err)
+	}
+
+	if cacheLaunchVolumeExists {
+		cmd := exec.Command("docker", "volume", "rm", fmt.Sprintf("%s.launch", a.CacheImage))
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to remove cache launch volume %s.launch: %s", a.CacheImage, err)
 		}
 	}
 
 	cmd := exec.Command("docker", "image", "prune", "-f")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to prune images: %s", err)
 	}
 
 	*a = App{}
@@ -223,7 +248,7 @@ func (a *App) Info() (cID string, imageID string, cacheID []string, e error) {
 }
 
 func (a *App) HTTPGet(path string) (string, map[string][]string, error) {
-	resp, err := http.Get("http://localhost:" + a.port + path)
+	resp, err := http.Get(fmt.Sprintf("http://localhost:%s%s", a.port, path))
 	if err != nil {
 		return "", nil, err
 	}
@@ -273,12 +298,14 @@ func getCacheVolumes() ([]string, error) {
 
 func DockerArtifactExists(name string) (bool, error) {
 	cmd := exec.Command("docker", "inspect", name)
-	if err := cmd.Run(); err != nil {
-		if strings.Contains(err.Error(), "No such object") {
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		if strings.Contains(string(output), "No such object") {
 			return false, nil
-		} else {
-			return false, err
 		}
+
+		return false, err
 	}
+
 	return true, nil
 }
