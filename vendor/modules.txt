@@ -17,7 +17,7 @@ github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191001184736-b0f1e98b53b2
 github.com/cloudfoundry/dagger
-# github.com/cloudfoundry/libcfbuildpack v1.88.3
+# github.com/cloudfoundry/libcfbuildpack v1.88.4
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/detect
@@ -63,7 +63,7 @@ github.com/sclevine/spec
 github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
-# golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
+# golang.org/x/net v0.0.0-20191002035440-2ec189313ef0
 golang.org/x/net/html/charset
 golang.org/x/net/html
 golang.org/x/net/context/ctxhttp
@@ -72,7 +72,7 @@ golang.org/x/net/context
 # golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.0.0-20191001151750-bb3f8db39f24
+# golang.org/x/sys v0.0.0-20191002091554-b397fe3ad8ed
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
@@ -100,5 +100,5 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# gopkg.in/yaml.v2 v2.2.3
+# gopkg.in/yaml.v2 v2.2.4
 gopkg.in/yaml.v2
