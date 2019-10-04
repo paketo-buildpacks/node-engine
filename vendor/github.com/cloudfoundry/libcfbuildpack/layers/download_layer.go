@@ -17,11 +17,13 @@
 package layers
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,6 +32,8 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"github.com/fatih/color"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 // DownloadLayer is an extension to Layer that is unique to a dependency download.
@@ -91,6 +95,40 @@ func (l DownloadLayer) Artifact() (string, error) {
 	return artifact, nil
 }
 
+func (l DownloadLayer) client(uri string) (http.Client, error) {
+	t := &http.Transport{Proxy: http.ProxyFromEnvironment}
+	t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
+
+	u, err := url.ParseRequestURI(uri)
+	if err != nil {
+		return http.Client{}, err
+	}
+
+	if u.Host != "storage.googleapis.com" {
+		l.logger.Debug("Using standard HTTP Client")
+		return http.Client{Transport: t}, nil
+	}
+
+	l.logger.Debug("Using GCP HTTP Client")
+
+	g, ok := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+	if !ok {
+		return http.Client{}, fmt.Errorf("cannot find Google Application credentials")
+	}
+
+	c, err := google.CredentialsFromJSON(context.Background(), []byte(g), "https://www.googleapis.com/auth/cloud-platform")
+	if err != nil {
+		return http.Client{}, err
+	}
+
+	return http.Client{
+		Transport: &oauth2.Transport{
+			Base:   t,
+			Source: c.TokenSource,
+		},
+	}, nil
+}
+
 func (l DownloadLayer) download(file string) error {
 	req, err := http.NewRequest("GET", l.dependency.URI, nil)
 	if err != nil {
@@ -98,10 +136,12 @@ func (l DownloadLayer) download(file string) error {
 	}
 
 	req.Header.Set("User-Agent", fmt.Sprintf("%s/%s", l.info.ID, l.info.Version))
-	t := &http.Transport{Proxy: http.ProxyFromEnvironment}
-	t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
 
-	client := http.Client{Transport: t}
+	client, err := l.client(l.dependency.URI)
+	if err != nil {
+		return err
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -109,7 +149,7 @@ func (l DownloadLayer) download(file string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("could not download: %bd", resp.StatusCode)
+		return fmt.Errorf("could not download: %d", resp.StatusCode)
 	}
 
 	return helper.WriteFileFromReader(file, 0644, resp.Body)
