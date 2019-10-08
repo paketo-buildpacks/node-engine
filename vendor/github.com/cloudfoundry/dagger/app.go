@@ -2,10 +2,11 @@ package dagger
 
 import (
 	"bytes"
+	"code.cloudfoundry.org/lager"
 	"fmt"
+	"github.com/cloudfoundry/libbuildpack/cutlass/docker"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -33,13 +34,21 @@ type HealthCheck struct {
 	timeout  string
 }
 
+func NewApp(fixturePath, imageName, cacheImage string, buildLogs *bytes.Buffer, env map[string]string) App {
+	return App{
+		ImageName:   imageName,
+		CacheImage:  cacheImage,
+		buildLogs:   buildLogs,
+		Env:         env,
+		fixtureName: fixturePath,
+	}
+}
+
 func (a *App) Start() error {
 	return a.StartWithCommand("")
 }
 
 func (a *App) StartWithCommand(startCmd string) error {
-	buf := &bytes.Buffer{}
-
 	if a.Env["PORT"] == "" {
 		a.Env["PORT"] = "8080"
 	}
@@ -73,13 +82,14 @@ func (a *App) StartWithCommand(startCmd string) error {
 		args = append(args, startCmd)
 	}
 
-	cmd := exec.Command("docker", args...)
-	cmd.Stdout = buf
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	dockerLogger := lager.NewLogger("docker")
+	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, args...)
+
+	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to run docker image: %s\n with command: %s", a.ImageName, args))
 	}
-	a.ContainerID = buf.String()[:12]
+
+	a.ContainerID = log[:12]
 
 	ticker := time.NewTicker(1 * time.Second)
 	timeOut := time.After(2 * time.Minute)
@@ -112,38 +122,40 @@ docker:
 		}
 	}
 
-	cmd = exec.Command("docker", "container", "port", a.ContainerID)
-	cmd.Stdout = buf
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	log, _, err = docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, "container", "port", a.ContainerID)
+	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("docker error: failed to get port from container: %s", a.ContainerID))
 	}
 
-	ports := strings.Split(buf.String(), ":")
+	ports := strings.Split(log, ":")
 
 	if len(ports) > 1 {
 		a.port = strings.TrimSpace(ports[1])
 	} else {
-		return fmt.Errorf("unable to get well formed port map from docker")
+		return fmt.Errorf("unable to get port map from docker")
 	}
 
 	return nil
 }
 
 func (a *App) Destroy() error {
+	dockerLogger := lager.NewLogger("docker")
+	dockerExec := docker.NewDockerExecutable(dockerLogger)
+	execOption := docker.ExecuteOptions{}
+
 	cntrExists, err := DockerArtifactExists(a.ContainerID)
 	if err != nil {
 		return fmt.Errorf("failed to find container %s: %s", a.ContainerID, err)
 	}
 
 	if cntrExists {
-		cmd := exec.Command("docker", "stop", a.ContainerID)
-		if err := cmd.Run(); err != nil {
+		_, _, err := dockerExec.Execute(execOption, "stop", a.ContainerID)
+		if err != nil {
 			return fmt.Errorf("failed to stop container %s: %s", a.ContainerID, err)
 		}
 
-		cmd = exec.Command("docker", "rm", a.ContainerID, "-f", "--volumes")
-		if err := cmd.Run(); err != nil {
+		_, _, err = dockerExec.Execute(execOption, "rm", a.ContainerID, "-f", "--volumes")
+		if err != nil {
 			return fmt.Errorf("failed to remove container %s: %s", a.ContainerID, err)
 		}
 	}
@@ -154,8 +166,8 @@ func (a *App) Destroy() error {
 	}
 
 	if imgExists {
-		cmd := exec.Command("docker", "rmi", a.ImageName, "-f")
-		if err := cmd.Run(); err != nil {
+		_, _, err = dockerExec.Execute(execOption, "rmi", a.ImageName, "-f")
+		if err != nil {
 			return fmt.Errorf("failed to remove image %s: %s", a.ImageName, err)
 		}
 	}
@@ -166,8 +178,8 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheExists {
-		cmd := exec.Command("docker", "rmi", a.CacheImage, "-f")
-		if err := cmd.Run(); err != nil {
+		_, _, err = dockerExec.Execute(execOption, "rmi", a.CacheImage, "-f")
+		if err != nil {
 			return fmt.Errorf("failed to remove cache image %s: %s", a.CacheImage, err)
 		}
 	}
@@ -178,8 +190,8 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheBuildVolumeExists {
-		cmd := exec.Command("docker", "volume", "rm", fmt.Sprintf("%s.build", a.CacheImage))
-		if err := cmd.Run(); err != nil {
+		_, _, err = dockerExec.Execute(execOption, "volume", "rm", fmt.Sprintf("%s.build", a.CacheImage))
+		if err != nil {
 			return fmt.Errorf("failed to remove cache build volume %s.build: %s", a.CacheImage, err)
 		}
 	}
@@ -190,14 +202,14 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheLaunchVolumeExists {
-		cmd := exec.Command("docker", "volume", "rm", fmt.Sprintf("%s.launch", a.CacheImage))
-		if err := cmd.Run(); err != nil {
+		_, _, err = dockerExec.Execute(execOption, "volume", "rm", fmt.Sprintf("%s.launch", a.CacheImage))
+		if err != nil {
 			return fmt.Errorf("failed to remove cache launch volume %s.launch: %s", a.CacheImage, err)
 		}
 	}
 
-	cmd := exec.Command("docker", "image", "prune", "-f")
-	if err := cmd.Run(); err != nil {
+	_, _, err = dockerExec.Execute(execOption, "image", "prune", "-f")
+	if err != nil {
 		return fmt.Errorf("failed to prune images: %s", err)
 	}
 
@@ -206,13 +218,13 @@ func (a *App) Destroy() error {
 }
 
 func (a *App) Logs() (string, error) {
-	cmd := exec.Command("docker", "logs", a.ContainerID)
-	output, err := cmd.CombinedOutput()
+	dockerLogger := lager.NewLogger("docker")
+	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, "logs", a.ContainerID)
 	if err != nil {
 		return "", err
 	}
 
-	return stripColor(string(output)), nil
+	return stripColor(log), nil
 }
 
 func (a *App) BuildLogs() string {
@@ -229,13 +241,21 @@ func (a *App) SetHealthCheck(command, interval, timeout string) {
 
 func (a *App) Files(path string) ([]string, error) {
 	// Ensures that the error and results from "Permission denied" don't get sent to the output
-	line := fmt.Sprintf("docker run %s find ./.. -wholename *%s* 2>&1 | grep -v \"Permission denied\"", a.ImageName, path)
-	cmd := exec.Command("bash", "-c", line)
-	output, err := cmd.CombinedOutput()
+	dockerLogger := lager.NewLogger("docker")
+	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
+		docker.ExecuteOptions{},
+		"run",
+		a.ImageName,
+		"find",
+		"./..",
+		fmt.Sprintf("-wholename *%s* 2>&1 | grep -v \"Permission denied\"", path),
+	)
+
 	if err != nil {
 		return []string{}, err
 	}
-	return strings.Split(string(output), "\n"), nil
+
+	return strings.Split(log, "\n"), nil
 }
 
 func (a *App) Info() (cID string, imageID string, cacheID []string, e error) {
@@ -280,13 +300,18 @@ func stripColor(input string) string {
 }
 
 func getCacheVolumes() ([]string, error) {
-	cmd := exec.Command("docker", "volume", "ls", "-q")
-	output, err := cmd.Output()
+	dockerLogger := lager.NewLogger("docker")
+	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
+		docker.ExecuteOptions{},
+		"volume",
+		"ls",
+		"-q",
+	)
 	if err != nil {
 		return []string{}, err
 	}
 
-	outputArr := strings.Split(string(output), "\n")
+	outputArr := strings.Split(log, "\n")
 	var finalVolumes []string
 	for _, line := range outputArr {
 		if strings.Contains(line, "pack-cache") {
@@ -297,10 +322,14 @@ func getCacheVolumes() ([]string, error) {
 }
 
 func DockerArtifactExists(name string) (bool, error) {
-	cmd := exec.Command("docker", "inspect", name)
-	output, err := cmd.CombinedOutput()
+	dockerLogger := lager.NewLogger("docker")
+	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
+		docker.ExecuteOptions{},
+		"inspect",
+		name,
+	)
 	if err != nil {
-		if strings.Contains(string(output), "No such object") {
+		if strings.Contains(log, "No such object") {
 			return false, nil
 		}
 

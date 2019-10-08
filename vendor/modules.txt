@@ -1,5 +1,7 @@
 # cloud.google.com/go v0.46.3
 cloud.google.com/go/compute/metadata
+# code.cloudfoundry.org/lager v2.0.0+incompatible
+code.cloudfoundry.org/lager
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
@@ -17,8 +19,11 @@ github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
-# github.com/cloudfoundry/dagger v0.0.0-20191001184736-b0f1e98b53b2
+# github.com/cloudfoundry/dagger v0.0.0-20191008210309-499f8aacb425
 github.com/cloudfoundry/dagger
+github.com/cloudfoundry/dagger/utils
+# github.com/cloudfoundry/libbuildpack v0.0.0-20191007182113-c10f57166e5b
+github.com/cloudfoundry/libbuildpack/cutlass/docker
 # github.com/cloudfoundry/libcfbuildpack v1.89.0
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpackplan

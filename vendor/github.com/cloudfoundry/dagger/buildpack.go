@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/cloudfoundry/dagger/utils"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -62,7 +63,7 @@ func PackageBuildpack(root string) (string, error) {
 		return "", err
 	}
 
-	bpName := fmt.Sprintf("%s_%s", filepath.Base(path), RandStringRunes(8))
+	bpName := fmt.Sprintf("%s_%s", filepath.Base(path), utils.RandStringRunes(8))
 	bpPath := filepath.Join(path, bpName)
 
 	cmd := exec.Command("scripts/package.sh")
@@ -83,17 +84,22 @@ func PackageCachedBuildpack(root string) (string, string, error) {
 		return "", "", err
 	}
 
-	tarFile := filepath.Join(tmp, filepath.Base(root))
-	cmd := exec.Command("./.bin/packager", tarFile)
+	path := filepath.Join(tmp, filepath.Base(root))
+	cmd := exec.Command("scripts/package.sh", "-c", "-v", "0.0.0")
+	cmd.Env = append(os.Environ(), fmt.Sprintf("PACKAGE_DIR=%s", path))
 	cmd.Dir = root
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 
-	return tarFile, string(out), err
+	return fmt.Sprintf("%s-cached", path), string(out), err
 }
 
 func GetLatestBuildpack(name string) (string, error) {
 	return GetLatestCommunityBuildpack("cloudfoundry", name)
+}
+
+func GetLatestUnpackagedBuildpack(name string) (string, error) {
+	return GetLatestUnpackagedCommunityBuildpack("cloudfoundry", name)
 }
 
 func DeleteBuildpack(root string) error {
@@ -103,10 +109,30 @@ func DeleteBuildpack(root string) error {
 	return os.RemoveAll(root)
 }
 
+func GetLatestUnpackagedCommunityBuildpack(org, name string) (string, error) {
+	uri := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", org, name)
+	ctx := context.Background()
+	client := utils.NewGitClient(ctx)
+
+	release := struct {
+		TagName    string `json:"tag_name"`
+		TarballURL string `json:"tarball_url"`
+	}{}
+	request, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		return "", err
+	}
+	if _, err := client.Do(ctx, request, &release); err != nil {
+		return "", err
+	}
+
+	return downloadAndUnTarBuildpack(release.TarballURL, fmt.Sprintf("%s-cached", name), release.TagName, 1)
+}
+
 func GetLatestCommunityBuildpack(org, name string) (string, error) {
 	uri := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", org, name)
 	ctx := context.Background()
-	client := NewGitClient(ctx)
+	client := utils.NewGitClient(ctx)
 
 	release := struct {
 		TagName string `json:"tag_name"`
@@ -125,9 +151,13 @@ func GetLatestCommunityBuildpack(org, name string) (string, error) {
 		return "", fmt.Errorf("there are no releases for %s", name)
 	}
 
-	contents, found := downloadCache.Load(name + release.TagName)
+	return downloadAndUnTarBuildpack(release.Assets[0].BrowserDownloadURL, name, release.TagName, 0)
+}
+
+func downloadAndUnTarBuildpack(downloadURL, name, tagName string, level int) (string, error) { //'level' specifies which level of the untarred directory we care about
+	contents, found := downloadCache.Load(name + tagName)
 	if !found {
-		buildpackResp, err := http.Get(release.Assets[0].BrowserDownloadURL)
+		buildpackResp, err := http.Get(downloadURL)
 		if err != nil {
 			return "", err
 		}
@@ -143,7 +173,7 @@ func GetLatestCommunityBuildpack(org, name string) (string, error) {
 			return "", errors.Errorf("Erroring Getting buildpack : status %d : %s", buildpackResp.StatusCode, contents)
 		}
 
-		downloadCache.Store(name+release.TagName, contents)
+		downloadCache.Store(name+tagName, contents)
 	}
 
 	downloadFile, err := ioutil.TempFile("", "")
@@ -162,5 +192,5 @@ func GetLatestCommunityBuildpack(org, name string) (string, error) {
 		return "", err
 	}
 
-	return dest, helper.ExtractTarGz(downloadFile.Name(), dest, 0)
+	return dest, helper.ExtractTarGz(downloadFile.Name(), dest, level)
 }
