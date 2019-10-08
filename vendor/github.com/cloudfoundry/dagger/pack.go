@@ -69,6 +69,14 @@ func PackBuildNamedImage(appImage, appDir string, buildpacks ...string) (*App, e
 	).Build()
 }
 
+func PackBuildNamedImageWithEnv(appImage, appDir string, env map[string]string, buildpacks ...string) (*App, error) {
+	return NewPack(
+		appDir,
+		SetImage(appImage),
+		SetEnv(env),
+		SetBuildpacks(buildpacks...),
+	).Build()
+}
 func SetImage(image string) PackOption {
 	return func(pack Pack) Pack {
 		pack.image = image

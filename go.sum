@@ -25,8 +25,8 @@ github.com/buildpack/libbuildpack v1.24.3/go.mod h1:16+PwmWtgcwzIVcCzwxwc9yi1g/N
 github.com/buildpack/libbuildpack v1.24.5 h1:r7AM7r8ff7ocI1KOopVHEC3EDTCdrj0YeTXkfYuqH0I=
 github.com/buildpack/libbuildpack v1.24.5/go.mod h1:cBmq8aozSDfy+RiKCERQbT6lk0M/Xf3aJWK2PLbPG1g=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
-github.com/cloudfoundry/dagger v0.0.0-20191008210309-499f8aacb425 h1:ChFf80cNIvOj+TT4ChEMehaluzFEcsXev9LMFxZIcOQ=
-github.com/cloudfoundry/dagger v0.0.0-20191008210309-499f8aacb425/go.mod h1:5SsFi1j50yJ8GEcvyX/Ftg+FsT4HX0dw9VjH3nDCb/o=
+github.com/cloudfoundry/dagger v0.0.0-20191008214257-082243eedf72 h1:6o2X5yXYyK18Nfyzp7N0luUwZn+9fsQw2vOu/byUI0M=
+github.com/cloudfoundry/dagger v0.0.0-20191008214257-082243eedf72/go.mod h1:5SsFi1j50yJ8GEcvyX/Ftg+FsT4HX0dw9VjH3nDCb/o=
 github.com/cloudfoundry/libbuildpack v0.0.0-20191007182113-c10f57166e5b h1:W/ieO8SAZfeRlxpla9WF4INqBCWXTELoa12+akON6mI=
 github.com/cloudfoundry/libbuildpack v0.0.0-20191007182113-c10f57166e5b/go.mod h1:F89xsc6s04sSmwubA99WA9m5uvcLBFeNln17bT8xap0=
 github.com/cloudfoundry/libcfbuildpack v1.76.0 h1:oMTv35mjk5Jogzy2sshVXHyolDWnWHMfANQ0UooXJq0=
