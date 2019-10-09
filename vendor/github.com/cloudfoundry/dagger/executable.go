@@ -35,10 +35,9 @@ func (p PackExecutable) Execute(options executable.ExecuteOptions, args ...strin
 	packCmd.Stderr = stderr
 
 	p.logger.Info("")
-	if err := packCmd.Run(); err != nil {
-		return "", "", err
-	}
-	return stdout.String(), stderr.String(), nil
+	err := packCmd.Run()
+
+	return stdout.String(), stderr.String(), err
 }
 
 

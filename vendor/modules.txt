@@ -19,7 +19,7 @@ github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
-# github.com/cloudfoundry/dagger v0.0.0-20191008214257-082243eedf72
+# github.com/cloudfoundry/dagger v0.0.0-20191009190047-e65ce4cd4ad0
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libbuildpack v0.0.0-20191007182113-c10f57166e5b

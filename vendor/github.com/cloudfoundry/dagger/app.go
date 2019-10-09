@@ -323,13 +323,13 @@ func getCacheVolumes() ([]string, error) {
 
 func DockerArtifactExists(name string) (bool, error) {
 	dockerLogger := lager.NewLogger("docker")
-	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
+	_, errLog, err := docker.NewDockerExecutable(dockerLogger).Execute(
 		docker.ExecuteOptions{},
 		"inspect",
 		name,
 	)
 	if err != nil {
-		if strings.Contains(log, "No such object") {
+		if strings.Contains(errLog, "No such object") {
 			return false, nil
 		}
 
