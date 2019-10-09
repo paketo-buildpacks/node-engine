@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/buildpack/libbuildpack/logger"
 	"github.com/cloudfoundry/dagger/utils"
-	"github.com/cloudfoundry/libbuildpack/cutlass/docker"
+	"github.com/cloudfoundry/libbuildpack/cutlass/execution"
 	"github.com/pkg/errors"
 	"io"
 	"os"
@@ -38,7 +38,7 @@ type Pack struct {
 	env        map[string]string
 	buildpacks []string
 	offline    bool
-	executable PackExecutable
+	executable execution.Executable
 }
 
 type PackOption func(Pack) Pack
@@ -132,7 +132,7 @@ func NewPack(dir string, options ...PackOption) Pack {
 
 	pack := Pack{
 		dir:        dir,
-		executable: NewPackExecutable(logger.NewLogger(os.Stdout, os.Stdout)),
+		executable: execution.NewExecutable("pack", lager.NewLogger("pack")),
 	}
 
 	for _, option := range options {
@@ -162,16 +162,16 @@ func (p Pack) Build() (*App, error) {
 	if p.offline {
 		// probably want to pull here?
 		dockerLogger := lager.NewLogger("docker")
-		dockerExec := docker.NewDockerExecutable(dockerLogger)
+		dockerExec := execution.NewExecutable("docker", dockerLogger)
 
-		stdout, stderr, err := dockerExec.Execute(docker.ExecuteOptions{}, "pull", TestBuilderImage)
+		stdout, stderr, err := dockerExec.Execute(execution.Options{}, "pull", TestBuilderImage)
 		if err != nil {
 			return nil, fmt.Errorf("failed to pull %s\n with stdout %s\n stderr %s\n%s", TestBuilderImage, stdout, stderr, err.Error())
 		}
 		packArgs = append(packArgs, "--network", "none", "--no-pull")
 	}
 
-	buildLogs, _, err := p.executable.Execute(docker.ExecuteOptions{Dir: p.dir}, packArgs...)
+	buildLogs, _, err := p.executable.Execute(execution.Options{Dir: p.dir}, packArgs...)
 
 	if err != nil {
 		return nil, errors.Wrap(err, buildLogs)

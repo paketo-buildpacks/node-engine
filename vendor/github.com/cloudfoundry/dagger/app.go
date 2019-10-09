@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"code.cloudfoundry.org/lager"
 	"fmt"
-	"github.com/cloudfoundry/libbuildpack/cutlass/docker"
+	"github.com/cloudfoundry/libbuildpack/cutlass/execution"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
@@ -83,7 +83,7 @@ func (a *App) StartWithCommand(startCmd string) error {
 	}
 
 	dockerLogger := lager.NewLogger("docker")
-	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, args...)
+	log, _, err := execution.NewExecutable("docker", dockerLogger).Execute(execution.Options{}, args...)
 
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to run docker image: %s\n with command: %s", a.ImageName, args))
@@ -122,7 +122,7 @@ docker:
 		}
 	}
 
-	log, _, err = docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, "container", "port", a.ContainerID)
+	log, _, err = execution.NewExecutable("docker", dockerLogger).Execute(execution.Options{}, "container", "port", a.ContainerID)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("docker error: failed to get port from container: %s", a.ContainerID))
 	}
@@ -140,8 +140,8 @@ docker:
 
 func (a *App) Destroy() error {
 	dockerLogger := lager.NewLogger("docker")
-	dockerExec := docker.NewDockerExecutable(dockerLogger)
-	execOption := docker.ExecuteOptions{}
+	dockerExec := execution.NewExecutable("docker", dockerLogger)
+	execOption := execution.Options{}
 
 	cntrExists, err := DockerArtifactExists(a.ContainerID)
 	if err != nil {
@@ -219,7 +219,7 @@ func (a *App) Destroy() error {
 
 func (a *App) Logs() (string, error) {
 	dockerLogger := lager.NewLogger("docker")
-	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(docker.ExecuteOptions{}, "logs", a.ContainerID)
+	log, _, err := execution.NewExecutable("docker", dockerLogger).Execute(execution.Options{}, "logs", a.ContainerID)
 	if err != nil {
 		return "", err
 	}
@@ -242,8 +242,8 @@ func (a *App) SetHealthCheck(command, interval, timeout string) {
 func (a *App) Files(path string) ([]string, error) {
 	// Ensures that the error and results from "Permission denied" don't get sent to the output
 	dockerLogger := lager.NewLogger("docker")
-	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
-		docker.ExecuteOptions{},
+	log, _, err := execution.NewExecutable("docker", dockerLogger).Execute(
+		execution.Options{},
 		"run",
 		a.ImageName,
 		"find",
@@ -301,8 +301,8 @@ func stripColor(input string) string {
 
 func getCacheVolumes() ([]string, error) {
 	dockerLogger := lager.NewLogger("docker")
-	log, _, err := docker.NewDockerExecutable(dockerLogger).Execute(
-		docker.ExecuteOptions{},
+	log, _, err := execution.NewExecutable("docker", dockerLogger).Execute(
+		execution.Options{},
 		"volume",
 		"ls",
 		"-q",
@@ -323,8 +323,8 @@ func getCacheVolumes() ([]string, error) {
 
 func DockerArtifactExists(name string) (bool, error) {
 	dockerLogger := lager.NewLogger("docker")
-	_, errLog, err := docker.NewDockerExecutable(dockerLogger).Execute(
-		docker.ExecuteOptions{},
+	_, errLog, err := execution.NewExecutable("docker", dockerLogger).Execute(
+		execution.Options{},
 		"inspect",
 		name,
 	)
