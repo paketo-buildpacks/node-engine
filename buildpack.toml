@@ -15,14 +15,6 @@ node = "10.x"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "b391450e0fead11f61f119ed26c713180cfe64b363cd945bac229130dfab64fa"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v8.16.0/node-v8.16.0-linux-x64.tar.gz"
-version = "8.16.0"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
 sha256 = "f190a0786c817d7749c3ec6e294f284104cd9a594e1989c59cafe08b41fe347c"
 source = "https://nodejs.org/dist/v8.16.0/node-v8.16.0.tar.gz"
 source_sha256 = "a1a885add3e511177f05676f0834df710886b68cb559b893169f8674a23adfcf"
@@ -57,6 +49,24 @@ source_sha256 = "7666207212ac5cbd766b052951f57da62aaa641fedf83fabcb31dbb19f61169
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.1-linux-x64-cflinuxfs3-fbbdac75.tgz"
 version = "8.16.1"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "722d07291a8886384388c6795a747ec2055073f83dc73c0a97efba0022cc23ff"
+stacks = ["io.buildpacks.stacks.bionic"]
+uri = "https://nodejs.org/dist/v8.16.2/node-v8.16.2-linux-x64.tar.gz"
+version = "8.16.2"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "41238419bb4f3070bf5a31e83652c8506c79e392060e1b948fbdafd704b3a65f"
+source = "https://nodejs.org/dist/v8.16.2/node-v8.16.2.tar.gz"
+source_sha256 = "4f94361bbe087bc3a9d48ff69c2cefabb6460c64cb7d959204726467b9ee84b8"
+stacks = ["org.cloudfoundry.stacks.tiny"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.2-linux-x64-cflinuxfs3-41238419.tgz"
+version = "8.16.2"
 
 [[metadata.dependencies]]
 id = "node"
