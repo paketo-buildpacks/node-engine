@@ -109,7 +109,5 @@ mkdir -p .bin
 export PATH=$(pwd)/.bin:$PATH
 
 install_pack
-if [[ -z "${BP_PACKAGED_PATH}" ]]; then
-    install_packager
-fi
+install_packager
 
