@@ -2,17 +2,18 @@ package dagger
 
 import (
 	"bytes"
-	"code.cloudfoundry.org/lager"
 	"crypto/sha256"
 	"fmt"
-	"github.com/buildpack/libbuildpack/logger"
-	"github.com/cloudfoundry/dagger/utils"
-	"github.com/cloudfoundry/libbuildpack/cutlass/execution"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"sort"
 	"sync"
+
+	"code.cloudfoundry.org/lager"
+	"github.com/buildpack/libbuildpack/logger"
+	"github.com/cloudfoundry/dagger/utils"
+	"github.com/cloudfoundry/packit"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -32,13 +33,17 @@ var (
 	queueIsInitializedMutex sync.Mutex
 )
 
+type Executable interface {
+	Execute(packit.Execution) (stdout, stderr string, err error)
+}
+
 type Pack struct {
 	dir        string
 	image      string
 	env        map[string]string
 	buildpacks []string
 	offline    bool
-	executable execution.Executable
+	executable Executable
 }
 
 type PackOption func(Pack) Pack
@@ -132,7 +137,7 @@ func NewPack(dir string, options ...PackOption) Pack {
 
 	pack := Pack{
 		dir:        dir,
-		executable: execution.NewExecutable("pack", lager.NewLogger("pack")),
+		executable: packit.NewExecutable("pack", lager.NewLogger("pack")),
 	}
 
 	for _, option := range options {
@@ -162,16 +167,21 @@ func (p Pack) Build() (*App, error) {
 	if p.offline {
 		// probably want to pull here?
 		dockerLogger := lager.NewLogger("docker")
-		dockerExec := execution.NewExecutable("docker", dockerLogger)
+		dockerExec := packit.NewExecutable("docker", dockerLogger)
 
-		stdout, stderr, err := dockerExec.Execute(execution.Options{}, "pull", TestBuilderImage)
+		stdout, stderr, err := dockerExec.Execute(packit.Execution{
+			Args: []string{"pull", TestBuilderImage},
+		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to pull %s\n with stdout %s\n stderr %s\n%s", TestBuilderImage, stdout, stderr, err.Error())
 		}
 		packArgs = append(packArgs, "--network", "none", "--no-pull")
 	}
 
-	buildLogs, _, err := p.executable.Execute(execution.Options{Dir: p.dir}, packArgs...)
+	buildLogs, _, err := p.executable.Execute(packit.Execution{
+		Args: packArgs,
+		Dir:  p.dir,
+	})
 
 	if err != nil {
 		return nil, errors.Wrap(err, buildLogs)

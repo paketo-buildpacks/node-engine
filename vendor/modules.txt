@@ -19,11 +19,9 @@ github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
 github.com/buildpack/libbuildpack/stack
-# github.com/cloudfoundry/dagger v0.0.0-20191009195436-217477522663
+# github.com/cloudfoundry/dagger v0.0.0-20191014145151-7f38f25964e1
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libbuildpack v0.0.0-20191009185614-d9d0eef25651
-github.com/cloudfoundry/libbuildpack/cutlass/execution
 # github.com/cloudfoundry/libcfbuildpack v1.89.0
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
@@ -36,6 +34,8 @@ github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
 github.com/cloudfoundry/libcfbuildpack/internal
+# github.com/cloudfoundry/packit v0.0.0-20191014140300-f8d2e0b20a04
+github.com/cloudfoundry/packit
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.2
