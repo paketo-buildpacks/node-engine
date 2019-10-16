@@ -64,7 +64,7 @@ name = "Node Engine"
 sha256 = "41238419bb4f3070bf5a31e83652c8506c79e392060e1b948fbdafd704b3a65f"
 source = "https://nodejs.org/dist/v8.16.2/node-v8.16.2.tar.gz"
 source_sha256 = "4f94361bbe087bc3a9d48ff69c2cefabb6460c64cb7d959204726467b9ee84b8"
-stacks = ["org.cloudfoundry.stacks.tiny"]
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-8.16.2-linux-x64-cflinuxfs3-41238419.tgz"
 version = "8.16.2"
 
@@ -146,7 +146,7 @@ name = "Node Engine"
 sha256 = "7a04cee498e962eb780a62cc4bda02824ffc5e36b354488c08ba5b458764b238"
 source = "https://nodejs.org/dist/v12.12.0/node-v12.12.0.tar.gz"
 source_sha256 = "6ce681625c09bc2b2b5757165580e648579e4bc7bce5e246fa6339270eec8bde"
-stacks = ["org.cloudfoundry.stacks.tiny"]
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.12.0-linux-x64-cflinuxfs3-7a04cee4.tgz"
 version = "12.12.0"
 
