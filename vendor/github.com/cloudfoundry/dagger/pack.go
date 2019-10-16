@@ -154,7 +154,7 @@ func (p Pack) Build() (*App, error) {
 	}
 
 	keys := []string{}
-	for key, _ := range p.env {
+	for key := range p.env {
 		keys = append(keys, key)
 	}
 
@@ -178,19 +178,21 @@ func (p Pack) Build() (*App, error) {
 		packArgs = append(packArgs, "--network", "none", "--no-pull")
 	}
 
-	buildLogs, _, err := p.executable.Execute(packit.Execution{
-		Args: packArgs,
-		Dir:  p.dir,
+	buildLogs := bytes.NewBuffer(nil)
+	_, _, err := p.executable.Execute(packit.Execution{
+		Args:   packArgs,
+		Stdout: buildLogs,
+		Stderr: buildLogs,
+		Dir:    p.dir,
 	})
-
 	if err != nil {
-		return nil, errors.Wrap(err, buildLogs)
+		return nil, errors.Wrap(err, buildLogs.String())
 	}
 
 	sum := sha256.Sum256([]byte(fmt.Sprintf("index.docker.io/library/%s:latest", p.image))) //This is how pack makes cache image names
 	cacheImage := fmt.Sprintf("pack-cache-%x", sum[:6])
 
-	app := NewApp(p.dir, p.image, cacheImage, bytes.NewBufferString(buildLogs), make(map[string]string))
+	app := NewApp(p.dir, p.image, cacheImage, buildLogs, make(map[string]string))
 	return &app, nil
 }
 
