@@ -62,26 +62,68 @@ func (l Layer) AppendSharedEnv(name string, format string, args ...interface{}) 
 
 // AppendPathBuildEnv appends the value of this environment variable to any previous declarations of the value using the
 // OS path delimiter.
+//
+// Deprecated: Use PrependPathBuildEnv
 func (l Layer) AppendPathBuildEnv(name string, format string, args ...interface{}) error {
-	l.Touch()
-	l.Logger.Body("Writing %s to build", name)
-	return l.Layer.AppendPathBuildEnv(name, format, args...)
+	return l.PrependPathBuildEnv(name, format, args...)
 }
 
 // AppendPathLaunchEnv appends the value of this environment variable to any previous declarations of the value using
 // the OS path delimiter.
+//
+// Deprecated: Use PrependPathLaunchEnv
 func (l Layer) AppendPathLaunchEnv(name string, format string, args ...interface{}) error {
-	l.Touch()
-	l.Logger.Body("Writing %s to launch", name)
-	return l.Layer.AppendPathLaunchEnv(name, format, args...)
+	return l.PrependPathLaunchEnv(name, format, args...)
 }
 
 // AppendPathSharedEnv appends the value of this environment variable to any previous declarations of the value using
 // the OS path delimiter.
+//
+// Deprecated: Use PrependPathSharedEnv
 func (l Layer) AppendPathSharedEnv(name string, format string, args ...interface{}) error {
+	return l.PrependPathSharedEnv(name, format, args...)
+}
+
+// DefaultBuildEnv sets a default for an environment variable with this value.
+func (l Layer) DefaultBuildEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to build", name)
+	return l.Layer.DefaultBuildEnv(name, format, args...)
+}
+
+// DefaultLaunchEnv sets a default for an environment variable with this value.
+func (l Layer) DefaultLaunchEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to launch", name)
+	return l.Layer.DefaultLaunchEnv(name, format, args...)
+}
+
+// DefaultSharedEnv sets a default for an environment variable with this value.
+func (l Layer) DefaultSharedEnv(name string, format string, args ...interface{}) error {
 	l.Touch()
 	l.Logger.Body("Writing %s to shared", name)
-	return l.Layer.AppendPathSharedEnv(name, format, args...)
+	return l.Layer.DefaultSharedEnv(name, format, args...)
+}
+
+// DelimiterBuildEnv sets a delimiter for an environment variable with this value.
+func (l Layer) DelimiterBuildEnv(name string, delimiter string) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to build", name)
+	return l.Layer.DelimiterBuildEnv(name, delimiter)
+}
+
+// DelimiterLaunchEnv sets a delimiter for an environment variable with this value.
+func (l Layer) DelimiterLaunchEnv(name string, delimiter string) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to launch", name)
+	return l.Layer.DelimiterLaunchEnv(name, delimiter)
+}
+
+// DelimiterSharedEnv sets a delimiter for an environment variable with this value.
+func (l Layer) DelimiterSharedEnv(name string, delimiter string) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to shared", name)
+	return l.Layer.DefaultSharedEnv(name, delimiter)
 }
 
 // OverrideBuildEnv overrides any existing value for an environment variable with this value.
@@ -103,6 +145,54 @@ func (l Layer) OverrideSharedEnv(name string, format string, args ...interface{}
 	l.Touch()
 	l.Logger.Body("Writing %s to shared", name)
 	return l.Layer.OverrideSharedEnv(name, format, args...)
+}
+
+// PrependBuildEnv prepends the value of this environment variable to any previous declarations of the value without any
+// delimitation.  If delimitation is important during concatenation, callers are required to add it.
+func (l Layer) PrependBuildEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to build", name)
+	return l.Layer.PrependBuildEnv(name, format, args...)
+}
+
+// PrependLaunchEnv prepends the value of this environment variable to any previous declarations of the value without
+// any delimitation.  If delimitation is important during concatenation, callers are required to add it.
+func (l Layer) PrependLaunchEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to shared", name)
+	return l.Layer.PrependSharedEnv(name, format, args...)
+}
+
+// PrependSharedEnv prepends the value of this environment variable to any previous declarations of the value without
+// any delimitation.  If delimitation is important during concatenation, callers are required to add it.
+func (l Layer) PrependSharedEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to shared", name)
+	return l.Layer.PrependSharedEnv(name, format, args...)
+}
+
+// PrependPathBuildEnv prepends the value of this environment variable to any previous declarations of the value using
+// the OS path delimiter.
+func (l Layer) PrependPathBuildEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to build", name)
+	return l.Layer.PrependPathBuildEnv(name, format, args...)
+}
+
+// PrependPathLaunchEnv prepends the value of this environment variable to any previous declarations of the value using
+// the OS path delimiter.
+func (l Layer) PrependPathLaunchEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to launch", name)
+	return l.Layer.PrependPathLaunchEnv(name, format, args...)
+}
+
+// PrependPathSharedEnv prepends the value of this environment variable to any previous declarations of the value using
+// the OS path delimiter.
+func (l Layer) PrependPathSharedEnv(name string, format string, args ...interface{}) error {
+	l.Touch()
+	l.Logger.Body("Writing %s to shared", name)
+	return l.Layer.PrependPathSharedEnv(name, format, args...)
 }
 
 // LayerContributor defines a callback function that is called when a layer needs to be contributed.
