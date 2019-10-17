@@ -31,7 +31,7 @@ func HaveAppendBuildEnvironment(name string, format string, args ...interface{})
 	return haveBuildEnvironment(fmt.Sprintf("%s.append", name), format, args...)
 }
 
-// HaveAppendBuildEnvironment tests that a layer has an append launch environment variable with the expected
+// HaveAppendLaunchEnvironment tests that a layer has an append launch environment variable with the expected
 // content.
 func HaveAppendLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
 	return haveLaunchEnvironment(fmt.Sprintf("%s.append", name), format, args...)
@@ -45,20 +45,62 @@ func HaveAppendSharedEnvironment(name string, format string, args ...interface{}
 
 // HaveAppendPathBuildEnvironment tests that a layer has an append path build environment variable with the expected
 // content.
+//
+// Deprecated: Use HavePrependPathBuildEnvironment
 func HaveAppendPathBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
-	return haveBuildEnvironment(name, format, args...)
+	return HavePrependPathBuildEnvironment(name, format, args...)
 }
 
-// HaveAppendPathBuildEnvironment tests that a layer has an append path launch environment variable with the expected
+// HaveAppendPathLaunchEnvironment tests that a layer has an append path launch environment variable with the expected
 // content.
+//
+// Deprecated: Use HavePrependPathLaunchEnvironment
 func HaveAppendPathLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
-	return haveLaunchEnvironment(name, format, args...)
+	return HavePrependPathLaunchEnvironment(name, format, args...)
 }
 
 // HaveAppendPathSharedEnvironment tests that a layer has an append path shared environment variable with the expected
 // content.
+//
+// Deprecated: Use HavePrependPathSharedEnvironment
 func HaveAppendPathSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
-	return haveSharedEnvironment(name, format, args...)
+	return HavePrependPathSharedEnvironment(name, format, args...)
+}
+
+// HaveDefaultBuildEnvironment tests that a layer has a default build environment variable with the expected
+// content.
+func HaveDefaultBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveBuildEnvironment(fmt.Sprintf("%s.default", name), format, args...)
+}
+
+// HaveDefaultLaunchEnvironment tests that a layer has a default launch environment variable with the expected
+// content.
+func HaveDefaultLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveLaunchEnvironment(fmt.Sprintf("%s.default", name), format, args...)
+}
+
+// HaveDefaultSharedEnvironment tests that a layer has a default shared environment variable with the expected
+// content.
+func HaveDefaultSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveSharedEnvironment(fmt.Sprintf("%s.default", name), format, args...)
+}
+
+// HaveDelimiterBuildEnvironment tests that a layer has a delimiter for a build environment variable with the expected
+// content.
+func HaveDelimiterBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveBuildEnvironment(fmt.Sprintf("%s.delim", name), format, args...)
+}
+
+// HaveDelimiterLaunchEnvironment tests that a layer has a delimiter for a launch environment variable with the expected
+// content.
+func HaveDelimiterLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveLaunchEnvironment(fmt.Sprintf("%s.delim", name), format, args...)
+}
+
+// HaveDelimiterSharedEnvironment tests that a layer has a delimiter for a shared environment variable with the expected
+// content.
+func HaveDelimiterSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveSharedEnvironment(fmt.Sprintf("%s.delim", name), format, args...)
 }
 
 // HaveOverrideBuildEnvironment tests that a layer has an override build environment variable with the expected
@@ -67,7 +109,7 @@ func HaveOverrideBuildEnvironment(name string, format string, args ...interface{
 	return haveBuildEnvironment(fmt.Sprintf("%s.override", name), format, args...)
 }
 
-// HaveOverrideBuildEnvironment tests that a layer has an override launch environment variable with the expected
+// HaveOverrideLaunchEnvironment tests that a layer has an override launch environment variable with the expected
 // content.
 func HaveOverrideLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
 	return haveLaunchEnvironment(fmt.Sprintf("%s.override", name), format, args...)
@@ -77,6 +119,42 @@ func HaveOverrideLaunchEnvironment(name string, format string, args ...interface
 // content.
 func HaveOverrideSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
 	return haveSharedEnvironment(fmt.Sprintf("%s.override", name), format, args...)
+}
+
+// HavePrependBuildEnvironment tests that a layer has a prepend build environment variable with the expected
+// content.
+func HavePrependBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveBuildEnvironment(fmt.Sprintf("%s.prepend", name), format, args...)
+}
+
+// HavePrependLaunchEnvironment tests that a layer has a prepend launch environment variable with the expected
+// content.
+func HavePrependLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveLaunchEnvironment(fmt.Sprintf("%s.prepend", name), format, args...)
+}
+
+// HavePrependSharedEnvironment tests that a layer has a prepend shared environment variable with the expected
+// content.
+func HavePrependSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveSharedEnvironment(fmt.Sprintf("%s.prepend", name), format, args...)
+}
+
+// HavePrependPathBuildEnvironment tests that a layer has a prepend path build environment variable with the expected
+// content.
+func HavePrependPathBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveBuildEnvironment(name, format, args...)
+}
+
+// HavePrependPathLaunchEnvironment tests that a layer has a prepend path launch environment variable with the expected
+// content.
+func HavePrependPathLaunchEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveLaunchEnvironment(name, format, args...)
+}
+
+// HavePrependPathSharedEnvironment tests that a layer has a prepend path shared environment variable with the expected
+// content.
+func HavePrependPathSharedEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
+	return haveSharedEnvironment(name, format, args...)
 }
 
 func haveBuildEnvironment(name string, format string, args ...interface{}) types.GomegaMatcher {
