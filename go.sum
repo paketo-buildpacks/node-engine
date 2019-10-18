@@ -29,8 +29,8 @@ github.com/cloudfoundry/dagger v0.0.0-20191016144449-e21676fc28c9 h1:KtPKzoWvDgH
 github.com/cloudfoundry/dagger v0.0.0-20191016144449-e21676fc28c9/go.mod h1:xqRl2xy0Q75hzZXM/Cv2DZNl7OIzaT/6JOy8TZbb4yk=
 github.com/cloudfoundry/libcfbuildpack v1.89.0 h1:A0OXihcHjvDRLYendhfqMxTBVe5pi5fmM5t4sqNRpao=
 github.com/cloudfoundry/libcfbuildpack v1.89.0/go.mod h1:ufhp/bp0LxbDDwbf2Ms3Bf4x9YnLr9dkL1RTUYSdKg0=
-github.com/cloudfoundry/libcfbuildpack v1.89.4 h1:tpr0/QYgDV2XAaCJu7S7KB+50Nd3iP4kHUdXzsXHY84=
-github.com/cloudfoundry/libcfbuildpack v1.89.4/go.mod h1:xiHXVOlUXVnv2rwaRBiFWZCwcxkb2SzMH/xQi5H6bFg=
+github.com/cloudfoundry/libcfbuildpack v1.89.5 h1:SZPRZlOyH7iziRGa7CCaGDnw9285w1W1zqMK2ZZwIEY=
+github.com/cloudfoundry/libcfbuildpack v1.89.5/go.mod h1:xiHXVOlUXVnv2rwaRBiFWZCwcxkb2SzMH/xQi5H6bFg=
 github.com/cloudfoundry/packit v0.0.0-20191014140300-f8d2e0b20a04 h1:IKq64UyPDs+HD8dDE7fRHC+W/Vw2L0J+GfPuTiTTo50=
 github.com/cloudfoundry/packit v0.0.0-20191014140300-f8d2e0b20a04/go.mod h1:m8hk5BTIclmOWMxv3aQKIU/0LA4FVe4XKC9o0VNsLow=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=

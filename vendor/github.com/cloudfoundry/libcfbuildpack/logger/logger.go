@@ -33,10 +33,12 @@ const (
 )
 
 var (
-	descriptionColor = color.New(color.FgBlue)
+	description      = color.New(color.FgBlue)
 	error            = color.New(color.FgRed, color.Bold)
+	errorName        = color.New(color.FgRed, color.Bold)
+	errorDescription = color.New(color.FgRed)
 	lines            = regexp.MustCompile(`(?m)^`)
-	nameColor        = color.New(color.FgBlue, color.Bold)
+	name             = color.New(color.FgBlue, color.Bold)
 	warning          = color.New(color.FgYellow, color.Bold)
 
 	errorEyeCatcher     string
@@ -56,13 +58,24 @@ type Logger struct {
 	logger.Logger
 }
 
-// Title prints the log message flush left, with an empty line above it.
+// Title prints the buildpack description flush left, with an empty line above it.
 func (l Logger) Title(v Identifiable) {
 	if !l.IsInfoEnabled() {
 		return
 	}
 
-	l.Info("\n%s", l.prettyIdentity(v))
+	l.Info("\n%s", l.prettyIdentity(v, name, description))
+}
+
+// Terminal error prints the build description colored red and bold, flush left, with an empty line above it, followed
+// by the log message message red and bold, and indented two spaces.
+func (l Logger) TerminalError(v Identifiable, format string, args ...interface{}) {
+	if !l.IsInfoEnabled() {
+		return
+	}
+
+	l.Info("\n%s", l.prettyIdentity(v, errorName, errorDescription))
+	l.HeaderError(format, args...)
 }
 
 // Header prints the log message indented two spaces, with an empty line above it.
@@ -128,7 +141,7 @@ func (l Logger) BodyWarning(format string, args ...interface{}) {
 	l.Body(warning.Sprintf(format, args...))
 }
 
-func (l Logger) prettyIdentity(v Identifiable) string {
+func (l Logger) prettyIdentity(v Identifiable, nameColor *color.Color, descriptionColor *color.Color) string {
 	if v == nil {
 		return ""
 	}
@@ -150,13 +163,13 @@ func (l Logger) PrettyIdentity(v Identifiable) string {
 		return ""
 	}
 
-	name, description := v.Identity()
+	n, d := v.Identity()
 
-	if description == "" {
-		return nameColor.Sprint(name)
+	if d == "" {
+		return name.Sprint(n)
 	}
 
-	return fmt.Sprintf("%s %s", nameColor.Sprint(name), descriptionColor.Sprint(description))
+	return fmt.Sprintf("%s %s", name.Sprint(n), description.Sprint(description))
 }
 
 // Error prints the log message with the error eye catcher.
