@@ -51,24 +51,6 @@ version = "8.16.2"
 [[metadata.dependencies]]
 id = "node"
 name = "Node Engine"
-sha256 = "2779d04b1a9744bbb003a1a4476db2444b5f697034bc902a07dde4a8669ae6d0"
-stacks = ["io.buildpacks.stacks.bionic"]
-uri = "https://nodejs.org/dist/v10.16.2/node-v10.16.2-linux-x64.tar.gz"
-version = "10.16.2"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
-sha256 = "9d21a165fedeccc9ffdd50657e51312e83ce7204370434d1cba9d02dc728c50a"
-source = "https://nodejs.org/dist/v10.16.2/node-v10.16.2.tar.gz"
-source_sha256 = "5936ef12ab3f0ce5fbb6751c1bb41f626b6058f414a297b3d8c5eb418a27e8fe"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.16.2-linux-x64-cflinuxfs3-9d21a165.tgz"
-version = "10.16.2"
-
-[[metadata.dependencies]]
-id = "node"
-name = "Node Engine"
 sha256 = "2f0397bb81c1d0c9901b9aff82a933257bf60f3992227b86107111a75b9030d9"
 stacks = ["io.buildpacks.stacks.bionic"]
 uri = "https://nodejs.org/dist/v10.16.3/node-v10.16.3-linux-x64.tar.gz"
@@ -83,6 +65,24 @@ source_sha256 = "db5a5e03a815b84a1266a4b48bb6a6d887175705f84fd2472f0d28e5e305a1f
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
 uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.16.3-linux-x64-cflinuxfs3-33294d36.tgz"
 version = "10.16.3"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "417bdc5402f6510fe1a5a898a9cdf1d67bd0202b5f014051c382f05358999534"
+stacks = ["io.buildpacks.stacks.bionic"]
+uri = "https://nodejs.org/dist/v10.17.0/node-v10.17.0-linux-x64.tar.gz"
+version = "10.17.0"
+
+[[metadata.dependencies]]
+id = "node"
+name = "Node Engine"
+sha256 = "1d19d6b0af72f2e396c1ed835c9318a06d107ea940c29818ecb82f4ef87242e5"
+source = "https://nodejs.org/dist/v10.17.0/node-v10.17.0.tar.gz"
+source_sha256 = "5204249d135176b547737d3eed2ca8a9d7f731fef6e545f741129cfa21f90573"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.17.0-linux-x64-cflinuxfs3-1d19d6b0.tgz"
+version = "10.17.0"
 
 [[metadata.dependencies]]
 id = "node"
