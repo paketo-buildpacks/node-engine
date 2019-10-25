@@ -144,6 +144,10 @@ docker:
 }
 
 func (a *App) Destroy() error {
+	if a == nil {
+		return nil
+	}
+
 	dockerLogger := lager.NewLogger("docker")
 	docker := packit.NewExecutable("docker", dockerLogger)
 
