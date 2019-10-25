@@ -13,7 +13,6 @@ import (
 	"github.com/buildpack/libbuildpack/logger"
 	"github.com/cloudfoundry/dagger/utils"
 	"github.com/cloudfoundry/packit"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -44,6 +43,7 @@ type Pack struct {
 	buildpacks []string
 	offline    bool
 	executable Executable
+	verbose    bool
 }
 
 type PackOption func(Pack) Pack
@@ -117,6 +117,13 @@ func SetOffline() PackOption {
 	}
 }
 
+func SetVerbose() PackOption {
+	return func(pack Pack) Pack {
+		pack.verbose = true
+		return pack
+	}
+}
+
 func NewPack(dir string, options ...PackOption) Pack {
 	var w io.Writer
 	queueIsInitializedMutex.Lock()
@@ -178,6 +185,10 @@ func (p Pack) Build() (*App, error) {
 		packArgs = append(packArgs, "--network", "none", "--no-pull")
 	}
 
+	if p.verbose {
+		packArgs = append(packArgs, "-v")
+	}
+
 	buildLogs := bytes.NewBuffer(nil)
 	_, _, err := p.executable.Execute(packit.Execution{
 		Args:   packArgs,
@@ -185,8 +196,9 @@ func (p Pack) Build() (*App, error) {
 		Stderr: buildLogs,
 		Dir:    p.dir,
 	})
+
 	if err != nil {
-		return nil, errors.Wrap(err, buildLogs.String())
+		return nil, fmt.Errorf("failed to pack build with output: %s\n %s\n", buildLogs, err.Error())
 	}
 
 	sum := sha256.Sum256([]byte(fmt.Sprintf("index.docker.io/library/%s:latest", p.image))) //This is how pack makes cache image names
