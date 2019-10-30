@@ -6,7 +6,7 @@ code.cloudfoundry.org/lager
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
 github.com/Masterminds/semver
-# github.com/buildpack/libbuildpack v1.25.2
+# github.com/buildpack/libbuildpack v1.25.3
 github.com/buildpack/libbuildpack/buildplan
 github.com/buildpack/libbuildpack/build
 github.com/buildpack/libbuildpack/layers
@@ -22,7 +22,7 @@ github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191025181811-15ebd2408e87
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.0
+# github.com/cloudfoundry/libcfbuildpack v1.91.1
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/detect
@@ -70,7 +70,7 @@ github.com/sclevine/spec
 github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
-# golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582
+# golang.org/x/net v0.0.0-20191028085509-fe3aa8a45271
 golang.org/x/net/html/charset
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/context
@@ -82,7 +82,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20191010194322-b09406accb47
+# golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
