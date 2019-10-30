@@ -104,17 +104,13 @@ func (l DownloadLayer) client(uri string) (http.Client, error) {
 		return http.Client{}, err
 	}
 
-	if u.Host != "storage.googleapis.com" {
+	g, ok := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+	if !ok || u.Host != "storage.googleapis.com" {
 		l.logger.Debug("Using standard HTTP Client")
 		return http.Client{Transport: t}, nil
 	}
 
 	l.logger.Debug("Using GCP HTTP Client")
-
-	g, ok := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-	if !ok {
-		return http.Client{}, fmt.Errorf("cannot find Google Application credentials")
-	}
 
 	c, err := google.CredentialsFromJSON(context.Background(), []byte(g), "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
