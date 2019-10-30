@@ -135,7 +135,7 @@ sha256 = "2bc664d158c760d4f5ec0b9675ecbd2bd2c9b29725b6118ac3278238e5569172"
 source = "https://nodejs.org/dist/v13.0.0/node-v13.0.0.tar.gz"
 source_sha256 = "103fc63b631a24ddc47189deee8c689e8158d7d804a67bd59fef04a1790bb217"
 stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.0.0-linux-x64-cflinuxfs3-2bc664d1.tgz""
+uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.0.0-linux-x64-cflinuxfs3-2bc664d1.tgz"
 version = "13.0.0"
 
 [[metadata.dependencies]]
