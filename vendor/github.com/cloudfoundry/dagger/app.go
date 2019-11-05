@@ -289,8 +289,12 @@ func (a *App) Info() (cID string, imageID string, cacheID []string, e error) {
 	return a.ContainerID, a.ImageName, volumes, nil
 }
 
+func (a App) GetBaseURL() string {
+	return fmt.Sprintf("http://localhost:%s", a.port)
+}
+
 func (a *App) HTTPGet(path string) (string, map[string][]string, error) {
-	resp, err := http.Get(fmt.Sprintf("http://localhost:%s%s", a.port, path))
+	resp, err := http.Get(fmt.Sprintf("%s%s", a.GetBaseURL(), path))
 	if err != nil {
 		return "", nil, err
 	}
