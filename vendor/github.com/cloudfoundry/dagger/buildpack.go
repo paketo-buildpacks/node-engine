@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/cloudfoundry/dagger/utils"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -14,6 +13,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/cloudfoundry/dagger/utils"
 
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/pkg/errors"
@@ -54,10 +55,6 @@ func FindBPRoot() (string, error) {
 }
 
 func PackageBuildpack(root string) (string, error) {
-	if bpPackagedPath := os.Getenv("BP_PACKAGED_PATH"); bpPackagedPath != "" {
-		return bpPackagedPath, nil
-	}
-
 	path, err := filepath.Abs(root)
 	if err != nil {
 		return "", err
@@ -103,9 +100,6 @@ func GetLatestUnpackagedBuildpack(name string) (string, error) {
 }
 
 func DeleteBuildpack(root string) error {
-	if root == os.Getenv("BP_PACKAGED_PATH") {
-		return nil
-	}
 	return os.RemoveAll(root)
 }
 
