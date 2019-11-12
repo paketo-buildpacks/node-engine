@@ -149,8 +149,7 @@ func LoadBuildpackYAML(appRoot string) (BuildpackYAML, error) {
 }
 
 func memoryAvailable() string {
-	return `which jq
-if [[ $? -eq 0 ]]; then
+	return `if [[ $? -eq 0 ]]; then
 	MEMORY_AVAILABLE="$(echo $VCAP_APPLICATION | jq .limits.mem)"
 fi
 
