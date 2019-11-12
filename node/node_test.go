@@ -69,8 +69,7 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_MEMORY", "512"))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_CONCURRENCY", "1"))
 
-			memoryAvailableProfile := `which jq
-if [[ $? -eq 0 ]]; then
+			memoryAvailableProfile := `if ! which jq > /dev/null; then
 	MEMORY_AVAILABLE="$(echo $VCAP_APPLICATION | jq .limits.mem)"
 fi
 
