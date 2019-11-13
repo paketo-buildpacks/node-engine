@@ -1,42 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/node-engine-cnb/node"
+	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/cargo"
+	"github.com/cloudfoundry/packit/scribe"
 )
 
 func main() {
-	context, err := build.DefaultBuild()
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to create a default build context: %s", err)
-		os.Exit(101)
-	}
+	logger := scribe.NewLogger(os.Stdout)
+	entryResolver := node.NewPlanEntryResolver(logger)
+	dependencyManager := node.NewEngineDependencyManager(cargo.NewTransport(), logger)
+	environment := node.NewEnvironment(logger)
+	planRefiner := node.NewPlanRefiner()
+	cacheHandler := node.NewCacheHandler()
 
-	code, err := runBuild(context)
-	if err != nil {
-		context.Logger.Info(err.Error())
-	}
-
-	os.Exit(code)
-
-}
-
-func runBuild(context build.Build) (int, error) {
-	context.Logger.FirstLine(context.Logger.PrettyIdentity(context.Buildpack))
-
-	nodeContributor, willContribute, err := node.NewContributor(context)
-	if err != nil {
-		return context.Failure(102), err
-	}
-
-	if willContribute {
-		if err := nodeContributor.Contribute(); err != nil {
-			return context.Failure(103), err
-		}
-	}
-
-	return context.Success()
+	packit.Build(node.Build(entryResolver, dependencyManager, environment, planRefiner, cacheHandler, logger))
 }

@@ -1,43 +1,26 @@
-# cloud.google.com/go v0.51.0
-cloud.google.com/go/compute/metadata
 # code.cloudfoundry.org/lager v2.0.0+incompatible
 code.cloudfoundry.org/lager
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
 github.com/Masterminds/semver
-# github.com/buildpack/libbuildpack v1.25.10
+# github.com/buildpack/libbuildpack v1.25.11
 github.com/buildpack/libbuildpack/application
-github.com/buildpack/libbuildpack/build
-github.com/buildpack/libbuildpack/buildpack
-github.com/buildpack/libbuildpack/buildpackplan
-github.com/buildpack/libbuildpack/buildplan
-github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/internal
-github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/logger
-github.com/buildpack/libbuildpack/platform
-github.com/buildpack/libbuildpack/services
-github.com/buildpack/libbuildpack/stack
+# github.com/cheggaaa/pb v2.0.7+incompatible
+github.com/cheggaaa/pb
 # github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.21
-github.com/cloudfoundry/libcfbuildpack/build
-github.com/cloudfoundry/libcfbuildpack/buildpack
-github.com/cloudfoundry/libcfbuildpack/buildpackplan
-github.com/cloudfoundry/libcfbuildpack/detect
+# github.com/cloudfoundry/libcfbuildpack v1.91.22
 github.com/cloudfoundry/libcfbuildpack/helper
-github.com/cloudfoundry/libcfbuildpack/internal
-github.com/cloudfoundry/libcfbuildpack/layers
-github.com/cloudfoundry/libcfbuildpack/logger
-github.com/cloudfoundry/libcfbuildpack/runner
-github.com/cloudfoundry/libcfbuildpack/services
-github.com/cloudfoundry/libcfbuildpack/test
-# github.com/cloudfoundry/packit v0.0.0-20191202164725-43d6fa19d96c
+# github.com/cloudfoundry/packit v0.0.0-20200114205204-249189c06cb9
+github.com/cloudfoundry/packit
+github.com/cloudfoundry/packit/cargo
+github.com/cloudfoundry/packit/internal
 github.com/cloudfoundry/packit/pexec
-# github.com/fatih/color v1.9.0
-github.com/fatih/color
+github.com/cloudfoundry/packit/scribe
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
 # github.com/google/go-github v17.0.0+incompatible
@@ -48,8 +31,6 @@ github.com/google/go-querystring/query
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.11
 github.com/mattn/go-isatty
-# github.com/mitchellh/mapstructure v1.1.2
-github.com/mitchellh/mapstructure
 # github.com/onsi/gomega v1.8.1
 github.com/onsi/gomega
 github.com/onsi/gomega/format
@@ -63,26 +44,23 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/pkg/errors v0.8.1
+# github.com/pkg/errors v0.9.0
 github.com/pkg/errors
 # github.com/sclevine/spec v1.4.0
 github.com/sclevine/spec
 github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
-# golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+# golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/oauth2 v0.0.0-20200107160858-eca82077e2d1
+# golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 golang.org/x/oauth2
-golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
-golang.org/x/oauth2/jws
-golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20200107162124-548cf772de50
+# golang.org/x/sys v0.0.0-20200113162924-86b910548bc1
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
@@ -106,15 +84,24 @@ golang.org/x/text/transform
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
 # google.golang.org/appengine v1.6.5
-google.golang.org/appengine
 google.golang.org/appengine/internal
-google.golang.org/appengine/internal/app_identity
 google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
-google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
+# gopkg.in/VividCortex/ewma.v1 v1.1.1
+gopkg.in/VividCortex/ewma.v1
+# gopkg.in/cheggaaa/pb.v2 v2.0.7
+gopkg.in/cheggaaa/pb.v2/termutil
+# gopkg.in/fatih/color.v1 v1.7.0
+gopkg.in/fatih/color.v1
+# gopkg.in/mattn/go-colorable.v0 v0.1.0
+gopkg.in/mattn/go-colorable.v0
+# gopkg.in/mattn/go-isatty.v0 v0.0.4
+gopkg.in/mattn/go-isatty.v0
+# gopkg.in/mattn/go-runewidth.v0 v0.0.4
+gopkg.in/mattn/go-runewidth.v0
 # gopkg.in/yaml.v2 v2.2.7
 gopkg.in/yaml.v2

@@ -27,7 +27,7 @@ export GIT_TOKEN
 
 echo "Run Buildpack Runtime Integration Tests"
 set +e
-GOMAXPROCS=4 go test -timeout 0 ./integration/... -v -mod=vendor -run Integration
+GOMAXPROCS=4 go test -count=1 -timeout 0 ./integration/... -v -mod=vendor -run Integration
 exit_code=$?
 
 if [[ "$exit_code" != "0" ]]; then
