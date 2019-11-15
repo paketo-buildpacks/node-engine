@@ -51,6 +51,7 @@ type Pack struct {
 	executable Executable
 	verbose    bool
 	builder    string
+	noPull     bool
 }
 
 type PackOption func(Pack) Pack
@@ -121,6 +122,7 @@ func SetBuildpacks(buildpacks ...string) PackOption {
 func SetOffline() PackOption {
 	return func(pack Pack) Pack {
 		pack.offline = true
+		pack = NoPull()(pack)
 		return pack
 	}
 }
@@ -135,6 +137,13 @@ func SetVerbose() PackOption {
 func SetBuilder(builder string) PackOption {
 	return func(pack Pack) Pack {
 		pack.builder = builder
+		return pack
+	}
+}
+
+func NoPull() PackOption {
+	return func(pack Pack) Pack {
+		pack.noPull = true
 		return pack
 	}
 }
@@ -191,6 +200,10 @@ func (p Pack) Build() (*App, error) {
 		packArgs = append(packArgs, "-e", fmt.Sprintf("%s=%s", key, p.env[key]))
 	}
 
+	if p.noPull {
+		packArgs = append(packArgs, "--no-pull")
+	}
+
 	if p.offline {
 		// probably want to pull here?
 		dockerLogger := lager.NewLogger("docker")
@@ -202,7 +215,7 @@ func (p Pack) Build() (*App, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to pull %s\n with stdout %s\n stderr %s\n%s", builderImage, stdout, stderr, err.Error())
 		}
-		packArgs = append(packArgs, "--network", "none", "--no-pull")
+		packArgs = append(packArgs, "--network", "none")
 	}
 
 	if p.verbose {
