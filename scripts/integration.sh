@@ -3,13 +3,15 @@ set -euo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 if [[ ! -d integration ]]; then
     echo -e "\n\033[0;31m** WARNING  No Integration tests **\033[0m"
     exit 0
 fi
 
-PACK_VERSION=${PACK_VERSION:-""}
-source scripts/install_tools.sh "$PACK_VERSION"
+PACK_VERSION=${PACK_VERSION:-"latest"}
+source "$SCRIPT_DIR"/install_tools.sh "$PACK_VERSION"
 
 export CNB_BUILD_IMAGE=${CNB_BUILD_IMAGE:-cloudfoundry/build:full-cnb}
 export CNB_RUN_IMAGE=${CNB_RUN_IMAGE:-cloudfoundry/run:full-cnb}
