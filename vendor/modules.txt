@@ -7,14 +7,14 @@ github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
 github.com/Masterminds/semver
 # github.com/buildpack/libbuildpack v1.25.4
-github.com/buildpack/libbuildpack/buildplan
-github.com/buildpack/libbuildpack/build
-github.com/buildpack/libbuildpack/layers
-github.com/buildpack/libbuildpack/internal
-github.com/buildpack/libbuildpack/buildpackplan
-github.com/buildpack/libbuildpack/detect
 github.com/buildpack/libbuildpack/application
+github.com/buildpack/libbuildpack/build
 github.com/buildpack/libbuildpack/buildpack
+github.com/buildpack/libbuildpack/buildpackplan
+github.com/buildpack/libbuildpack/buildplan
+github.com/buildpack/libbuildpack/detect
+github.com/buildpack/libbuildpack/internal
+github.com/buildpack/libbuildpack/layers
 github.com/buildpack/libbuildpack/logger
 github.com/buildpack/libbuildpack/platform
 github.com/buildpack/libbuildpack/services
@@ -24,16 +24,16 @@ github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libcfbuildpack v1.91.7
 github.com/cloudfoundry/libcfbuildpack/build
+github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
 github.com/cloudfoundry/libcfbuildpack/detect
 github.com/cloudfoundry/libcfbuildpack/helper
+github.com/cloudfoundry/libcfbuildpack/internal
 github.com/cloudfoundry/libcfbuildpack/layers
-github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/logger
 github.com/cloudfoundry/libcfbuildpack/runner
 github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
-github.com/cloudfoundry/libcfbuildpack/internal
 # github.com/cloudfoundry/packit v0.0.0-20191014140300-f8d2e0b20a04
 github.com/cloudfoundry/packit
 # github.com/fatih/color v1.7.0
@@ -52,17 +52,17 @@ github.com/mattn/go-isatty
 github.com/mitchellh/mapstructure
 # github.com/onsi/gomega v1.7.1
 github.com/onsi/gomega
-github.com/onsi/gomega/types
+github.com/onsi/gomega/format
 github.com/onsi/gomega/internal/assertion
 github.com/onsi/gomega/internal/asyncassertion
+github.com/onsi/gomega/internal/oraclematcher
 github.com/onsi/gomega/internal/testingtsupport
 github.com/onsi/gomega/matchers
-github.com/onsi/gomega/internal/oraclematcher
-github.com/onsi/gomega/format
 github.com/onsi/gomega/matchers/support/goraph/bipartitegraph
 github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
+github.com/onsi/gomega/types
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
 # github.com/sclevine/spec v1.3.0
@@ -71,11 +71,11 @@ github.com/sclevine/spec/report
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
 # golang.org/x/net v0.0.0-20191119073136-fc4aabc6c914
-golang.org/x/net/html/charset
-golang.org/x/net/context/ctxhttp
 golang.org/x/net/context
+golang.org/x/net/context/ctxhttp
 golang.org/x/net/html
 golang.org/x/net/html/atom
+golang.org/x/net/html/charset
 # golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 golang.org/x/oauth2
 golang.org/x/oauth2/google
@@ -88,30 +88,30 @@ golang.org/x/sys/unix
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
-golang.org/x/text/transform
-golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/japanese
 golang.org/x/text/encoding/korean
 golang.org/x/text/encoding/simplifiedchinese
 golang.org/x/text/encoding/traditionalchinese
 golang.org/x/text/encoding/unicode
-golang.org/x/text/language
-golang.org/x/text/internal/utf8internal
-golang.org/x/text/runes
 golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/language
+golang.org/x/text/runes
+golang.org/x/text/transform
 # google.golang.org/appengine v1.6.5
 google.golang.org/appengine
-google.golang.org/appengine/urlfetch
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/app_identity
-google.golang.org/appengine/internal/modules
-google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/urlfetch
 # gopkg.in/yaml.v2 v2.2.7
 gopkg.in/yaml.v2
