@@ -62,12 +62,9 @@ func testNode(t *testing.T, when spec.G, it spec.S) {
 			Expect(filepath.Join(layer.Root, "stub.txt")).To(BeARegularFile())
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_HOME", layer.Root))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_ENV", "production"))
-			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_MODULES_CACHE", "true"))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NODE_VERBOSE", "false"))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NPM_CONFIG_PRODUCTION", "true"))
 			Expect(layer).To(test.HaveOverrideSharedEnvironment("NPM_CONFIG_LOGLEVEL", "error"))
-			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_MEMORY", "512"))
-			Expect(layer).To(test.HaveOverrideSharedEnvironment("WEB_CONCURRENCY", "1"))
 
 			memoryAvailableProfile := `if which jq > /dev/null; then
 	MEMORY_AVAILABLE="$(echo $VCAP_APPLICATION | jq .limits.mem)"

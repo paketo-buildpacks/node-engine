@@ -79,10 +79,6 @@ func (c Contributor) Contribute() error {
 			return err
 		}
 
-		if err := layer.OverrideSharedEnv("NODE_MODULES_CACHE", "true"); err != nil {
-			return err
-		}
-
 		if err := layer.OverrideSharedEnv("NODE_VERBOSE", "false"); err != nil {
 			return err
 		}
@@ -92,14 +88,6 @@ func (c Contributor) Contribute() error {
 		}
 
 		if err := layer.OverrideSharedEnv("NPM_CONFIG_LOGLEVEL", "error"); err != nil {
-			return err
-		}
-
-		if err := layer.OverrideSharedEnv("WEB_MEMORY", "512"); err != nil {
-			return err
-		}
-
-		if err := layer.OverrideSharedEnv("WEB_CONCURRENCY", "1"); err != nil {
 			return err
 		}
 
