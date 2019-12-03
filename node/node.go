@@ -83,14 +83,6 @@ func (c Contributor) Contribute() error {
 			return err
 		}
 
-		if err := layer.OverrideSharedEnv("NPM_CONFIG_PRODUCTION", "true"); err != nil {
-			return err
-		}
-
-		if err := layer.OverrideSharedEnv("NPM_CONFIG_LOGLEVEL", "error"); err != nil {
-			return err
-		}
-
 		if err := layer.WriteProfile("0_memory_available.sh", memoryAvailable()); err != nil {
 			return err
 		}
