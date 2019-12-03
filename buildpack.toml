@@ -122,24 +122,6 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "node"
     name = "Node Engine"
-    sha256 = "490e998198e152450e79bb65178813ce0c81708954697f91cfd82537acfcb588"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://nodejs.org/dist/v13.1.0/node-v13.1.0-linux-x64.tar.gz"
-    version = "13.1.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "3510e2663fc3b14c1c51b57530daea588768050e87f234e555249b1437c284b5"
-    source = "https://nodejs.org/dist/v13.1.0/node-v13.1.0.tar.gz"
-    source_sha256 = "df640a2f151f788d02dc25c91d80fffe06b4c3c72fbdee07ab9abd7c6879d6cd"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.1.0-linux-x64-cflinuxfs3-3510e266.tgz"
-    version = "13.1.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
     sha256 = "dcf3954ecf6a34d65cab277d3565c654996b1d3e6d07cbbd98939cee0792c668"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://nodejs.org/dist/v13.2.0/node-v13.2.0-linux-x64.tar.gz"
@@ -154,6 +136,24 @@ api = "0.2"
     stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.2.0-linux-x64-cflinuxfs3-fd282407.tgz"
     version = "13.2.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "155b0510732d2f48150dc6bc4b25eb44ce5cd54d21c70d2ca7f31be3b9ab7fa6"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://nodejs.org/dist/v13.3.0/node-v13.3.0-linux-x64.tar.gz"
+    version = "13.3.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "8aa3e5d979e1903e6e95294f666ca4ea42c67b958a6dac4b37f3fb77e34b7a6c"
+    source = "https://nodejs.org/dist/v13.3.0/node-v13.3.0.tar.gz"
+    source_sha256 = "cab5bd4712265745cfce1416ea0f425f1de71452f0ddc544d815aacee2aede3e"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.3.0-linux-x64-cflinuxfs3-8aa3e5d9.tgz"
+    version = "13.3.0"
 
   [[metadata.dependency_deprecation_dates]]
     date = 2021-04-01T00:00:00Z
