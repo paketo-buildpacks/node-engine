@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/lager"
 	"github.com/buildpack/libbuildpack/logger"
 	"github.com/cloudfoundry/dagger/utils"
-	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/pexec"
 )
 
 const (
@@ -39,7 +39,7 @@ var (
 )
 
 type Executable interface {
-	Execute(packit.Execution) (stdout, stderr string, err error)
+	Execute(pexec.Execution) (stdout, stderr string, err error)
 }
 
 type Pack struct {
@@ -168,7 +168,7 @@ func NewPack(dir string, options ...PackOption) Pack {
 
 	pack := Pack{
 		dir:        dir,
-		executable: packit.NewExecutable("pack", lager.NewLogger("pack")),
+		executable: pexec.NewExecutable("pack", lager.NewLogger("pack")),
 	}
 
 	for _, option := range options {
@@ -207,9 +207,9 @@ func (p Pack) Build() (*App, error) {
 	if p.offline {
 		// probably want to pull here?
 		dockerLogger := lager.NewLogger("docker")
-		dockerExec := packit.NewExecutable("docker", dockerLogger)
+		dockerExec := pexec.NewExecutable("docker", dockerLogger)
 
-		stdout, stderr, err := dockerExec.Execute(packit.Execution{
+		stdout, stderr, err := dockerExec.Execute(pexec.Execution{
 			Args: []string{"pull", builderImage},
 		})
 		if err != nil {
@@ -223,7 +223,7 @@ func (p Pack) Build() (*App, error) {
 	}
 
 	buildLogs := bytes.NewBuffer(nil)
-	_, _, err = p.executable.Execute(packit.Execution{
+	_, _, err = p.executable.Execute(pexec.Execution{
 		Args:   packArgs,
 		Stdout: buildLogs,
 		Stderr: buildLogs,

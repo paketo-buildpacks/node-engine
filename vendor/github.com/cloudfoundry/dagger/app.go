@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/pexec"
 	"github.com/pkg/errors"
 )
 
@@ -83,8 +83,8 @@ func (a *App) StartWithCommand(startCmd string) error {
 	}
 
 	dockerLogger := lager.NewLogger("docker")
-	docker := packit.NewExecutable("docker", dockerLogger)
-	log, _, err := docker.Execute(packit.Execution{
+	docker := pexec.NewExecutable("docker", dockerLogger)
+	log, _, err := docker.Execute(pexec.Execution{
 		Args: args,
 	})
 
@@ -125,7 +125,7 @@ docker:
 		}
 	}
 
-	log, _, err = docker.Execute(packit.Execution{
+	log, _, err = docker.Execute(pexec.Execution{
 		Args: []string{"container", "port", a.ContainerID},
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func (a *App) Destroy() error {
 	}
 
 	dockerLogger := lager.NewLogger("docker")
-	docker := packit.NewExecutable("docker", dockerLogger)
+	docker := pexec.NewExecutable("docker", dockerLogger)
 
 	cntrExists, err := DockerArtifactExists(a.ContainerID)
 	if err != nil {
@@ -157,14 +157,14 @@ func (a *App) Destroy() error {
 	}
 
 	if cntrExists {
-		_, _, err := docker.Execute(packit.Execution{
+		_, _, err := docker.Execute(pexec.Execution{
 			Args: []string{"stop", a.ContainerID},
 		})
 		if err != nil {
 			return fmt.Errorf("failed to stop container %s: %s", a.ContainerID, err)
 		}
 
-		_, _, err = docker.Execute(packit.Execution{
+		_, _, err = docker.Execute(pexec.Execution{
 			Args: []string{"rm", a.ContainerID, "-f", "--volumes"},
 		})
 		if err != nil {
@@ -178,7 +178,7 @@ func (a *App) Destroy() error {
 	}
 
 	if imgExists {
-		_, _, err = docker.Execute(packit.Execution{
+		_, _, err = docker.Execute(pexec.Execution{
 			Args: []string{"rmi", a.ImageName, "-f"},
 		})
 		if err != nil {
@@ -192,7 +192,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheExists {
-		_, _, err = docker.Execute(packit.Execution{
+		_, _, err = docker.Execute(pexec.Execution{
 			Args: []string{"rmi", a.CacheImage, "-f"},
 		})
 		if err != nil {
@@ -206,7 +206,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheBuildVolumeExists {
-		_, _, err = docker.Execute(packit.Execution{
+		_, _, err = docker.Execute(pexec.Execution{
 			Args: []string{"volume", "rm", fmt.Sprintf("%s.build", a.CacheImage)},
 		})
 		if err != nil {
@@ -220,7 +220,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheLaunchVolumeExists {
-		_, _, err = docker.Execute(packit.Execution{
+		_, _, err = docker.Execute(pexec.Execution{
 			Args: []string{"volume", "rm", fmt.Sprintf("%s.launch", a.CacheImage)},
 		})
 		if err != nil {
@@ -228,7 +228,7 @@ func (a *App) Destroy() error {
 		}
 	}
 
-	_, _, err = docker.Execute(packit.Execution{
+	_, _, err = docker.Execute(pexec.Execution{
 		Args: []string{"image", "prune", "-f"},
 	})
 	if err != nil {
@@ -240,8 +240,8 @@ func (a *App) Destroy() error {
 }
 
 func (a *App) Logs() (string, error) {
-	docker := packit.NewExecutable("docker", lager.NewLogger("docker"))
-	log, _, err := docker.Execute(packit.Execution{
+	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
+	log, _, err := docker.Execute(pexec.Execution{
 		Args: []string{"logs", a.ContainerID},
 	})
 	if err != nil {
@@ -265,9 +265,9 @@ func (a *App) SetHealthCheck(command, interval, timeout string) {
 
 func (a *App) Files(path string) ([]string, error) {
 	// Ensures that the error and results from "Permission denied" don't get sent to the output
-	docker := packit.NewExecutable("docker", lager.NewLogger("docker"))
+	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
 
-	log, _, err := docker.Execute(packit.Execution{
+	log, _, err := docker.Execute(pexec.Execution{
 		Args: []string{
 			"run", a.ImageName,
 			"find", "./..", fmt.Sprintf("-wholename *%s* 2>&1 | grep -v \"Permission denied\"", path),
@@ -326,8 +326,8 @@ func stripColor(input string) string {
 }
 
 func getCacheVolumes() ([]string, error) {
-	docker := packit.NewExecutable("docker", lager.NewLogger("docker"))
-	log, _, err := docker.Execute(packit.Execution{
+	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
+	log, _, err := docker.Execute(pexec.Execution{
 		Args: []string{"volume", "ls", "-q"},
 	})
 	if err != nil {
@@ -345,8 +345,8 @@ func getCacheVolumes() ([]string, error) {
 }
 
 func DockerArtifactExists(name string) (bool, error) {
-	docker := packit.NewExecutable("docker", lager.NewLogger("docker"))
-	_, errLog, err := docker.Execute(packit.Execution{
+	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
+	_, errLog, err := docker.Execute(pexec.Execution{
 		Args: []string{"inspect", name},
 	})
 	if err != nil {
