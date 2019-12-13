@@ -85,10 +85,14 @@ func PackageCachedBuildpack(root string) (string, string, error) {
 	cmd := exec.Command("scripts/package.sh", "-c", "-v", "0.0.0")
 	cmd.Env = append(os.Environ(), fmt.Sprintf("PACKAGE_DIR=%s", path))
 	cmd.Dir = root
-	cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
 
-	return fmt.Sprintf("%s-cached", path), string(out), err
+	buffer := bytes.NewBuffer(nil)
+
+	cmd.Stdout = io.MultiWriter(os.Stdout, buffer)
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+
+	return fmt.Sprintf("%s-cached", path), buffer.String(), err
 }
 
 func GetLatestBuildpack(name string) (string, error) {
