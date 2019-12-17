@@ -86,24 +86,6 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "node"
     name = "Node Engine"
-    sha256 = "c69671c89d0faa47b64bd5f37079e4480852857a9a9366ee86cdd8bc9670074a"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://nodejs.org/dist/v12.13.0/node-v12.13.0-linux-x64.tar.gz"
-    version = "12.13.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "55d69507d240b1ce582ce1c66e675b2271d8c3585f76c453595b3f3f20f4ed09"
-    source = "https://nodejs.org/dist/v12.13.0/node-v12.13.0.tar.gz"
-    source_sha256 = "2e5321e095fe673a3ab936cf77faf8c983cba62f27a9fbd00530a7edb739a040"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.13.0-linux-x64-cflinuxfs3-55d69507.tgz"
-    version = "12.13.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
     sha256 = "074a6129da34b768b791f39e8b74c6e4ab3349d1296f1a303ef3547a7f9cf9be"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://nodejs.org/dist/v12.13.1/node-v12.13.1-linux-x64.tar.gz"
@@ -118,6 +100,24 @@ api = "0.2"
     stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.13.1-linux-x64-cflinuxfs3-1e528ef4.tgz"
     version = "12.13.1"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://nodejs.org/dist/v12.14.0/node-v12.14.0-linux-x64.tar.gz"
+    version = "12.14.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "bb6d60afdc962ba88c49f83c347836a89db43f7b9048dee249a0d67796d4495c"
+    source = "https://nodejs.org/dist/v12.14.0/node-v12.14.0.tar.gz"
+    source_sha256 = "5c1939867228f3845c808ef84a89c8ee93cc35f857bf7587ecee1b5a6d9da67b"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-12.14.0-linux-x64-cflinuxfs3-bb6d60af.tgz"
+    version = "12.14.0"
 
   [[metadata.dependencies]]
     id = "node"
