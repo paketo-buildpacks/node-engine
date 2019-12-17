@@ -25,7 +25,7 @@ fi
 install_pack_master() {
     if [[ -f ".bin/pack" ]]; then return 0; fi
 
-    git clone https://github.com/buildpack/pack ./.bin/pack-repo
+    git clone https://github.com/buildpacks/pack ./.bin/pack-repo
     pushd .bin/pack-repo
         go build -o ../pack ./cmd/pack/main.go
     popd
@@ -62,16 +62,16 @@ install_pack() {
         echo "Installing pack $PACK_VERSION"
 
         PACK_ARTIFACT=pack-$PACK_VERSION-$OS.tar.gz
-        ARTIFACT_URL="https://github.com/buildpack/pack/releases/download/v$PACK_VERSION/$PACK_ARTIFACT"
-        expand "$ARTIFACT_URL"
+        ARTIFACT_URL="https://github.com/buildpacks/pack/releases/download/v$PACK_VERSION/$PACK_ARTIFACT"
+        expand $ARTIFACT_URL
         return 0
     fi
 
     if [[ $OS == "macos" ]]; then
 
-        ARTIFACT_URL=$(curl "$CURL_DATA" -s https://api.github.com/repos/buildpack/pack/releases/latest |   jq --raw-output '.assets[1] | .browser_download_url')
+        ARTIFACT_URL=$(curl $CURL_DATA -s https://api.github.com/repos/buildpacks/pack/releases/latest |   jq --raw-output '.assets[1] | .browser_download_url')
     else
-        ARTIFACT_URL=$(curl "$CURL_DATA" -s https://api.github.com/repos/buildpack/pack/releases/latest |   jq --raw-output '.assets[0] | .browser_download_url')
+        ARTIFACT_URL=$(curl $CURL_DATA -s https://api.github.com/repos/buildpacks/pack/releases/latest |   jq --raw-output '.assets[0] | .browser_download_url')
     fi
 
     expand "$ARTIFACT_URL"
