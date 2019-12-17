@@ -50,24 +50,6 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "node"
     name = "Node Engine"
-    sha256 = "2f0397bb81c1d0c9901b9aff82a933257bf60f3992227b86107111a75b9030d9"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://nodejs.org/dist/v10.16.3/node-v10.16.3-linux-x64.tar.gz"
-    version = "10.16.3"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "33294d3658fe726d2d035092c72d150b7bd7b6d7de2ecab8fed66862f1f6bafd"
-    source = "https://nodejs.org/dist/v10.16.3/node-v10.16.3.tar.gz"
-    source_sha256 = "db5a5e03a815b84a1266a4b48bb6a6d887175705f84fd2472f0d28e5e305a1f8"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.16.3-linux-x64-cflinuxfs3-33294d36.tgz"
-    version = "10.16.3"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
     sha256 = "417bdc5402f6510fe1a5a898a9cdf1d67bd0202b5f014051c382f05358999534"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://nodejs.org/dist/v10.17.0/node-v10.17.0-linux-x64.tar.gz"
@@ -82,6 +64,24 @@ api = "0.2"
     stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.17.0-linux-x64-cflinuxfs3-1d19d6b0.tgz"
     version = "10.17.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "78a46d1e1f6db68c0732981fc9a1fe8583eabb4e232f1ed742f7dedc5bed3ddd"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://nodejs.org/dist/v10.18.0/node-v10.18.0-linux-x64.tar.gz"
+    version = "10.18.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "7242c51f0b49bd8e489b5a0b298cad9b4cd64ff3f0aec0d87b38eb7da9a2e980"
+    source = "https://nodejs.org/dist/v10.18.0/node-v10.18.0.tar.gz"
+    source_sha256 = "f9c8785c5d5ba0e5412dada04a89ab3fe32531423c47232217aad79757a769e7"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.0-linux-x64-cflinuxfs3-7242c51f.tgz"
+    version = "10.18.0"
 
   [[metadata.dependencies]]
     id = "node"
