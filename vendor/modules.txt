@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.49.0
+# cloud.google.com/go v0.50.0
 cloud.google.com/go/compute/metadata
 # code.cloudfoundry.org/lager v2.0.0+incompatible
 code.cloudfoundry.org/lager
@@ -22,7 +22,7 @@ github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191213212648-a45390236bb7
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.9
+# github.com/cloudfoundry/libcfbuildpack v1.91.10
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
@@ -50,7 +50,7 @@ github.com/mattn/go-colorable
 github.com/mattn/go-isatty
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
-# github.com/onsi/gomega v1.7.1
+# github.com/onsi/gomega v1.8.0
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/internal/assertion
@@ -82,7 +82,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20191210023423-ac6580df4449
+# golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
@@ -102,6 +102,9 @@ golang.org/x/text/internal/utf8internal
 golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
+# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+golang.org/x/xerrors
+golang.org/x/xerrors/internal
 # google.golang.org/appengine v1.6.5
 google.golang.org/appengine
 google.golang.org/appengine/internal
