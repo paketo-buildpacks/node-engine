@@ -6,7 +6,7 @@ code.cloudfoundry.org/lager
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
 github.com/Masterminds/semver
-# github.com/buildpack/libbuildpack v1.25.6
+# github.com/buildpack/libbuildpack v1.25.7
 github.com/buildpack/libbuildpack/application
 github.com/buildpack/libbuildpack/build
 github.com/buildpack/libbuildpack/buildpack
@@ -22,7 +22,7 @@ github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191213212648-a45390236bb7
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.10
+# github.com/cloudfoundry/libcfbuildpack v1.91.11
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
