@@ -55,7 +55,7 @@ func (d Dependencies) Best(id string, versionConstraint string, stack stack.Stac
 	}
 
 	sort.Slice(candidates, func(i int, j int) bool {
-		return d[i].Version.LessThan(d[j].Version.Version)
+		return candidates[i].Version.LessThan(candidates[j].Version.Version)
 	})
 
 	return candidates[len(candidates)-1], nil
