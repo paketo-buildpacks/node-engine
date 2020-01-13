@@ -141,6 +141,10 @@ func (l Logger) BodyWarning(format string, args ...interface{}) {
 	l.Body(warning.Sprintf(format, args...))
 }
 
+func (l Logger) LaunchConfiguration(format string, defaultValue string) {
+	l.Body("%s. Default %s", format, color.New(color.Italic).Sprint(defaultValue))
+}
+
 func (l Logger) prettyIdentity(v Identifiable, nameColor *color.Color, descriptionColor *color.Color) string {
 	if v == nil {
 		return ""
