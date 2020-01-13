@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.50.0
+# cloud.google.com/go v0.51.0
 cloud.google.com/go/compute/metadata
 # code.cloudfoundry.org/lager v2.0.0+incompatible
 code.cloudfoundry.org/lager
@@ -22,7 +22,7 @@ github.com/buildpack/libbuildpack/stack
 # github.com/cloudfoundry/dagger v0.0.0-20191213212648-a45390236bb7
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.19
+# github.com/cloudfoundry/libcfbuildpack v1.91.20
 github.com/cloudfoundry/libcfbuildpack/build
 github.com/cloudfoundry/libcfbuildpack/buildpack
 github.com/cloudfoundry/libcfbuildpack/buildpackplan
@@ -36,7 +36,7 @@ github.com/cloudfoundry/libcfbuildpack/services
 github.com/cloudfoundry/libcfbuildpack/test
 # github.com/cloudfoundry/packit v0.0.0-20191202164725-43d6fa19d96c
 github.com/cloudfoundry/packit/pexec
-# github.com/fatih/color v1.8.0
+# github.com/fatih/color v1.9.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
@@ -76,13 +76,13 @@ golang.org/x/net/context/ctxhttp
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6
+# golang.org/x/oauth2 v0.0.0-20200107160858-eca82077e2d1
 golang.org/x/oauth2
 golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20200103143344-a1369afcdac7
+# golang.org/x/sys v0.0.0-20200107162124-548cf772de50
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
