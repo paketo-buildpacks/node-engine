@@ -241,14 +241,17 @@ func (a *App) Destroy() error {
 
 func (a *App) Logs() (string, error) {
 	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
-	log, _, err := docker.Execute(pexec.Execution{
-		Args: []string{"logs", a.ContainerID},
+	buffer := bytes.NewBuffer(nil)
+	_, _, err := docker.Execute(pexec.Execution{
+		Args:   []string{"logs", a.ContainerID},
+		Stdout: buffer,
+		Stderr: buffer,
 	})
 	if err != nil {
 		return "", err
 	}
 
-	return stripColor(log), nil
+	return stripColor(buffer.String()), nil
 }
 
 func (a *App) BuildLogs() string {
