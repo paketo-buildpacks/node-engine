@@ -54,26 +54,6 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "node"
     name = "Node Engine"
-    sha256 = "7700f574409eca787cbc0ad9c2338d796f7a369522e0afb02b3ec48c118d921e"
-    source = "https://nodejs.org/dist/v10.17.0/node-v10.17.0-linux-x64.tar.gz"
-    source_sha256 = "417bdc5402f6510fe1a5a898a9cdf1d67bd0202b5f014051c382f05358999534"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.17.0-bionic-7700f574.tgz"
-    version = "10.17.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "bfa3ea5acac4aecc464af9586b2e1ff4e021bc158b375d407a848cabbdf3ff94"
-    source = "https://nodejs.org/dist/v10.17.0/node-v10.17.0.tar.gz"
-    source_sha256 = "5204249d135176b547737d3eed2ca8a9d7f731fef6e545f741129cfa21f90573"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.17.0-linux-x64-cflinuxfs3-bfa3ea5a.tgz"
-    version = "10.17.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
     sha256 = "4cfdc9908857be0bf2e752c9faa5cf5332a050784c4149112b5836f3b67339e8"
     source = "https://nodejs.org/dist/v10.18.0/node-v10.18.0-linux-x64.tar.gz"
     source_sha256 = "78a46d1e1f6db68c0732981fc9a1fe8583eabb4e232f1ed742f7dedc5bed3ddd"
@@ -90,6 +70,26 @@ api = "0.2"
     stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.0-linux-x64-cflinuxfs3-ceb4bbfb.tgz"
     version = "10.18.0"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "528414d1987c8ff9d74f6b5baef604632a2d1d1fbce4a33c7302debcbfa53e1b"
+    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1-linux-x64.tar.gz"
+    source_sha256 = "812fe7d421894b792027d19c78c919faad3bf32d8bc16bde67f5c7eea2469eac"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-bionic-528414d1.tgz"
+    version = "10.18.1"
+
+  [[metadata.dependencies]]
+    id = "node"
+    name = "Node Engine"
+    sha256 = "ad0376cbe4dfc3d6092d0ea9fdc4fd3fcb44c477bd4a2c800ccd48eee95e994d"
+    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1.tar.gz"
+    source_sha256 = "80a61ffbe6d156458ed54120eb0e9fff7b626502e0986e861d91b365f7e876db"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-cflinuxfs3-ad0376cb.tgz"
+    version = "10.18.1"
 
   [[metadata.dependencies]]
     id = "node"
