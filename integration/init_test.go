@@ -2,6 +2,7 @@ package integration
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -33,6 +34,10 @@ func TestIntegration(t *testing.T) {
 
 	offlineNodeBuildpack, _, err = dagger.PackageCachedBuildpack(root)
 	Expect(err).NotTo(HaveOccurred())
+
+	// HACK: we need to fix dagger and the package.sh scripts so that this isn't required
+	nodeBuildpack = fmt.Sprintf("%s.tgz", nodeBuildpack)
+	offlineNodeBuildpack = fmt.Sprintf("%s.tgz", offlineNodeBuildpack)
 
 	defer func() {
 		dagger.DeleteBuildpack(nodeBuildpack)

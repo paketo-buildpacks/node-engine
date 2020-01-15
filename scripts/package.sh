@@ -26,6 +26,10 @@ if [[ -n "${offline}" ]]; then
     extra_args+="--offline"
 fi
 
+if [[ "${PACKAGE_DIR}" != "*.tgz" ]]; then
+    PACKAGE_DIR="${PACKAGE_DIR}.tgz"
+fi
+
 .bin/jam pack \
     --buildpack "$(pwd)/buildpack.toml" \
     --version "${version}" \
