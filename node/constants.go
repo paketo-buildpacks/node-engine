@@ -1,7 +1,8 @@
 package node
 
 const (
-	Node = "node"
+	Node       = "node"
+	Dependency = Node // NOTE: alias for old constant name
 
 	DepKey             = "dependency-sha"
 	NvmrcSource        = ".nvmrc"
