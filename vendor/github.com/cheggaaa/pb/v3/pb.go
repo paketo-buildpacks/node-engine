@@ -12,13 +12,14 @@ import (
 	"text/template"
 	"time"
 
-	"gopkg.in/cheggaaa/pb.v2/termutil"
-	"gopkg.in/mattn/go-colorable.v0"
-	"gopkg.in/mattn/go-isatty.v0"
+	"github.com/mattn/go-colorable"
+	"github.com/mattn/go-isatty"
+
+	"github.com/cheggaaa/pb/v3/termutil"
 )
 
 // Version of ProgressBar library
-const Version = "2.0.6"
+const Version = "3.0.4"
 
 type key int
 
@@ -26,6 +27,9 @@ const (
 	// Bytes means we're working with byte sizes. Numbers will print as Kb, Mb, etc
 	// bar.Set(pb.Bytes, true)
 	Bytes key = 1 << iota
+
+	// Use SI bytes prefix names (kB, MB, etc) instead of IEC prefix names (KiB, MiB, etc)
+	SIBytesPrefix
 
 	// Terminal means we're will print to terminal and can use ascii sequences
 	// Also we're will try to use terminal width
@@ -77,6 +81,7 @@ var (
 type ProgressBar struct {
 	current, total int64
 	width          int
+	maxWidth       int
 	mu             sync.RWMutex
 	rm             sync.Mutex
 	vars           map[interface{}]interface{}
@@ -286,6 +291,15 @@ func (pb *ProgressBar) SetWidth(width int) *ProgressBar {
 	return pb
 }
 
+// SetMaxWidth sets the bar maximum width
+// When given value <= 0 would be using the terminal width (if possible) or default value.
+func (pb *ProgressBar) SetMaxWidth(maxWidth int) *ProgressBar {
+	pb.mu.Lock()
+	pb.maxWidth = maxWidth
+	pb.mu.Unlock()
+	return pb
+}
+
 // Width return the bar width
 // It's current terminal width or settled over 'SetWidth' value.
 func (pb *ProgressBar) Width() (width int) {
@@ -296,12 +310,16 @@ func (pb *ProgressBar) Width() (width int) {
 	}()
 	pb.mu.RLock()
 	width = pb.width
+	maxWidth := pb.maxWidth
 	pb.mu.RUnlock()
 	if width <= 0 {
 		var err error
 		if width, err = terminalWidth(); err != nil {
 			return defaultBarWidth
 		}
+	}
+	if maxWidth > 0 && width > maxWidth {
+		width = maxWidth
 	}
 	return
 }
@@ -336,7 +354,7 @@ func (pb *ProgressBar) StartTime() time.Time {
 // Format convert int64 to string according to the current settings
 func (pb *ProgressBar) Format(v int64) string {
 	if pb.GetBool(Bytes) {
-		return formatBytes(v)
+		return formatBytes(v, pb.GetBool(SIBytesPrefix))
 	}
 	return strconv.FormatInt(v, 10)
 }
@@ -387,6 +405,14 @@ func (pb *ProgressBar) SetTemplate(tmpl ProgressBarTemplate) *ProgressBar {
 func (pb *ProgressBar) NewProxyReader(r io.Reader) *Reader {
 	pb.Set(Bytes, true)
 	return &Reader{r, pb}
+}
+
+// NewProxyWriter creates a wrapper for given writer, but with progress handle
+// Takes io.Writer or io.WriteCloser
+// Also, it automatically switches progress bar to handle units as bytes
+func (pb *ProgressBar) NewProxyWriter(r io.Writer) *Writer {
+	pb.Set(Bytes, true)
+	return &Writer{r, pb}
 }
 
 func (pb *ProgressBar) render() (result string, width int) {

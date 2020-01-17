@@ -4,23 +4,28 @@ code.cloudfoundry.org/lager
 github.com/BurntSushi/toml
 # github.com/Masterminds/semver v1.5.0
 github.com/Masterminds/semver
+# github.com/VividCortex/ewma v1.1.1
+github.com/VividCortex/ewma
 # github.com/buildpack/libbuildpack v1.25.11
 github.com/buildpack/libbuildpack/application
 github.com/buildpack/libbuildpack/internal
 github.com/buildpack/libbuildpack/logger
-# github.com/cheggaaa/pb v2.0.7+incompatible
-github.com/cheggaaa/pb
+# github.com/cheggaaa/pb/v3 v3.0.4
+github.com/cheggaaa/pb/v3
+github.com/cheggaaa/pb/v3/termutil
 # github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libcfbuildpack v1.91.22
 github.com/cloudfoundry/libcfbuildpack/helper
-# github.com/cloudfoundry/packit v0.0.0-20200114205204-249189c06cb9
+# github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec
 github.com/cloudfoundry/packit
 github.com/cloudfoundry/packit/cargo
 github.com/cloudfoundry/packit/internal
 github.com/cloudfoundry/packit/pexec
 github.com/cloudfoundry/packit/scribe
+# github.com/fatih/color v1.9.0
+github.com/fatih/color
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
 # github.com/google/go-github v17.0.0+incompatible
@@ -31,6 +36,8 @@ github.com/google/go-querystring/query
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.11
 github.com/mattn/go-isatty
+# github.com/mattn/go-runewidth v0.0.7
+github.com/mattn/go-runewidth
 # github.com/onsi/gomega v1.8.1
 github.com/onsi/gomega
 github.com/onsi/gomega/format
@@ -91,17 +98,5 @@ google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# gopkg.in/VividCortex/ewma.v1 v1.1.1
-gopkg.in/VividCortex/ewma.v1
-# gopkg.in/cheggaaa/pb.v2 v2.0.7
-gopkg.in/cheggaaa/pb.v2/termutil
-# gopkg.in/fatih/color.v1 v1.7.0
-gopkg.in/fatih/color.v1
-# gopkg.in/mattn/go-colorable.v0 v0.1.0
-gopkg.in/mattn/go-colorable.v0
-# gopkg.in/mattn/go-isatty.v0 v0.0.4
-gopkg.in/mattn/go-isatty.v0
-# gopkg.in/mattn/go-runewidth.v0 v0.0.4
-gopkg.in/mattn/go-runewidth.v0
 # gopkg.in/yaml.v2 v2.2.7
 gopkg.in/yaml.v2

@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
 	github.com/cloudfoundry/libcfbuildpack v1.91.22 // indirect
-	github.com/cloudfoundry/packit v0.0.0-20200114205204-249189c06cb9
+	github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec
 	github.com/onsi/gomega v1.8.1
 	github.com/pkg/errors v0.9.0 // indirect
 	github.com/sclevine/spec v1.4.0
