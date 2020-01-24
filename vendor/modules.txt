@@ -16,7 +16,7 @@ github.com/cheggaaa/pb/v3/termutil
 # github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
-# github.com/cloudfoundry/libcfbuildpack v1.91.22
+# github.com/cloudfoundry/libcfbuildpack v1.91.23
 github.com/cloudfoundry/libcfbuildpack/helper
 # github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec
 github.com/cloudfoundry/packit
@@ -34,7 +34,7 @@ github.com/google/go-github/github
 github.com/google/go-querystring/query
 # github.com/mattn/go-colorable v0.1.4
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.11
+# github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.8
 github.com/mattn/go-runewidth
@@ -67,7 +67,7 @@ golang.org/x/net/html/charset
 # golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.0.0-20200117145432-59e60aa80a0c
+# golang.org/x/sys v0.0.0-20200122134326-e047566fdf82
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
@@ -98,5 +98,5 @@ google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# gopkg.in/yaml.v2 v2.2.7
+# gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
