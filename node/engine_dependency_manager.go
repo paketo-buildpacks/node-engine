@@ -1,20 +1,17 @@
 package node
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/cargo"
 	"github.com/cloudfoundry/packit/scribe"
+	"github.com/cloudfoundry/packit/vacation"
 )
 
 //go:generate faux --interface Transport --output fakes/transport.go
@@ -91,46 +88,10 @@ func (e EngineDependencyManager) Install(dependency BuildpackMetadataDependency,
 	defer bundle.Close()
 
 	validatedReader := cargo.NewValidatedReader(bundle, dependency.SHA256)
-	zr, err := gzip.NewReader(validatedReader)
+
+	err = vacation.NewTarGzipArchive(validatedReader).Decompress(layerPath)
 	if err != nil {
-		return fmt.Errorf("failed to read gzip response: %s", err)
-	}
-
-	tr := tar.NewReader(zr)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("failed to read tar response: %s", err)
-		}
-
-		name := strings.Join(strings.Split(hdr.Name, string(filepath.Separator))[1:], string(filepath.Separator))
-		if name == "" {
-			continue
-		}
-
-		path := filepath.Join(layerPath, name)
-		switch hdr.Typeflag {
-		case tar.TypeDir:
-			err = os.MkdirAll(path, os.ModePerm)
-			if err != nil {
-				return fmt.Errorf("failed to create archived directory: %s", err)
-			}
-
-		case tar.TypeReg:
-			err := writeStreamingFile(tr, path, hdr.FileInfo().Mode())
-			if err != nil {
-				return fmt.Errorf("failed to stream file from archive: %s", err)
-			}
-
-		case tar.TypeSymlink:
-			err = os.Symlink(hdr.Linkname, path)
-			if err != nil {
-				return fmt.Errorf("failed to extract symlink: %s", err)
-			}
-		}
+		return err
 	}
 
 	ok, err := validatedReader.Valid()

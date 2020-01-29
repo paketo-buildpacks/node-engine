@@ -18,12 +18,13 @@ github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libcfbuildpack v1.91.23
 github.com/cloudfoundry/libcfbuildpack/helper
-# github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec
+# github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52
 github.com/cloudfoundry/packit
 github.com/cloudfoundry/packit/cargo
 github.com/cloudfoundry/packit/internal
 github.com/cloudfoundry/packit/pexec
 github.com/cloudfoundry/packit/scribe
+github.com/cloudfoundry/packit/vacation
 # github.com/fatih/color v1.9.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.2

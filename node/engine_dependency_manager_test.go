@@ -229,27 +229,23 @@ func testEngineDependencyManager(t *testing.T, context spec.G, it spec.S) {
 			zw := gzip.NewWriter(buffer)
 			tw := tar.NewWriter(zw)
 
-			Expect(tw.WriteHeader(&tar.Header{Name: "node-v10.17.0-linux-x64", Mode: 0755, Typeflag: tar.TypeDir})).To(Succeed())
+			Expect(tw.WriteHeader(&tar.Header{Name: "./some-dir", Mode: 0755, Typeflag: tar.TypeDir})).To(Succeed())
 			_, err = tw.Write(nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(tw.WriteHeader(&tar.Header{Name: "node-v10.17.0-linux-x64/some-dir", Mode: 0755, Typeflag: tar.TypeDir})).To(Succeed())
-			_, err = tw.Write(nil)
-			Expect(err).NotTo(HaveOccurred())
-
-			nestedFile := "node-v10.17.0-linux-x64/some-dir/some-file"
+			nestedFile := "./some-dir/some-file"
 			Expect(tw.WriteHeader(&tar.Header{Name: nestedFile, Mode: 0755, Size: int64(len(nestedFile))})).To(Succeed())
 			_, err = tw.Write([]byte(nestedFile))
 			Expect(err).NotTo(HaveOccurred())
 
-			for _, file := range []string{"node-v10.17.0-linux-x64/first", "node-v10.17.0-linux-x64/second", "node-v10.17.0-linux-x64/third"} {
+			for _, file := range []string{"./first", "./second", "./third"} {
 				Expect(tw.WriteHeader(&tar.Header{Name: file, Mode: 0755, Size: int64(len(file))})).To(Succeed())
 				_, err = tw.Write([]byte(file))
 				Expect(err).NotTo(HaveOccurred())
 			}
 
-			linkName := "node-v10.17.0-linux-x64/symlink"
-			linkDest := "node-v10.17.0-linux-x64/first"
+			linkName := "./symlink"
+			linkDest := "./first"
 			Expect(tw.WriteHeader(&tar.Header{Name: linkName, Mode: 0777, Size: int64(0), Typeflag: tar.TypeSymlink, Linkname: linkDest})).To(Succeed())
 			// what does a sylink actually look like??
 			_, err = tw.Write([]byte{})
@@ -332,7 +328,7 @@ func testEngineDependencyManager(t *testing.T, context spec.G, it spec.S) {
 						Version: "1.2.3",
 					}, "some-cnb-path", tmpDir)
 
-					Expect(err).To(MatchError(ContainSubstring("failed to read gzip response")))
+					Expect(err).To(MatchError(ContainSubstring("failed to create gzip reader")))
 				})
 			})
 
@@ -419,7 +415,7 @@ func testEngineDependencyManager(t *testing.T, context spec.G, it spec.S) {
 						Version: "1.2.3",
 					}, "some-cnb-path", tmpDir)
 
-					Expect(err).To(MatchError(ContainSubstring("failed to create file")))
+					Expect(err).To(MatchError(ContainSubstring("failed to create archived file")))
 				})
 			})
 
@@ -429,7 +425,7 @@ func testEngineDependencyManager(t *testing.T, context spec.G, it spec.S) {
 					zw := gzip.NewWriter(buffer)
 					tw := tar.NewWriter(zw)
 
-					linkName := "node-v10.17.0-linux-x64/symlink"
+					linkName := "./symlink"
 					Expect(tw.WriteHeader(&tar.Header{Name: linkName, Mode: 0777, Size: int64(0), Typeflag: tar.TypeSymlink, Linkname: ""})).To(Succeed())
 					// what does a sylink actually look like??
 					_, err := tw.Write([]byte{})
