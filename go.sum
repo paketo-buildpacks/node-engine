@@ -39,8 +39,6 @@ github.com/cloudfoundry/libcfbuildpack v1.89.0/go.mod h1:ufhp/bp0LxbDDwbf2Ms3Bf4
 github.com/cloudfoundry/libcfbuildpack v1.91.23 h1:RCorc4zL0D4+mG2z/qOueFyYGz1j3rM+e3Vbb37KPLg=
 github.com/cloudfoundry/libcfbuildpack v1.91.23/go.mod h1:h95FwHvbelcd0cSOhLC8SGEZXLwCMYh1dZo2kCr7lsA=
 github.com/cloudfoundry/packit v0.0.0-20191202164725-43d6fa19d96c/go.mod h1:FffmDGXYVSrrj9HlFP4XbnJnQi7jHcsElHujPGbfP3U=
-github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec h1:DMK5ngDDzkhZJEIicz/8cYeaftg4cwrOjqlL6EU/Qbk=
-github.com/cloudfoundry/packit v0.0.0-20200117181238-c9fbc0a623ec/go.mod h1:p3aFtVhY7pMoXsIrp8vTk01FYaFebTURk5KYae5/Nnw=
 github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52 h1:wv8Z5HiXdplVvSv+OWlhtalg1jGJmsC7P7AT5eZVSic=
 github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52/go.mod h1:p3aFtVhY7pMoXsIrp8vTk01FYaFebTURk5KYae5/Nnw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
