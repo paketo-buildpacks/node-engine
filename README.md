@@ -2,13 +2,19 @@
 
 ## Integration
 
-The Node Engine CNB provides node as a dependency. Downstream buildpacks, like Yarn or NPM, can require the node dependency by generating a Build Plan TOML file that looks like the following:
+The Node Engine CNB provides node as a dependency. Downstream buildpacks, like
+[Yarn](https://github.com/cloudfoundry/yarn-cnb) or
+[NPM](https://github.com/cloudfoundry/npm-cnb), can require the node dependency
+by generating a [Build Plan
+TOML](https://github.com/buildpacks/spec/blob/master/buildpack.md#build-plan-toml)
+file that looks like the following:
 
 ```toml
 [[requires]]
 
   # The name of the Node Engine dependency is "node". This value is considered
-  # part of the public API for the buildpack and will not change.
+  # part of the public API for the buildpack and will not change without a plan
+  # for deprecation.
   name = "node"
 
   # The version of the Node Engine dependency is not required. In the case it
