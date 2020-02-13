@@ -13,7 +13,7 @@ github.com/buildpack/libbuildpack/logger
 # github.com/cheggaaa/pb/v3 v3.0.4
 github.com/cheggaaa/pb/v3
 github.com/cheggaaa/pb/v3/termutil
-# github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
+# github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4
 github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libcfbuildpack v1.91.23

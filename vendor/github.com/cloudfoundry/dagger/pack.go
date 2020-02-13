@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/lager"
@@ -232,11 +233,12 @@ func (p Pack) Build() (*App, error) {
 	})
 
 	if err != nil {
-		printErr := printBufferSafely(buildLogs, os.Stdout)
+		output := &strings.Builder{}
+		printErr := printBufferSafely(buildLogs, output)
 		if printErr != nil {
 			return nil, printErr
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to pack build with output:\n%s\n--> error message: %w", output, err)
 	}
 
 	sum := sha256.Sum256([]byte(fmt.Sprintf("index.docker.io/library/%s:latest", p.image))) //This is how pack makes cache image names

@@ -4,7 +4,7 @@ require (
 	code.cloudfoundry.org/lager v2.0.0+incompatible
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/semver v1.5.0
-	github.com/cloudfoundry/dagger v0.0.0-20200114192520-43fb0b3ec98f
+	github.com/cloudfoundry/dagger v0.0.0-20200115142400-b69a9b4eabf4
 	github.com/cloudfoundry/libcfbuildpack v1.91.23 // indirect
 	github.com/cloudfoundry/packit v0.0.0-20200129211718-a2b2b4f67a52
 	github.com/mattn/go-runewidth v0.0.8 // indirect
