@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/lager"
 	"github.com/cloudfoundry/packit/pexec"
 	"github.com/pkg/errors"
 )
@@ -82,17 +81,18 @@ func (a *App) StartWithCommand(startCmd string) error {
 		args = append(args, startCmd)
 	}
 
-	dockerLogger := lager.NewLogger("docker")
-	docker := pexec.NewExecutable("docker", dockerLogger)
-	log, _, err := docker.Execute(pexec.Execution{
-		Args: args,
+	docker := pexec.NewExecutable("docker")
+	stdout := bytes.NewBuffer(nil)
+	err := docker.Execute(pexec.Execution{
+		Args:   args,
+		Stdout: stdout,
 	})
 
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to run docker image: %s\n with command: %s", a.ImageName, args))
 	}
 
-	a.ContainerID = log[:12]
+	a.ContainerID = stdout.String()[:12]
 
 	ticker := time.NewTicker(1 * time.Second)
 	timeOut := time.After(2 * time.Minute)
@@ -125,14 +125,16 @@ docker:
 		}
 	}
 
-	log, _, err = docker.Execute(pexec.Execution{
-		Args: []string{"container", "port", a.ContainerID},
+	stdout = bytes.NewBuffer(nil)
+	err = docker.Execute(pexec.Execution{
+		Args:   []string{"container", "port", a.ContainerID},
+		Stdout: stdout,
 	})
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("docker error: failed to get port from container: %s", a.ContainerID))
 	}
 
-	ports := strings.Split(log, ":")
+	ports := strings.Split(stdout.String(), ":")
 
 	if len(ports) > 1 {
 		a.port = strings.TrimSpace(ports[1])
@@ -148,8 +150,7 @@ func (a *App) Destroy() error {
 		return nil
 	}
 
-	dockerLogger := lager.NewLogger("docker")
-	docker := pexec.NewExecutable("docker", dockerLogger)
+	docker := pexec.NewExecutable("docker")
 
 	cntrExists, err := DockerArtifactExists(a.ContainerID)
 	if err != nil {
@@ -157,14 +158,14 @@ func (a *App) Destroy() error {
 	}
 
 	if cntrExists {
-		_, _, err := docker.Execute(pexec.Execution{
+		err := docker.Execute(pexec.Execution{
 			Args: []string{"stop", a.ContainerID},
 		})
 		if err != nil {
 			return fmt.Errorf("failed to stop container %s: %s", a.ContainerID, err)
 		}
 
-		_, _, err = docker.Execute(pexec.Execution{
+		err = docker.Execute(pexec.Execution{
 			Args: []string{"rm", a.ContainerID, "-f", "--volumes"},
 		})
 		if err != nil {
@@ -178,7 +179,7 @@ func (a *App) Destroy() error {
 	}
 
 	if imgExists {
-		_, _, err = docker.Execute(pexec.Execution{
+		err = docker.Execute(pexec.Execution{
 			Args: []string{"rmi", a.ImageName, "-f"},
 		})
 		if err != nil {
@@ -192,7 +193,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheExists {
-		_, _, err = docker.Execute(pexec.Execution{
+		err = docker.Execute(pexec.Execution{
 			Args: []string{"rmi", a.CacheImage, "-f"},
 		})
 		if err != nil {
@@ -206,7 +207,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheBuildVolumeExists {
-		_, _, err = docker.Execute(pexec.Execution{
+		err = docker.Execute(pexec.Execution{
 			Args: []string{"volume", "rm", fmt.Sprintf("%s.build", a.CacheImage)},
 		})
 		if err != nil {
@@ -220,7 +221,7 @@ func (a *App) Destroy() error {
 	}
 
 	if cacheLaunchVolumeExists {
-		_, _, err = docker.Execute(pexec.Execution{
+		err = docker.Execute(pexec.Execution{
 			Args: []string{"volume", "rm", fmt.Sprintf("%s.launch", a.CacheImage)},
 		})
 		if err != nil {
@@ -228,7 +229,7 @@ func (a *App) Destroy() error {
 		}
 	}
 
-	_, _, err = docker.Execute(pexec.Execution{
+	err = docker.Execute(pexec.Execution{
 		Args: []string{"image", "prune", "-f"},
 	})
 	if err != nil {
@@ -240,9 +241,9 @@ func (a *App) Destroy() error {
 }
 
 func (a *App) Logs() (string, error) {
-	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
+	docker := pexec.NewExecutable("docker")
 	buffer := bytes.NewBuffer(nil)
-	_, _, err := docker.Execute(pexec.Execution{
+	err := docker.Execute(pexec.Execution{
 		Args:   []string{"logs", a.ContainerID},
 		Stdout: buffer,
 		Stderr: buffer,
@@ -268,19 +269,21 @@ func (a *App) SetHealthCheck(command, interval, timeout string) {
 
 func (a *App) Files(path string) ([]string, error) {
 	// Ensures that the error and results from "Permission denied" don't get sent to the output
-	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
+	docker := pexec.NewExecutable("docker")
+	stdout := bytes.NewBuffer(nil)
 
-	log, _, err := docker.Execute(pexec.Execution{
+	err := docker.Execute(pexec.Execution{
 		Args: []string{
 			"run", a.ImageName,
 			"find", "./..", fmt.Sprintf("-wholename *%s* 2>&1 | grep -v \"Permission denied\"", path),
 		},
+		Stdout: stdout,
 	})
 	if err != nil {
 		return []string{}, err
 	}
 
-	return strings.Split(log, "\n"), nil
+	return strings.Split(stdout.String(), "\n"), nil
 }
 
 func (a *App) Info() (cID string, imageID string, cacheID []string, e error) {
@@ -329,15 +332,17 @@ func stripColor(input string) string {
 }
 
 func getCacheVolumes() ([]string, error) {
-	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
-	log, _, err := docker.Execute(pexec.Execution{
-		Args: []string{"volume", "ls", "-q"},
+	docker := pexec.NewExecutable("docker")
+	stdout := bytes.NewBuffer(nil)
+	err := docker.Execute(pexec.Execution{
+		Args:   []string{"volume", "ls", "-q"},
+		Stdout: stdout,
 	})
 	if err != nil {
 		return []string{}, err
 	}
 
-	outputArr := strings.Split(log, "\n")
+	outputArr := strings.Split(stdout.String(), "\n")
 	var finalVolumes []string
 	for _, line := range outputArr {
 		if strings.Contains(line, "pack-cache") {
@@ -348,12 +353,14 @@ func getCacheVolumes() ([]string, error) {
 }
 
 func DockerArtifactExists(name string) (bool, error) {
-	docker := pexec.NewExecutable("docker", lager.NewLogger("docker"))
-	_, errLog, err := docker.Execute(pexec.Execution{
-		Args: []string{"inspect", name},
+	docker := pexec.NewExecutable("docker")
+	stderr := bytes.NewBuffer(nil)
+	err := docker.Execute(pexec.Execution{
+		Args:   []string{"inspect", name},
+		Stderr: stderr,
 	})
 	if err != nil {
-		if strings.Contains(errLog, "No such object") {
+		if strings.Contains(stderr.String(), "No such object") {
 			return false, nil
 		}
 
