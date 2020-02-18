@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -eu
+set -o pipefail
 
-cd "$( dirname "${BASH_SOURCE[0]}" )/.."
+readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
 
-echo "Run Buildpack Unit Tests"
-go test -mod=vendor ./... -v -run Unit
-exit_code=$?
+# shellcheck source=.util/print.sh
+source "${PROGDIR}/.util/print.sh"
 
-if [ "$exit_code" != "0" ]; then
-    echo -e "\n\033[0;31m** GO Test Failed **\033[0m"
-else
-    echo -e "\n\033[0;32m** GO Test Succeeded **\033[0m"
-fi
+function main() {
+    util::print::title "Run Buildpack Unit Tests"
 
-exit $exit_code
+    pushd "${BUILDPACKDIR}" > /dev/null
+        if go test -mod=vendor ./... -v -run Unit; then
+            util::print::success "** GO Test Succeeded **"
+        else
+            util::print::error "** GO Test Failed **"
+        fi
+    popd > /dev/null
+}
+
+main "${@:-}"

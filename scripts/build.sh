@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eu
+set -o pipefail
 
-cd "$( dirname "${BASH_SOURCE[0]}" )/.."
+readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
 
-target_os=${1:-linux}
+function main() {
+    local name
+    for src in "${BUILDPACKDIR}"/cmd/*; do
+        name="$(basename "${src}")"
 
-for b in $(ls cmd); do
-    GOOS="$target_os" go build -mod=vendor -ldflags="-s -w" -o "bin/$b" "cmd/$b/main.go"
-done
+        printf "%s" "Building ${name}..."
+
+        GOOS="linux" \
+            go build \
+                -mod=vendor \
+                -ldflags="-s -w" \
+                -o "${BUILDPACKDIR}/bin/${name}" \
+                    "${src}/main.go"
+
+        echo "Success!"
+    done
+}
+
+main "${@:-}"
