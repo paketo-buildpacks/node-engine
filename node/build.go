@@ -51,7 +51,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		logger.Subprocess("Selecting Node Engine version (using %s): %s", entry.Metadata["version-source"], dependency.Version)
+		logger.Subprocess("Selected Node Engine version (using %s): %s", entry.Metadata["version-source"], dependency.Version)
 		logger.Break()
 
 		nodeLayer, err := context.Layers.Get(Node, packit.LaunchLayer)

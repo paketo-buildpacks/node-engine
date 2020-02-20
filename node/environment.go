@@ -37,7 +37,7 @@ func NewEnvironment(logger scribe.Logger) Environment {
 }
 
 func (e Environment) Configure(env EnvironmentVariables, path string, optimizeMemory bool) error {
-	e.logger.Subprocess("Configuring environment")
+	e.logger.Process("Configuring environment")
 
 	envMap := scribe.FormattedMap{
 		"NODE_HOME":    path,
@@ -49,7 +49,7 @@ func (e Environment) Configure(env EnvironmentVariables, path string, optimizeMe
 		env.Override(key, val.(string))
 	}
 
-	e.logger.Action("%s", envMap)
+	e.logger.Subprocess("%s", envMap)
 	e.logger.Break()
 
 	profileDPath := filepath.Join(path, "profile.d")
@@ -58,9 +58,9 @@ func (e Environment) Configure(env EnvironmentVariables, path string, optimizeMe
 		return err
 	}
 
-	e.logger.Action("Writing profile.d/0_memory_available.sh")
-	e.logger.Detail("Calculates available memory based on container limits at launch time.")
-	e.logger.Detail("Made available in the MEMORY_AVAILABLE environment variable.")
+	e.logger.Subprocess("Writing profile.d/0_memory_available.sh")
+	e.logger.Action("Calculates available memory based on container limits at launch time.")
+	e.logger.Action("Made available in the MEMORY_AVAILABLE environment variable.")
 
 	err = ioutil.WriteFile(filepath.Join(profileDPath, "0_memory_available.sh"), []byte(MemoryAvailableScript), 0644)
 	if err != nil {
@@ -69,9 +69,9 @@ func (e Environment) Configure(env EnvironmentVariables, path string, optimizeMe
 
 	if optimizeMemory {
 		e.logger.Break()
-		e.logger.Action("Writing profile.d/1_optimize_memory.sh")
-		e.logger.Detail("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
-		e.logger.Detail("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
+		e.logger.Subprocess("Writing profile.d/1_optimize_memory.sh")
+		e.logger.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
+		e.logger.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
 
 		err = ioutil.WriteFile(filepath.Join(profileDPath, "1_optimize_memory.sh"), []byte(OptimizeMemoryScript), 0644)
 		if err != nil {

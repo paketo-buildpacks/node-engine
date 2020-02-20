@@ -194,7 +194,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
 		Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
-		Expect(buffer.String()).To(ContainSubstring("Selecting Node Engine version (using buildpack.yml): "))
+		Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using buildpack.yml): "))
 		Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 	})
 
@@ -467,7 +467,7 @@ nodejs:
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
-			Expect(buffer.String()).To(ContainSubstring("Selecting Node Engine version (using buildpack.yml): "))
+			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using buildpack.yml): "))
 			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
 			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
 		})

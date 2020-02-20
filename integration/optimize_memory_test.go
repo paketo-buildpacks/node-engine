@@ -31,9 +31,9 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 
 		logs := GetBuildLogs(app.BuildLogs())
 		Expect(logs).To(ContainSequence([]string{
-			"      Writing profile.d/1_optimize_memory.sh",
-			"        Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
-			"        Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
+			"    Writing profile.d/1_optimize_memory.sh",
+			"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
+			"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 		}))
 	})
 }
