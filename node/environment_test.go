@@ -83,9 +83,9 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 			Expect(string(contents)).To(Equal(MemoryAvailableScript))
 
 			Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
-			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> production"))
-			Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME    -> %s", path)))
-			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> false"))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"production\""))
+			Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME    -> %q", path)))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"false\""))
 			Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
 			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))

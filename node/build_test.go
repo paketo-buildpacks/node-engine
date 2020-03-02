@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/node-engine-cnb/node/fakes"
@@ -26,6 +27,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
 		cacheManager      *fakes.CacheManager
+		clock             node.Clock
+		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
 		planRefinery      *fakes.PlanRefinery
 		buffer            *bytes.Buffer
@@ -79,6 +82,11 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		cacheManager.MatchCall.Returns.Bool = false
 
+		timeStamp = time.Now()
+		clock = node.NewClock(func() time.Time {
+			return timeStamp
+		})
+
 		planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
 			Entries: []packit.BuildpackPlanEntry{
 				{
@@ -94,7 +102,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		buffer = bytes.NewBuffer(nil)
 		logger := scribe.NewLogger(buffer)
 
-		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, cacheManager, logger)
+		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, cacheManager, logger, clock)
 	})
 
 	it.After(func() {
@@ -144,6 +152,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					Cache:     false,
 					Metadata: map[string]interface{}{
 						node.DepKey: "",
+						"built_at":  timeStamp.Format(time.RFC3339Nano),
 					},
 				},
 			},
@@ -326,6 +335,7 @@ nodejs:
 						Cache:     true,
 						Metadata: map[string]interface{}{
 							node.DepKey: "",
+							"built_at":  timeStamp.Format(time.RFC3339Nano),
 						},
 					},
 				},
@@ -424,6 +434,7 @@ nodejs:
 						Cache:     false,
 						Metadata: map[string]interface{}{
 							node.DepKey: "",
+							"built_at":  timeStamp.Format(time.RFC3339Nano),
 						},
 					},
 				},

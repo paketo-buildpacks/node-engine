@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/scribe"
@@ -34,7 +35,7 @@ type CacheManager interface {
 	Match(layer packit.Layer, dependency BuildpackMetadataDependency) (bool, error)
 }
 
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery PlanRefinery, cacheManager CacheManager, logger scribe.Logger) packit.BuildFunc {
+func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery PlanRefinery, cacheManager CacheManager, logger scribe.Logger, clock Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		buildpack, err := ParseBuildpack(filepath.Join(context.CNBPath, "buildpack.toml"))
 		if err != nil {
@@ -85,7 +86,8 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		nodeLayer.Metadata = map[string]interface{}{
-			DepKey: dependency.SHA256,
+			DepKey:     dependency.SHA256,
+			"built_at": clock.Now().Format(time.RFC3339Nano),
 		}
 
 		err = dependencies.Install(dependency, context.CNBPath, nodeLayer.Path)

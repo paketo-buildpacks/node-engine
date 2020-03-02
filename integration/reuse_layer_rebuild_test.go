@@ -2,33 +2,83 @@ package integration
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"path/filepath"
 	"testing"
 
-	"github.com/cloudfoundry/dagger"
+	"github.com/cloudfoundry/occam"
 	"github.com/sclevine/spec"
 
+	. "github.com/cloudfoundry/occam/matchers"
 	. "github.com/onsi/gomega"
 )
 
 func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
-	var Expect = NewWithT(t).Expect
+	var (
+		Expect     = NewWithT(t).Expect
+		Eventually = NewWithT(t).Eventually
+
+		docker occam.Docker
+		pack   occam.Pack
+
+		imageIDs     map[string]struct{}
+		containerIDs map[string]struct{}
+		name         string
+	)
+
+	it.Before(func() {
+		var err error
+		name, err = occam.RandomName()
+		Expect(err).NotTo(HaveOccurred())
+
+		docker = occam.NewDocker()
+		pack = occam.NewPack()
+		imageIDs = map[string]struct{}{}
+		containerIDs = map[string]struct{}{}
+
+	})
+
+	it.After(func() {
+		for id := range containerIDs {
+			Expect(docker.Container.Remove.Execute(id)).To(Succeed())
+		}
+
+		for id := range imageIDs {
+			Expect(docker.Image.Remove.Execute(id)).To(Succeed())
+		}
+
+		Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
+	})
 
 	context("when an app is rebuilt and does not change", func() {
 		it("reuses a layer from a previous build", func() {
-			app, err := dagger.NewPack(
-				filepath.Join("testdata", "simple_app"),
-				dagger.RandomImage(),
-				dagger.SetBuildpacks(nodeBuildpack),
-				dagger.SetVerbose(),
-			).Build()
-			Expect(err).ToNot(HaveOccurred())
+			var (
+				err         error
+				logs        fmt.Stringer
+				firstImage  occam.Image
+				secondImage occam.Image
+
+				firstContainer  occam.Container
+				secondContainer occam.Container
+			)
+
+			firstImage, logs, err = pack.WithNoColor().Build.
+				WithNoPull().
+				WithBuildpacks(nodeBuildpack).
+				Execute(name, filepath.Join("testdata", "simple_app"))
+			Expect(err).NotTo(HaveOccurred())
+
+			imageIDs[firstImage.ID] = struct{}{}
+
+			Expect(firstImage.Buildpacks).To(HaveLen(1))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			buildpackVersion, err := GetGitVersion()
 			Expect(err).ToNot(HaveOccurred())
 
-			logs := GetBuildLogs(app.BuildLogs())
-			Expect(logs).To(ContainSequence([]interface{}{
+			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -41,24 +91,36 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring environment",
-				"    NODE_ENV     -> production",
-				"    NODE_HOME    -> /layers/org.cloudfoundry.node-engine/node",
-				"    NODE_VERBOSE -> false",
+				`    NODE_ENV     -> "production"`,
+				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}))
+			}), logs.String())
 
-			app, err = dagger.NewPack(
-				filepath.Join("testdata", "simple_app"),
-				dagger.SetImage(app.ImageName),
-				dagger.SetBuildpacks(nodeBuildpack),
-			).Build()
-			Expect(err).ToNot(HaveOccurred())
+			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
+			Expect(err).NotTo(HaveOccurred())
 
-			logs = GetBuildLogs(app.BuildLogs())
-			Expect(logs).To(ContainSequence([]interface{}{
+			containerIDs[firstContainer.ID] = struct{}{}
+
+			Eventually(firstContainer).Should(BeAvailable())
+
+			// Second pack build
+			secondImage, logs, err = pack.WithNoColor().Build.
+				WithNoPull().
+				WithBuildpacks(nodeBuildpack).
+				Execute(name, filepath.Join("testdata", "simple_app"))
+			Expect(err).NotTo(HaveOccurred())
+
+			imageIDs[secondImage.ID] = struct{}{}
+
+			Expect(secondImage.Buildpacks).To(HaveLen(1))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
+
+			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -67,32 +129,55 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
 				"  Reusing cached layer /layers/org.cloudfoundry.node-engine/node",
-			}))
+			}), logs.String())
 
-			Expect(app.StartWithCommand("node server.js")).To(Succeed())
-
-			body, _, err := app.HTTPGet("/")
+			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(body).To(ContainSubstring("hello world"))
 
-			app.Destroy()
+			containerIDs[secondContainer.ID] = struct{}{}
+
+			Eventually(secondContainer).Should(BeAvailable())
+
+			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			content, err := ioutil.ReadAll(response.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(content).To(ContainSubstring("hello world"))
+
+			Expect(secondImage.Buildpacks[0].Layers["node"].Metadata["built_at"]).To(Equal(firstImage.Buildpacks[0].Layers["node"].Metadata["built_at"]))
 		})
 	})
 
 	context("when an app is rebuilt and there is a change", func() {
 		it("rebuilds the layer", func() {
-			app, err := dagger.NewPack(
-				filepath.Join("testdata", "simple_app"),
-				dagger.RandomImage(),
-				dagger.SetBuildpacks(nodeBuildpack),
-			).Build()
-			Expect(err).ToNot(HaveOccurred())
+			var (
+				err         error
+				logs        fmt.Stringer
+				firstImage  occam.Image
+				secondImage occam.Image
+
+				firstContainer  occam.Container
+				secondContainer occam.Container
+			)
+
+			firstImage, logs, err = pack.WithNoColor().Build.
+				WithNoPull().
+				WithBuildpacks(nodeBuildpack).
+				Execute(name, filepath.Join("testdata", "simple_app"))
+			Expect(err).NotTo(HaveOccurred())
+
+			imageIDs[firstImage.ID] = struct{}{}
+
+			Expect(firstImage.Buildpacks).To(HaveLen(1))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			buildpackVersion, err := GetGitVersion()
 			Expect(err).ToNot(HaveOccurred())
 
-			logs := GetBuildLogs(app.BuildLogs())
-			Expect(logs).To(ContainSequence([]interface{}{
+			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -105,24 +190,36 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring environment",
-				"    NODE_ENV     -> production",
-				"    NODE_HOME    -> /layers/org.cloudfoundry.node-engine/node",
-				"    NODE_VERBOSE -> false",
+				`    NODE_ENV     -> "production"`,
+				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}))
+			}), logs.String())
 
-			app, err = dagger.NewPack(
-				filepath.Join("testdata", "different_version_simple_app"),
-				dagger.SetImage(app.ImageName),
-				dagger.SetBuildpacks(nodeBuildpack),
-			).Build()
-			Expect(err).ToNot(HaveOccurred())
+			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
+			Expect(err).NotTo(HaveOccurred())
 
-			logs = GetBuildLogs(app.BuildLogs())
-			Expect(logs).To(ContainSequence([]interface{}{
+			containerIDs[firstContainer.ID] = struct{}{}
+
+			Eventually(firstContainer).Should(BeAvailable())
+
+			// Second pack build
+			secondImage, logs, err = pack.WithNoColor().Build.
+				WithNoPull().
+				WithBuildpacks(nodeBuildpack).
+				Execute(name, filepath.Join("testdata", "different_version_simple_app"))
+			Expect(err).NotTo(HaveOccurred())
+
+			imageIDs[secondImage.ID] = struct{}{}
+
+			Expect(secondImage.Buildpacks).To(HaveLen(1))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
+
+			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -135,21 +232,31 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring environment",
-				"    NODE_ENV     -> production",
-				"    NODE_HOME    -> /layers/org.cloudfoundry.node-engine/node",
-				"    NODE_VERBOSE -> false",
+				`    NODE_ENV     -> "production"`,
+				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}))
-			Expect(app.StartWithCommand("node server.js")).To(Succeed())
+			}), logs.String())
 
-			body, _, err := app.HTTPGet("/")
+			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(body).To(ContainSubstring("hello world"))
 
-			app.Destroy()
+			containerIDs[secondContainer.ID] = struct{}{}
+
+			Eventually(secondContainer).Should(BeAvailable())
+
+			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			content, err := ioutil.ReadAll(response.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(content).To(ContainSubstring("hello world"))
+
+			Expect(secondImage.Buildpacks[0].Layers["node"].Metadata["built_at"]).NotTo(Equal(firstImage.Buildpacks[0].Layers["node"].Metadata["built_at"]))
 		})
 	})
 }

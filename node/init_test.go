@@ -13,6 +13,7 @@ func TestUnitNode(t *testing.T) {
 	suite("Buildpack", testBuildpack)
 	suite("BuildpackYMLParser", testBuildpackYMLParser)
 	suite("CacheHandler", testCacheHandler)
+	suite("Clock", testClock)
 	suite("Detect", testDetect)
 	suite("EngineDependencyManager", testEngineDependencyManager)
 	suite("Environment", testEnvironment)
