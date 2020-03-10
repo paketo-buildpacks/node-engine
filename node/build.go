@@ -61,7 +61,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		nodeLayer.Build = entry.Metadata["build"] == true
-		nodeLayer.Cache = entry.Metadata["cache"] == true
+		nodeLayer.Cache = entry.Metadata["build"] == true
 
 		match, err := cacheManager.Match(nodeLayer, dependency)
 		if err != nil {

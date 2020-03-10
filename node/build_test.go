@@ -251,7 +251,7 @@ nodejs:
 		})
 	})
 
-	context("when the layer flags are set for the chosen build plan entry", func() {
+	context("when the build plan entry includes the build flag", func() {
 		var workingDir string
 
 		it.Before(func() {
@@ -265,7 +265,6 @@ nodejs:
 				Metadata: map[string]interface{}{
 					"version-source": "buildpack.yml",
 					"build":          true,
-					"cache":          true,
 				},
 			}
 
@@ -277,7 +276,6 @@ nodejs:
 						Metadata: map[string]interface{}{
 							"version-source": "buildpack.yml",
 							"build":          true,
-							"cache":          true,
 						},
 					},
 				},
@@ -288,7 +286,7 @@ nodejs:
 			Expect(os.RemoveAll(workingDir)).To(Succeed())
 		})
 
-		it("tells the environment to optimize memory", func() {
+		it("marks the node layer as cached", func() {
 			result, err := build(packit.BuildContext{
 				CNBPath:    cnbDir,
 				Stack:      "some-stack",
@@ -301,7 +299,6 @@ nodejs:
 							Metadata: map[string]interface{}{
 								"version-source": "buildpack.yml",
 								"build":          true,
-								"cache":          true,
 							},
 						},
 					},
@@ -318,7 +315,6 @@ nodejs:
 							Metadata: map[string]interface{}{
 								"version-source": "buildpack.yml",
 								"build":          true,
-								"cache":          true,
 							},
 						},
 					},
