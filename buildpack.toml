@@ -92,26 +92,6 @@ api = "0.2"
     version = "12.16.1"
 
   [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "da76b24cb5741a03fbf1f8503113c5e33d26ddc06717aa88f07a753f8a063d90"
-    source = "https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz"
-    source_sha256 = "bf30432175ea8a95fa3e5fe09e96d9fc17b07099742d5c83c4cf9d0edfc411ff"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.8.0-bionic-da76b24c.tgz"
-    version = "13.8.0"
-
-  [[metadata.dependencies]]
-    id = "node"
-    name = "Node Engine"
-    sha256 = "d95d5c092a4cf52abe83eac5e2ebb171d1126023408dc8f280b031f34808cf9a"
-    source = "https://nodejs.org/dist/v13.8.0/node-v13.8.0.tar.gz"
-    source_sha256 = "815b5e1b18114f35da89e4d98febeaba97555d51ef593bd5175db2b05f2e8be6"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.8.0-linux-x64-cflinuxfs3-d95d5c09.tgz"
-    version = "13.8.0"
-
-  [[metadata.dependencies]]
     deprecation_date = "2020-06-01T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -132,6 +112,28 @@ api = "0.2"
     stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.10.1-linux-x64-cflinuxfs3-712e8deb.tgz"
     version = "13.10.1"
+
+  [[metadata.dependencies]]
+    deprecation_date = "2020-06-01T00:00:00Z"
+    id = "node"
+    name = "Node Engine"
+    sha256 = "c3482c4ae4210bea5b80ab1630c6245eae3a774482eac372473915de82e1c8e6"
+    source = "https://nodejs.org/dist/v13.11.0/node-v13.11.0-linux-x64.tar.gz"
+    source_sha256 = "db9592a3e54c34fcf2252e6cf49780dda93cc175d7a27654a8971e1eb5f1f989"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.11.0-bionic-c3482c4a.tgz"
+    version = "13.11.0"
+
+  [[metadata.dependencies]]
+    deprecation_date = "2020-06-01T00:00:00Z"
+    id = "node"
+    name = "Node Engine"
+    sha256 = "855d9f7ae9fd7bff37799bbf9f01893a2451b7c33b41860c8019c09a4595dc0d"
+    source = "https://nodejs.org/dist/v13.11.0/node-v13.11.0.tar.gz"
+    source_sha256 = "a47e0a2ce346c7d5b25a5d4cb3c9efa82068a2a32a2885332d7d354f9e120706"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-13.11.0-linux-x64-cflinuxfs3-855d9f7a.tgz"
+    version = "13.11.0"
 
   [[metadata.dependency_deprecation_dates]]
     date = 2021-04-01T00:00:00Z
