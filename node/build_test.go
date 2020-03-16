@@ -31,7 +31,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		clock             node.Clock
 		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
-		planRefinery      *fakes.PlanRefinery
+		planRefinery      *fakes.BuildPlanRefinery
 		buffer            *bytes.Buffer
 
 		build packit.BuildFunc
@@ -79,7 +79,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{}
 
 		environment = &fakes.EnvironmentConfiguration{}
-		planRefinery = &fakes.PlanRefinery{}
+		planRefinery = &fakes.BuildPlanRefinery{}
 
 		cacheManager.MatchCall.Returns.Bool = false
 
@@ -181,7 +181,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
 
 		Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(node.BuildpackMetadataDependency{}))
+		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{}))
 
 		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{}))
 		Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
@@ -459,7 +459,7 @@ nodejs:
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(node.BuildpackMetadataDependency{Name: "some-dep"}))
+			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "some-dep"}))
 
 			Expect(cacheManager.MatchCall.CallCount).To(Equal(1))
 

@@ -16,9 +16,9 @@ func main() {
 	entryResolver := node.NewPlanEntryResolver(logger)
 	dependencyManager := postal.NewService(cargo.NewTransport())
 	environment := node.NewEnvironment(logger)
-	planRefiner := node.NewPlanRefiner()
+	planRefinery := node.NewPlanRefinery()
 	cacheHandler := node.NewCacheHandler()
 	clock := node.NewClock(time.Now)
 
-	packit.Build(node.Build(entryResolver, dependencyManager, environment, planRefiner, cacheHandler, logger, clock))
+	packit.Build(node.Build(entryResolver, dependencyManager, environment, planRefinery, cacheHandler, logger, clock))
 }

@@ -17,6 +17,6 @@ func TestUnitNode(t *testing.T) {
 	suite("Environment", testEnvironment)
 	suite("NvmrcParser", testNvmrcParser)
 	suite("PlanEntryResolver", testPlanEntryResolver)
-	suite("PlanRefiner", testPlanRefiner)
+	suite("PlanRefinery", testPlanRefinery)
 	suite.Run(t)
 }

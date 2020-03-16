@@ -35,9 +35,9 @@ type EnvironmentConfiguration interface {
 	Configure(env EnvironmentVariables, path string, optimizeMemory bool) error
 }
 
-//go:generate faux --interface PlanRefinery --output fakes/plan_refinery.go
-type PlanRefinery interface {
-	BillOfMaterial(dependency BuildpackMetadataDependency) packit.BuildpackPlan
+//go:generate faux --interface BuildPlanRefinery --output fakes/build_plan_refinery.go
+type BuildPlanRefinery interface {
+	BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan
 }
 
 //go:generate faux --interface CacheManager --output fakes/cache_manager.go
@@ -45,7 +45,7 @@ type CacheManager interface {
 	Match(layer packit.Layer, dependency BuildpackMetadataDependency) (bool, error)
 }
 
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery PlanRefinery, cacheManager CacheManager, logger scribe.Logger, clock Clock) packit.BuildFunc {
+func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, cacheManager CacheManager, logger scribe.Logger, clock Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -73,19 +73,21 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
+		bom := planRefinery.BillOfMaterial(postal.Dependency{
+			ID:      dependency.ID,
+			Name:    dependency.Name,
+			SHA256:  dependency.SHA256,
+			Stacks:  dependency.Stacks,
+			URI:     dependency.URI,
+			Version: dependency.Version,
+		})
+
 		if match {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
 			return packit.BuildResult{
-				Plan: planRefinery.BillOfMaterial(BuildpackMetadataDependency{
-					ID:      dependency.ID,
-					Name:    dependency.Name,
-					SHA256:  dependency.SHA256,
-					Stacks:  dependency.Stacks,
-					URI:     dependency.URI,
-					Version: dependency.Version,
-				}),
+				Plan:   bom,
 				Layers: []packit.Layer{nodeLayer},
 			}, nil
 		}
@@ -122,14 +124,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		return packit.BuildResult{
-			Plan: planRefinery.BillOfMaterial(BuildpackMetadataDependency{
-				ID:      dependency.ID,
-				Name:    dependency.Name,
-				SHA256:  dependency.SHA256,
-				Stacks:  dependency.Stacks,
-				URI:     dependency.URI,
-				Version: dependency.Version,
-			}),
+			Plan:   bom,
 			Layers: []packit.Layer{nodeLayer},
 		}, nil
 	}

@@ -3,25 +3,25 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/postal"
 )
 
-type PlanRefinery struct {
+type BuildPlanRefinery struct {
 	BillOfMaterialCall struct {
 		sync.Mutex
 		CallCount int
 		Receives  struct {
-			Dependency node.BuildpackMetadataDependency
+			Dependency postal.Dependency
 		}
 		Returns struct {
 			BuildpackPlan packit.BuildpackPlan
 		}
-		Stub func(node.BuildpackMetadataDependency) packit.BuildpackPlan
+		Stub func(postal.Dependency) packit.BuildpackPlan
 	}
 }
 
-func (f *PlanRefinery) BillOfMaterial(param1 node.BuildpackMetadataDependency) packit.BuildpackPlan {
+func (f *BuildPlanRefinery) BillOfMaterial(param1 postal.Dependency) packit.BuildpackPlan {
 	f.BillOfMaterialCall.Lock()
 	defer f.BillOfMaterialCall.Unlock()
 	f.BillOfMaterialCall.CallCount++

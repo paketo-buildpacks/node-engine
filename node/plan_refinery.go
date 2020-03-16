@@ -1,14 +1,17 @@
 package node
 
-import "github.com/cloudfoundry/packit"
+import (
+	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/postal"
+)
 
-type PlanRefiner struct{}
+type PlanRefinery struct{}
 
-func NewPlanRefiner() PlanRefiner {
-	return PlanRefiner{}
+func NewPlanRefinery() PlanRefinery {
+	return PlanRefinery{}
 }
 
-func (pf PlanRefiner) BillOfMaterial(dependency BuildpackMetadataDependency) packit.BuildpackPlan {
+func (pf PlanRefinery) BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan {
 	return packit.BuildpackPlan{
 		Entries: []packit.BuildpackPlanEntry{
 			{
