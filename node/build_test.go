@@ -13,7 +13,6 @@ import (
 	"github.com/cloudfoundry/node-engine-cnb/node/fakes"
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/postal"
-	"github.com/cloudfoundry/packit/scribe"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -97,9 +96,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		buffer = bytes.NewBuffer(nil)
-		logger := scribe.NewLogger(buffer)
+		logEmitter := node.NewLogEmitter(buffer)
 
-		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, logger, clock)
+		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock)
 	})
 
 	it.After(func() {

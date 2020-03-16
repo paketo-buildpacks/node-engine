@@ -8,16 +8,15 @@ import (
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/cargo"
 	"github.com/cloudfoundry/packit/postal"
-	"github.com/cloudfoundry/packit/scribe"
 )
 
 func main() {
-	logger := scribe.NewLogger(os.Stdout)
-	entryResolver := node.NewPlanEntryResolver(logger)
+	logEmitter := node.NewLogEmitter(os.Stdout)
+	entryResolver := node.NewPlanEntryResolver(logEmitter)
 	dependencyManager := postal.NewService(cargo.NewTransport())
-	environment := node.NewEnvironment(logger)
+	environment := node.NewEnvironment(logEmitter)
 	planRefinery := node.NewPlanRefinery()
 	clock := node.NewClock(time.Now)
 
-	packit.Build(node.Build(entryResolver, dependencyManager, environment, planRefinery, logger, clock))
+	packit.Build(node.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock))
 }

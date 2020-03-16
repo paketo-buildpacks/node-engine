@@ -2,17 +2,15 @@ package node
 
 import (
 	"sort"
-	"strconv"
 
 	"github.com/cloudfoundry/packit"
-	"github.com/cloudfoundry/packit/scribe"
 )
 
 type PlanEntryResolver struct {
-	logger scribe.Logger
+	logger LogEmitter
 }
 
-func NewPlanEntryResolver(logger scribe.Logger) PlanEntryResolver {
+func NewPlanEntryResolver(logger LogEmitter) PlanEntryResolver {
 	return PlanEntryResolver{
 		logger: logger,
 	}
@@ -40,8 +38,6 @@ func (r PlanEntryResolver) Resolve(entries []packit.BuildpackPlanEntry) packit.B
 
 	chosenEntry := entries[0]
 
-	r.printCandidates(entries)
-
 	if chosenEntry.Metadata == nil {
 		chosenEntry.Metadata = map[string]interface{}{}
 	}
@@ -50,39 +46,9 @@ func (r PlanEntryResolver) Resolve(entries []packit.BuildpackPlanEntry) packit.B
 		if entry.Metadata["build"] == true {
 			chosenEntry.Metadata["build"] = true
 		}
-
-		if entry.Metadata["cache"] == true {
-			chosenEntry.Metadata["cache"] = true
-		}
 	}
+
+	r.logger.Candidates(entries)
 
 	return chosenEntry
-}
-
-func (r PlanEntryResolver) printCandidates(entries []packit.BuildpackPlanEntry) {
-	r.logger.Subprocess("Candidate version sources (in priority order):")
-
-	var (
-		sources [][2]string
-		maxLen  int
-	)
-
-	for _, entry := range entries {
-		versionSource, ok := entry.Metadata["version-source"].(string)
-		if !ok {
-			versionSource = "<unknown>"
-		}
-
-		if len(versionSource) > maxLen {
-			maxLen = len(versionSource)
-		}
-
-		sources = append(sources, [2]string{versionSource, entry.Version})
-	}
-
-	for _, source := range sources {
-		r.logger.Action(("%-" + strconv.Itoa(maxLen) + "s -> %q"), source[0], source[1])
-	}
-
-	r.logger.Break()
 }

@@ -10,8 +10,7 @@ import (
 	"testing"
 
 	"github.com/cloudfoundry/node-engine-cnb/node"
-	"github.com/cloudfoundry/node-engine-cnb/node/fakes"
-	"github.com/cloudfoundry/packit/scribe"
+	"github.com/cloudfoundry/packit"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -33,28 +32,21 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		env     *fakes.EnvironmentVariables
-		envVars map[string]string
-		path    string
+		env  packit.Environment
+		path string
 
 		buffer      *bytes.Buffer
 		environment node.Environment
 	)
 
 	it.Before(func() {
-		envVars = map[string]string{}
-
-		env = &fakes.EnvironmentVariables{}
-		env.OverrideCall.Stub = func(key, value string) {
-			envVars[key] = value
-		}
-
 		var err error
 		path, err = ioutil.TempDir("", "layer-dir")
 		Expect(err).NotTo(HaveOccurred())
 
+		env = packit.Environment{}
 		buffer = bytes.NewBuffer(nil)
-		environment = node.NewEnvironment(scribe.NewLogger(buffer))
+		environment = node.NewEnvironment(node.NewLogEmitter(buffer))
 	})
 
 	it.After(func() {
@@ -66,11 +58,10 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 			err := environment.Configure(env, path, false)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(env.OverrideCall.CallCount).To(Equal(3))
-			Expect(envVars).To(Equal(map[string]string{
-				"NODE_HOME":    path,
-				"NODE_ENV":     "production",
-				"NODE_VERBOSE": "false",
+			Expect(env).To(Equal(packit.Environment{
+				"NODE_HOME.override":    path,
+				"NODE_ENV.override":     "production",
+				"NODE_VERBOSE.override": "false",
 			}))
 		})
 

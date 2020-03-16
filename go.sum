@@ -50,6 +50,8 @@ github.com/cloudfoundry/packit v0.0.0-20200213185904-9d0fc689e7af h1:G6pQ5RECHT1
 github.com/cloudfoundry/packit v0.0.0-20200213185904-9d0fc689e7af/go.mod h1:L9r26GHPYpUReBWTpkU5BgyDuNVU01JSG4QsHybI0Bg=
 github.com/cloudfoundry/packit v0.0.0-20200313204923-80904314b26f h1:pDwc/rbM/tE8ERwZVNP9bRdDdohedkXp7ZaGAJBst0I=
 github.com/cloudfoundry/packit v0.0.0-20200313204923-80904314b26f/go.mod h1:L9r26GHPYpUReBWTpkU5BgyDuNVU01JSG4QsHybI0Bg=
+github.com/cloudfoundry/packit v0.0.0-20200316192019-270fa885ab52 h1:5C1zcLz7uQVWtt3GTBwbGuiAnN8tCGw0a/Ht12Ca2V8=
+github.com/cloudfoundry/packit v0.0.0-20200316192019-270fa885ab52/go.mod h1:L9r26GHPYpUReBWTpkU5BgyDuNVU01JSG4QsHybI0Bg=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

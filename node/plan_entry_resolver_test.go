@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/packit"
-	"github.com/cloudfoundry/packit/scribe"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -22,7 +21,7 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		buffer = bytes.NewBuffer(nil)
-		resolver = node.NewPlanEntryResolver(scribe.NewLogger(buffer))
+		resolver = node.NewPlanEntryResolver(node.NewLogEmitter(buffer))
 	})
 
 	context("when a buildpack.yml entry is included", func() {
@@ -127,7 +126,7 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
-	context("when Build and Cache flags differ", func() {
+	context("when entry flags differ", func() {
 		context("OR's them together on best plan entry", func() {
 			it("has all flags", func() {
 				entry := resolver.Resolve([]packit.BuildpackPlanEntry{
@@ -136,7 +135,6 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 						Version: "package-json-version",
 						Metadata: map[string]interface{}{
 							"version-source": "package.json",
-							"build":          true,
 						},
 					},
 					{
@@ -144,7 +142,7 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 						Version: "nvmrc-version",
 						Metadata: map[string]interface{}{
 							"version-source": ".nvmrc",
-							"cache":          true,
+							"build":          true,
 						},
 					},
 				})
@@ -154,32 +152,6 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 					Metadata: map[string]interface{}{
 						"version-source": "package.json",
 						"build":          true,
-						"cache":          true,
-					},
-				}))
-			})
-		})
-
-		context("when the chosen entry does not have a metadata", func() {
-			it("merges the layer flags correctly", func() {
-				entry := resolver.Resolve([]packit.BuildpackPlanEntry{
-					{
-						Name:    "node",
-						Version: "chosen-version",
-					},
-					{
-						Name:    "node",
-						Version: "other-version",
-						Metadata: map[string]interface{}{
-							"build": true,
-						},
-					},
-				})
-				Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-					Name:    "node",
-					Version: "chosen-version",
-					Metadata: map[string]interface{}{
-						"build": true,
 					},
 				}))
 			})

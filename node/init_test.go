@@ -14,6 +14,7 @@ func TestUnitNode(t *testing.T) {
 	suite("Clock", testClock)
 	suite("Detect", testDetect)
 	suite("Environment", testEnvironment)
+	suite("LogEmitter", testLogEmitter)
 	suite("NvmrcParser", testNvmrcParser)
 	suite("PlanEntryResolver", testPlanEntryResolver)
 	suite("PlanRefinery", testPlanRefinery)

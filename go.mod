@@ -2,12 +2,11 @@ module github.com/cloudfoundry/node-engine-cnb
 
 require (
 	cloud.google.com/go v0.53.0 // indirect
-	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/semver v1.5.0
 	github.com/cloudfoundry/dagger v0.0.0-20200213200846-c2a9723f08c4
 	github.com/cloudfoundry/libcfbuildpack v1.91.23 // indirect
 	github.com/cloudfoundry/occam v0.0.0-20200227222407-1c4318bd26e2
-	github.com/cloudfoundry/packit v0.0.0-20200313204923-80904314b26f
+	github.com/cloudfoundry/packit v0.0.0-20200316192019-270fa885ab52
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect

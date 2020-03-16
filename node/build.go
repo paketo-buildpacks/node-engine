@@ -7,7 +7,6 @@ import (
 
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/postal"
-	"github.com/cloudfoundry/packit/scribe"
 )
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
@@ -23,7 +22,7 @@ type DependencyManager interface {
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
 type EnvironmentConfiguration interface {
-	Configure(env EnvironmentVariables, path string, optimizeMemory bool) error
+	Configure(env packit.Environment, path string, optimizeMemory bool) error
 }
 
 //go:generate faux --interface BuildPlanRefinery --output fakes/build_plan_refinery.go
@@ -31,7 +30,7 @@ type BuildPlanRefinery interface {
 	BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan
 }
 
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger scribe.Logger, clock Clock) packit.BuildFunc {
+func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger LogEmitter, clock Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -43,8 +42,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		logger.Subprocess("Selected Node Engine version (using %s): %s", entry.Metadata["version-source"], dependency.Version)
-		logger.Break()
+		logger.SelectedDependency(entry, dependency)
 
 		nodeLayer, err := context.Layers.Get(Node, packit.LaunchLayer)
 		if err != nil {

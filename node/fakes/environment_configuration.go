@@ -3,7 +3,7 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
+	"github.com/cloudfoundry/packit"
 )
 
 type EnvironmentConfiguration struct {
@@ -11,18 +11,18 @@ type EnvironmentConfiguration struct {
 		sync.Mutex
 		CallCount int
 		Receives  struct {
-			Env            node.EnvironmentVariables
+			Env            packit.Environment
 			Path           string
 			OptimizeMemory bool
 		}
 		Returns struct {
 			Error error
 		}
-		Stub func(node.EnvironmentVariables, string, bool) error
+		Stub func(packit.Environment, string, bool) error
 	}
 }
 
-func (f *EnvironmentConfiguration) Configure(param1 node.EnvironmentVariables, param2 string, param3 bool) error {
+func (f *EnvironmentConfiguration) Configure(param1 packit.Environment, param2 string, param3 bool) error {
 	f.ConfigureCall.Lock()
 	defer f.ConfigureCall.Unlock()
 	f.ConfigureCall.CallCount++
