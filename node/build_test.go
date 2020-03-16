@@ -27,7 +27,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		cnbDir            string
 		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
-		cacheManager      *fakes.CacheManager
 		clock             node.Clock
 		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
@@ -74,14 +73,11 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			},
 		}
 
-		cacheManager = &fakes.CacheManager{}
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{}
 
 		environment = &fakes.EnvironmentConfiguration{}
 		planRefinery = &fakes.BuildPlanRefinery{}
-
-		cacheManager.MatchCall.Returns.Bool = false
 
 		timeStamp = time.Now()
 		clock = node.NewClock(func() time.Time {
@@ -103,7 +99,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		buffer = bytes.NewBuffer(nil)
 		logger := scribe.NewLogger(buffer)
 
-		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, cacheManager, logger, clock)
+		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, logger, clock)
 	})
 
 	it.After(func() {
@@ -431,8 +427,13 @@ nodejs:
 
 	context("when there is a dependency cache match", func() {
 		it.Before(func() {
-			cacheManager.MatchCall.Returns.Bool = true
-			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "some-dep"}
+			err := ioutil.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0644)
+			Expect(err).NotTo(HaveOccurred())
+
+			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
+				Name:   "some-dep",
+				SHA256: "some-sha",
+			}
 		})
 
 		it("exits build process early", func() {
@@ -459,9 +460,10 @@ nodejs:
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "some-dep"}))
-
-			Expect(cacheManager.MatchCall.CallCount).To(Equal(1))
+			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{
+				Name:   "some-dep",
+				SHA256: "some-sha",
+			}))
 
 			Expect(dependencyManager.InstallCall.CallCount).To(Equal(0))
 			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
@@ -609,31 +611,6 @@ nodejs:
 					Layers: packit.Layers{Path: layersDir},
 				})
 				Expect(err).To(MatchError("failed to configure environment"))
-			})
-		})
-
-		context("when the cache match fails", func() {
-			it.Before(func() {
-				cacheManager.MatchCall.Returns.Error = errors.New("cache match failed")
-			})
-
-			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name:    "node",
-								Version: "~10",
-								Metadata: map[string]interface{}{
-									"version-source": "buildpack.yml",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
-				Expect(err).To(MatchError("cache match failed"))
 			})
 		})
 	})

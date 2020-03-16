@@ -11,7 +11,6 @@ func TestUnitNode(t *testing.T) {
 	suite := spec.New("node", spec.Report(report.Terminal{}))
 	suite("Build", testBuild)
 	suite("BuildpackYMLParser", testBuildpackYMLParser)
-	suite("CacheHandler", testCacheHandler)
 	suite("Clock", testClock)
 	suite("Detect", testDetect)
 	suite("Environment", testEnvironment)

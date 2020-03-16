@@ -10,15 +10,6 @@ import (
 	"github.com/cloudfoundry/packit/scribe"
 )
 
-type BuildpackMetadataDependency struct {
-	ID      string   `toml:"id"`
-	Name    string   `toml:"name"`
-	SHA256  string   `toml:"sha256"`
-	Stacks  []string `toml:"stacks"`
-	URI     string   `toml:"uri"`
-	Version string   `toml:"version"`
-}
-
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
 type EntryResolver interface {
 	Resolve([]packit.BuildpackPlanEntry) packit.BuildpackPlanEntry
@@ -40,12 +31,7 @@ type BuildPlanRefinery interface {
 	BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan
 }
 
-//go:generate faux --interface CacheManager --output fakes/cache_manager.go
-type CacheManager interface {
-	Match(layer packit.Layer, dependency BuildpackMetadataDependency) (bool, error)
-}
-
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, cacheManager CacheManager, logger scribe.Logger, clock Clock) packit.BuildFunc {
+func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger scribe.Logger, clock Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -68,11 +54,6 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		nodeLayer.Build = entry.Metadata["build"] == true
 		nodeLayer.Cache = entry.Metadata["build"] == true
 
-		match, err := cacheManager.Match(nodeLayer, BuildpackMetadataDependency{SHA256: dependency.SHA256})
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
 		bom := planRefinery.BillOfMaterial(postal.Dependency{
 			ID:      dependency.ID,
 			Name:    dependency.Name,
@@ -82,7 +63,8 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			Version: dependency.Version,
 		})
 
-		if match {
+		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
+		if ok && cachedSHA == dependency.SHA256 {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
