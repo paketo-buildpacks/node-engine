@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/node-engine-cnb/node/fakes"
 	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/postal"
 	"github.com/cloudfoundry/packit/scribe"
 	"github.com/sclevine/spec"
 
@@ -75,7 +76,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		cacheManager = &fakes.CacheManager{}
 		dependencyManager = &fakes.DependencyManager{}
-		dependencyManager.ResolveCall.Returns.BuildpackMetadataDependency = node.BuildpackMetadataDependency{}
+		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{}
 
 		environment = &fakes.EnvironmentConfiguration{}
 		planRefinery = &fakes.PlanRefinery{}
@@ -114,6 +115,10 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		result, err := build(packit.BuildContext{
 			CNBPath: cnbDir,
 			Stack:   "some-stack",
+			BuildpackInfo: packit.BuildpackInfo{
+				Name:    "Some Buildpack",
+				Version: "some-version",
+			},
 			Plan: packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
 					{
@@ -170,30 +175,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			},
 		}))
 
-		Expect(dependencyManager.ResolveCall.Receives.Dependencies).To(Equal([]node.BuildpackMetadataDependency{
-			{
-				ID:      "some-dep",
-				Name:    "Some Dep",
-				SHA256:  "some-sha",
-				Stacks:  node.BuildpackMetadataDependencyStacks{"some-stack"},
-				URI:     "some-uri",
-				Version: "some-dep-version",
-			},
-		}))
-		Expect(dependencyManager.ResolveCall.Receives.DefaultVersion).To(Equal("10.x"))
+		Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
+		Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal("node"))
+		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal("~10"))
 		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
-		Expect(dependencyManager.ResolveCall.Receives.Entry).To(Equal(packit.BuildpackPlanEntry{
-			Name:    "node",
-			Version: "~10",
-			Metadata: map[string]interface{}{
-				"version-source": "buildpack.yml",
-			},
-		}))
 
 		Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
 		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(node.BuildpackMetadataDependency{}))
 
-		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(node.BuildpackMetadataDependency{}))
+		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{}))
 		Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.InstallCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 
@@ -442,13 +432,17 @@ nodejs:
 	context("when there is a dependency cache match", func() {
 		it.Before(func() {
 			cacheManager.MatchCall.Returns.Bool = true
-			dependencyManager.ResolveCall.Returns.BuildpackMetadataDependency = node.BuildpackMetadataDependency{Name: "some-dep"}
+			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "some-dep"}
 		})
 
 		it("exits build process early", func() {
 			_, err := build(packit.BuildContext{
 				CNBPath: cnbDir,
 				Stack:   "some-stack",
+				BuildpackInfo: packit.BuildpackInfo{
+					Name:    "Some Buildpack",
+					Version: "some-version",
+				},
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
@@ -615,14 +609,6 @@ nodejs:
 					Layers: packit.Layers{Path: layersDir},
 				})
 				Expect(err).To(MatchError("failed to configure environment"))
-			})
-		})
-
-		context("parsing the buildpack.toml fails", func() {
-			it("returns an error", func() {
-				_, err := build(packit.BuildContext{})
-				Expect(err).To(MatchError(ContainSubstring("failed to parse buildpack.toml:")))
-				Expect(err).To(MatchError(ContainSubstring("no such file or directory")))
 			})
 		})
 

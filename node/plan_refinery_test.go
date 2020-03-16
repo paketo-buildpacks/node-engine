@@ -22,7 +22,7 @@ func testPlanRefiner(t *testing.T, context spec.G, it spec.S) {
 		dependency = node.BuildpackMetadataDependency{
 			ID:      "some-id",
 			Name:    "some-name",
-			Stacks:  node.BuildpackMetadataDependencyStacks{"some-stack"},
+			Stacks:  []string{"some-stack"},
 			URI:     "some-uri",
 			SHA256:  "some-sha",
 			Version: "some-version",
@@ -39,7 +39,7 @@ func testPlanRefiner(t *testing.T, context spec.G, it spec.S) {
 				"licenses": []string{},
 				"name":     "some-name",
 				"sha256":   "some-sha",
-				"stacks":   node.BuildpackMetadataDependencyStacks{"some-stack"},
+				"stacks":   []string{"some-stack"},
 				"uri":      "some-uri",
 			},
 			))

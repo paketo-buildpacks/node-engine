@@ -6,8 +6,18 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/postal"
 	"github.com/cloudfoundry/packit/scribe"
 )
+
+type BuildpackMetadataDependency struct {
+	ID      string   `toml:"id"`
+	Name    string   `toml:"name"`
+	SHA256  string   `toml:"sha256"`
+	Stacks  []string `toml:"stacks"`
+	URI     string   `toml:"uri"`
+	Version string   `toml:"version"`
+}
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
 type EntryResolver interface {
@@ -16,8 +26,8 @@ type EntryResolver interface {
 
 //go:generate faux --interface DependencyManager --output fakes/dependency_manager.go
 type DependencyManager interface {
-	Resolve(dependencies []BuildpackMetadataDependency, defaultVersion, stack string, entry packit.BuildpackPlanEntry) (BuildpackMetadataDependency, error)
-	Install(dependency BuildpackMetadataDependency, cnbPath, layerPath string) error
+	Resolve(path, id, version, stack string) (postal.Dependency, error)
+	Install(dependency postal.Dependency, cnbPath, layerPath string) error
 }
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
@@ -37,17 +47,12 @@ type CacheManager interface {
 
 func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery PlanRefinery, cacheManager CacheManager, logger scribe.Logger, clock Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		buildpack, err := ParseBuildpack(filepath.Join(context.CNBPath, "buildpack.toml"))
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		logger.Title("%s %s", buildpack.Info.Name, buildpack.Info.Version)
+		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
 
 		entry := entries.Resolve(context.Plan.Entries)
 
-		dependency, err := dependencies.Resolve(buildpack.Metadata.Dependencies, buildpack.Metadata.DefaultVersions.Node, context.Stack, entry)
+		dependency, err := dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, entry.Version, context.Stack)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
@@ -63,7 +68,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		nodeLayer.Build = entry.Metadata["build"] == true
 		nodeLayer.Cache = entry.Metadata["build"] == true
 
-		match, err := cacheManager.Match(nodeLayer, dependency)
+		match, err := cacheManager.Match(nodeLayer, BuildpackMetadataDependency{SHA256: dependency.SHA256})
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
@@ -73,7 +78,14 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			logger.Break()
 
 			return packit.BuildResult{
-				Plan:   planRefinery.BillOfMaterial(dependency),
+				Plan: planRefinery.BillOfMaterial(BuildpackMetadataDependency{
+					ID:      dependency.ID,
+					Name:    dependency.Name,
+					SHA256:  dependency.SHA256,
+					Stacks:  dependency.Stacks,
+					URI:     dependency.URI,
+					Version: dependency.Version,
+				}),
 				Layers: []packit.Layer{nodeLayer},
 			}, nil
 		}
@@ -90,10 +102,14 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			"built_at": clock.Now().Format(time.RFC3339Nano),
 		}
 
+		logger.Subprocess("Installing Node Engine %s", dependency.Version)
+		then := clock.Now()
 		err = dependencies.Install(dependency, context.CNBPath, nodeLayer.Path)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
+		logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
+		logger.Break()
 
 		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
 		if err != nil {
@@ -106,7 +122,14 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		return packit.BuildResult{
-			Plan:   planRefinery.BillOfMaterial(dependency),
+			Plan: planRefinery.BillOfMaterial(BuildpackMetadataDependency{
+				ID:      dependency.ID,
+				Name:    dependency.Name,
+				SHA256:  dependency.SHA256,
+				Stacks:  dependency.Stacks,
+				URI:     dependency.URI,
+				Version: dependency.Version,
+			}),
 			Layers: []packit.Layer{nodeLayer},
 		}, nil
 	}

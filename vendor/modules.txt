@@ -19,11 +19,12 @@ github.com/cloudfoundry/libcfbuildpack/helper
 # github.com/cloudfoundry/occam v0.0.0-20200227222407-1c4318bd26e2
 github.com/cloudfoundry/occam
 github.com/cloudfoundry/occam/matchers
-# github.com/cloudfoundry/packit v0.0.0-20200227210312-ad5e6f66a6a5
+# github.com/cloudfoundry/packit v0.0.0-20200313204923-80904314b26f
 github.com/cloudfoundry/packit
 github.com/cloudfoundry/packit/cargo
 github.com/cloudfoundry/packit/internal
 github.com/cloudfoundry/packit/pexec
+github.com/cloudfoundry/packit/postal
 github.com/cloudfoundry/packit/scribe
 github.com/cloudfoundry/packit/vacation
 # github.com/fatih/color v1.9.0
@@ -71,7 +72,7 @@ golang.org/x/net/html/charset
 # golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae
+# golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding

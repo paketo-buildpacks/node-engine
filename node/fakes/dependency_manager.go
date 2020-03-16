@@ -3,8 +3,7 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
-	"github.com/cloudfoundry/packit"
+	"github.com/cloudfoundry/packit/postal"
 )
 
 type DependencyManager struct {
@@ -12,33 +11,33 @@ type DependencyManager struct {
 		sync.Mutex
 		CallCount int
 		Receives  struct {
-			Dependency node.BuildpackMetadataDependency
+			Dependency postal.Dependency
 			CnbPath    string
 			LayerPath  string
 		}
 		Returns struct {
 			Error error
 		}
-		Stub func(node.BuildpackMetadataDependency, string, string) error
+		Stub func(postal.Dependency, string, string) error
 	}
 	ResolveCall struct {
 		sync.Mutex
 		CallCount int
 		Receives  struct {
-			Dependencies   []node.BuildpackMetadataDependency
-			DefaultVersion string
-			Stack          string
-			Entry          packit.BuildpackPlanEntry
+			Path    string
+			Id      string
+			Version string
+			Stack   string
 		}
 		Returns struct {
-			BuildpackMetadataDependency node.BuildpackMetadataDependency
-			Error                       error
+			Dependency postal.Dependency
+			Error      error
 		}
-		Stub func([]node.BuildpackMetadataDependency, string, string, packit.BuildpackPlanEntry) (node.BuildpackMetadataDependency, error)
+		Stub func(string, string, string, string) (postal.Dependency, error)
 	}
 }
 
-func (f *DependencyManager) Install(param1 node.BuildpackMetadataDependency, param2 string, param3 string) error {
+func (f *DependencyManager) Install(param1 postal.Dependency, param2 string, param3 string) error {
 	f.InstallCall.Lock()
 	defer f.InstallCall.Unlock()
 	f.InstallCall.CallCount++
@@ -50,16 +49,16 @@ func (f *DependencyManager) Install(param1 node.BuildpackMetadataDependency, par
 	}
 	return f.InstallCall.Returns.Error
 }
-func (f *DependencyManager) Resolve(param1 []node.BuildpackMetadataDependency, param2 string, param3 string, param4 packit.BuildpackPlanEntry) (node.BuildpackMetadataDependency, error) {
+func (f *DependencyManager) Resolve(param1 string, param2 string, param3 string, param4 string) (postal.Dependency, error) {
 	f.ResolveCall.Lock()
 	defer f.ResolveCall.Unlock()
 	f.ResolveCall.CallCount++
-	f.ResolveCall.Receives.Dependencies = param1
-	f.ResolveCall.Receives.DefaultVersion = param2
-	f.ResolveCall.Receives.Stack = param3
-	f.ResolveCall.Receives.Entry = param4
+	f.ResolveCall.Receives.Path = param1
+	f.ResolveCall.Receives.Id = param2
+	f.ResolveCall.Receives.Version = param3
+	f.ResolveCall.Receives.Stack = param4
 	if f.ResolveCall.Stub != nil {
 		return f.ResolveCall.Stub(param1, param2, param3, param4)
 	}
-	return f.ResolveCall.Returns.BuildpackMetadataDependency, f.ResolveCall.Returns.Error
+	return f.ResolveCall.Returns.Dependency, f.ResolveCall.Returns.Error
 }
