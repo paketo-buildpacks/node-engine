@@ -12,6 +12,7 @@ api = "0.2"
     node = "10.x"
 
   [[metadata.dependencies]]
+    deprecation_date = 2021-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "528414d1987c8ff9d74f6b5baef604632a2d1d1fbce4a33c7302debcbfa53e1b"
@@ -22,6 +23,7 @@ api = "0.2"
     version = "10.18.1"
 
   [[metadata.dependencies]]
+    deprecation_date = 2021-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "ad0376cbe4dfc3d6092d0ea9fdc4fd3fcb44c477bd4a2c800ccd48eee95e994d"
@@ -32,6 +34,7 @@ api = "0.2"
     version = "10.18.1"
 
   [[metadata.dependencies]]
+    deprecation_date = 2021-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "75d08023c0121ae0c82dc124e459dcf09141440a304658aefa2de7b2f09937de"
@@ -42,6 +45,7 @@ api = "0.2"
     version = "10.19.0"
 
   [[metadata.dependencies]]
+    deprecation_date = 2021-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "0bcac6860f8103e37d85a271898d019edb8d50ba7e3aaee50a0526684f962f10"
@@ -52,6 +56,7 @@ api = "0.2"
     version = "10.19.0"
 
   [[metadata.dependencies]]
+    deprecation_date = 2022-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "c623d3edfd3b69443ae26ac3f8c23db1bc42d9b4a7ab9ab68666f8c9828bd0b7"
@@ -62,6 +67,7 @@ api = "0.2"
     version = "12.16.0"
 
   [[metadata.dependencies]]
+    deprecation_date = 2022-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "e4ed0bdcaeb440bd6a78b61c982890f71e7ba84933d6c9a21bda6e8a6a18cef5"
@@ -72,6 +78,7 @@ api = "0.2"
     version = "12.16.0"
 
   [[metadata.dependencies]]
+    deprecation_date = 2022-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "ae67975b462a580000023ed9b461f6d91326fbb4c2781695c0da87857321edba"
@@ -82,6 +89,7 @@ api = "0.2"
     version = "12.16.1"
 
   [[metadata.dependencies]]
+    deprecation_date = 2022-04-01T00:00:00Z
     id = "node"
     name = "Node Engine"
     sha256 = "7bb532cc92e8c4422e5d56c16456b0b6a9cbfdbc4f328b428988e01b35b8fea8"
