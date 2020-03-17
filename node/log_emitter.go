@@ -3,6 +3,7 @@ package node
 import (
 	"io"
 	"strconv"
+	"time"
 
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/postal"
@@ -21,13 +22,25 @@ func NewLogEmitter(output io.Writer) LogEmitter {
 	}
 }
 
-func (e LogEmitter) SelectedDependency(entry packit.BuildpackPlanEntry, dependency postal.Dependency) {
+func (e LogEmitter) SelectedDependency(entry packit.BuildpackPlanEntry, dependency postal.Dependency, now time.Time) {
 	source, ok := entry.Metadata["version-source"].(string)
 	if !ok {
 		source = "<unknown>"
 	}
 
-	e.Subprocess("Selected Node Engine version (using %s): %s", source, dependency.Version)
+	e.Subprocess("Selected %s version (using %s): %s", dependency.Name, source, dependency.Version)
+
+	if (dependency.DeprecationDate != time.Time{}) {
+		deprecationDate := dependency.DeprecationDate
+		switch {
+		case (deprecationDate.Add(-30*24*time.Hour).Before(now) && deprecationDate.After(now)):
+			e.Action("Version %s of %s will be deprecated after %s.", dependency.Version, dependency.Name, dependency.DeprecationDate.Format("2006-01-02"))
+			e.Action("Migrate your application to a supported version of %s before this time.", dependency.Name)
+		case (deprecationDate == now || deprecationDate.Before(now)):
+			e.Action("Version %s of %s is deprecated.", dependency.Version, dependency.Name)
+			e.Action("Migrate your application to a supported version of %s.", dependency.Name)
+		}
+	}
 	e.Break()
 }
 

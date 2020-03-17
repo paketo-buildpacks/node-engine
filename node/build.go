@@ -42,7 +42,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		logger.SelectedDependency(entry, dependency)
+		logger.SelectedDependency(entry, dependency, clock.Now())
 
 		nodeLayer, err := context.Layers.Get(Node, packit.LaunchLayer)
 		if err != nil {

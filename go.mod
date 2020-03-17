@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.9.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sclevine/spec v1.4.0
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	golang.org/x/sys v0.0.0-20200317113312-5766fd39f98d // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )
 
