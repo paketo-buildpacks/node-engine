@@ -73,7 +73,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		dependencyManager = &fakes.DependencyManager{}
-		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{}
+		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
 
 		environment = &fakes.EnvironmentConfiguration{}
 		planRefinery = &fakes.BuildPlanRefinery{}
@@ -176,9 +176,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
 
 		Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{}))
+		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
 
-		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{}))
+		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
 		Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.InstallCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 
@@ -430,7 +430,7 @@ nodejs:
 			Expect(err).NotTo(HaveOccurred())
 
 			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
-				Name:   "some-dep",
+				Name:   "Node Engine",
 				SHA256: "some-sha",
 			}
 		})
@@ -460,7 +460,7 @@ nodejs:
 
 			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
 			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{
-				Name:   "some-dep",
+				Name:   "Node Engine",
 				SHA256: "some-sha",
 			}))
 
