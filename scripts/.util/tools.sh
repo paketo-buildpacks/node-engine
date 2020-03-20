@@ -98,7 +98,7 @@ function util::tools::pack::expand() {
     tarball="$(echo "${url}" | sed "s/.*\///")"
     version="v$(echo "${url}" | sed 's/pack-//' | sed 's/-.*//')"
 
-    wget -q "${url}"
+    curl --location --silent --output "${tarball}" "${url}"
     tar xzf "${tarball}" -C "${dir}"
     rm "${tarball}"
 }
