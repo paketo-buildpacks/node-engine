@@ -11,7 +11,7 @@ source "${PWD}/scripts/.util/tools.sh"
 # shellcheck source=.util/print.sh
 source "${PWD}/scripts/.util/print.sh"
 
-if ! command -v realpath; then
+if ! command -v realpath > /dev/null; then
   function realpath() {
       [[ "${1}" = /* ]] && echo "${1}" || echo "${PWD}/${1#./}"
   }
