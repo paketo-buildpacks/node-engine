@@ -54,6 +54,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
     node = "10.x"
 
   [[metadata.dependencies]]
+    deprecation_date = 2021-04-01T00:00:00Z
     id = "some-dep"
     name = "Some Dep"
     sha256 = "some-sha"

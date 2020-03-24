@@ -17,6 +17,8 @@ func ContainLines(expected ...interface{}) types.GomegaMatcher {
 
 type containLinesMatcher struct {
 	expected interface{}
+
+	expectedLine interface{}
 }
 
 func (matcher *containLinesMatcher) Match(actual interface{}) (success bool, err error) {
@@ -44,9 +46,9 @@ func (matcher *containLinesMatcher) Match(actual interface{}) (success bool, err
 		match := true
 		for j := 0; j < eSlice.Len(); j++ {
 			aValue := lines[j]
-			eValue := eSlice.Index(j)
+			matcher.expectedLine = eSlice.Index(j).Interface()
 
-			if eMatcher, ok := eValue.Interface().(types.GomegaMatcher); ok {
+			if eMatcher, ok := matcher.expectedLine.(types.GomegaMatcher); ok {
 				m, err := eMatcher.Match(aValue)
 				if err != nil {
 					return false, err
@@ -55,7 +57,7 @@ func (matcher *containLinesMatcher) Match(actual interface{}) (success bool, err
 				if !m {
 					match = false
 				}
-			} else if !reflect.DeepEqual(aValue, eValue.Interface()) {
+			} else if !reflect.DeepEqual(aValue, matcher.expectedLine) {
 				match = false
 			}
 		}
@@ -69,10 +71,18 @@ func (matcher *containLinesMatcher) Match(actual interface{}) (success bool, err
 }
 
 func (matcher *containLinesMatcher) FailureMessage(actual interface{}) (message string) {
+	if matcher.expectedLine != nil {
+		return format.Message(matcher.lines(actual), "to contain line", matcher.expectedLine)
+	}
+
 	return format.Message(matcher.lines(actual), "to contain lines", matcher.expected)
 }
 
 func (matcher *containLinesMatcher) NegatedFailureMessage(actual interface{}) (message string) {
+	if matcher.expectedLine != nil {
+		return format.Message(matcher.lines(actual), "not to contain line", matcher.expectedLine)
+	}
+
 	return format.Message(matcher.lines(actual), "not to contain lines", matcher.expected)
 }
 

@@ -2,10 +2,14 @@ package integration
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/cloudfoundry/dagger"
 	"github.com/cloudfoundry/occam"
+	"github.com/cloudfoundry/packit/cargo"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -75,6 +79,73 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 			}
 
 			Expect(GetBuildLogs(logs.String())).To(ContainSequence(sequence), logs.String())
+		})
+		context("when the node version specfied in the app is EOL'd", func() {
+			var (
+				logs                       fmt.Stringer
+				duplicator                 cargo.DirectoryDuplicator
+				deprecatedDepNodeBuildpack string
+				tmpBuildpackDir            string
+			)
+
+			it.Before(func() {
+				var err error
+				duplicator = cargo.NewDirectoryDuplicator()
+				tmpBuildpackDir, err = ioutil.TempDir("", "node-engine-cnb-outdated-deps")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(duplicator.Duplicate(root, tmpBuildpackDir)).To(Succeed())
+
+				bpToml := []byte(`
+api = "0.2"
+
+[buildpack]
+  id = "org.cloudfoundry.node-engine"
+  name = "Node Engine Buildpack"
+  version = "{{ .Version }}"
+
+[metadata]
+  include_files = ["bin/build", "bin/detect", "buildpack.toml"]
+  pre_package = "./scripts/build.sh"
+  [metadata.default-versions]
+    node = "10.x"
+
+  [[metadata.dependencies]]
+		deprecation_date = 2000-04-01T00:00:00Z
+    id = "node"
+    name = "Node Engine"
+    sha256 = "ad0376cbe4dfc3d6092d0ea9fdc4fd3fcb44c477bd4a2c800ccd48eee95e994d"
+    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1.tar.gz"
+    source_sha256 = "80a61ffbe6d156458ed54120eb0e9fff7b626502e0986e861d91b365f7e876db"
+    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-cflinuxfs3-ad0376cb.tgz"
+    version = "10.18.1"
+
+[[stacks]]
+  id = "org.cloudfoundry.stacks.cflinuxfs3"
+`)
+
+				err = ioutil.WriteFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), bpToml, os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+
+				deprecatedDepNodeBuildpack, err = dagger.PackageBuildpack(tmpBuildpackDir)
+				deprecatedDepNodeBuildpack = fmt.Sprintf("%s.tgz", deprecatedDepNodeBuildpack)
+				Expect(err).NotTo(HaveOccurred())
+			})
+			it.After(func() {
+				os.RemoveAll(tmpBuildpackDir)
+			})
+			it("logs thats the dependency is deprecated", func() {
+				var err error
+				image, logs, err = pack.WithNoColor().Build.
+					WithNoPull().
+					WithBuildpacks(deprecatedDepNodeBuildpack).
+					Execute(name, filepath.Join("testdata", "simple_app"))
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs.String()).To(ContainSubstring("Version 10.18.1 of Node Engine is deprecated."))
+				Expect(logs.String()).To(ContainSubstring("Migrate your application to a supported version of Node Engine."))
+			})
 		})
 	})
 }

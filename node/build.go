@@ -37,7 +37,10 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		entry := entries.Resolve(context.Plan.Entries)
 
-		dependency, err := dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, entry.Version, context.Stack)
+		var dependency postal.Dependency
+		var err error
+		dependency, err = dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, entry.Version, context.Stack)
+
 		if err != nil {
 			return packit.BuildResult{}, err
 		}

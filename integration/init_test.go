@@ -23,12 +23,14 @@ import (
 var (
 	nodeBuildpack        string
 	offlineNodeBuildpack string
+	root                 string
 )
 
 func TestIntegration(t *testing.T) {
 	Expect := NewWithT(t).Expect
 
-	root, err := dagger.FindBPRoot()
+	var err error
+	root, err = dagger.FindBPRoot()
 	Expect(err).ToNot(HaveOccurred())
 
 	nodeBuildpack, err = dagger.PackageBuildpack(root)
