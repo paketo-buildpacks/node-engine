@@ -1,7 +1,7 @@
 api = "0.2"
 
 [buildpack]
-  id = "org.cloudfoundry.node-engine"
+  id = "paketo-buildpacks/node-engine"
   name = "Node Engine Buildpack"
   version = "{{ .Version }}"
 

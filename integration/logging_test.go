@@ -70,7 +70,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -100,7 +100,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 api = "0.2"
 
 [buildpack]
-  id = "org.cloudfoundry.node-engine"
+  id = "paketo-buildpacks_node-engine"
   name = "Node Engine Buildpack"
   version = "{{ .Version }}"
 

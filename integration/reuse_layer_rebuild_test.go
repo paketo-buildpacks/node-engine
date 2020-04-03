@@ -72,7 +72,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(1))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			buildpackVersion, err := GetGitVersion()
@@ -92,7 +92,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -117,7 +117,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(1))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
@@ -128,7 +128,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
-				"  Reusing cached layer /layers/org.cloudfoundry.node-engine/node",
+				"  Reusing cached layer /layers/paketo-buildpacks_node-engine/node",
 			}), logs.String())
 
 			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
@@ -171,7 +171,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(1))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			buildpackVersion, err := GetGitVersion()
@@ -191,7 +191,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -216,7 +216,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(1))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal("org.cloudfoundry.node-engine"))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
@@ -233,7 +233,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/org.cloudfoundry.node-engine/node"`,
+				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
