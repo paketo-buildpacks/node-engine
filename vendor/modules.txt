@@ -19,7 +19,7 @@ github.com/cloudfoundry/libcfbuildpack/helper
 # github.com/cloudfoundry/occam v0.0.0-20200323143411-1484bd3b2566
 github.com/cloudfoundry/occam
 github.com/cloudfoundry/occam/matchers
-# github.com/cloudfoundry/packit v0.0.2
+# github.com/cloudfoundry/packit v0.0.3
 github.com/cloudfoundry/packit
 github.com/cloudfoundry/packit/cargo
 github.com/cloudfoundry/packit/internal
@@ -61,6 +61,11 @@ github.com/pkg/errors
 # github.com/sclevine/spec v1.4.0
 github.com/sclevine/spec
 github.com/sclevine/spec/report
+# github.com/ulikunitz/xz v0.5.7
+github.com/ulikunitz/xz
+github.com/ulikunitz/xz/internal/hash
+github.com/ulikunitz/xz/internal/xlog
+github.com/ulikunitz/xz/lzma
 # github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 github.com/xi2/xz
 # golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
