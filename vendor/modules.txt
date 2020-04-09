@@ -16,7 +16,7 @@ github.com/cloudfoundry/dagger
 github.com/cloudfoundry/dagger/utils
 # github.com/cloudfoundry/libcfbuildpack v1.91.23
 github.com/cloudfoundry/libcfbuildpack/helper
-# github.com/cloudfoundry/occam v0.0.0-20200323143411-1484bd3b2566
+# github.com/cloudfoundry/occam v0.0.1
 github.com/cloudfoundry/occam
 github.com/cloudfoundry/occam/matchers
 # github.com/cloudfoundry/packit v0.0.3
