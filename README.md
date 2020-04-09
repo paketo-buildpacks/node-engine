@@ -3,8 +3,8 @@
 ## Integration
 
 The Node Engine CNB provides node as a dependency. Downstream buildpacks, like
-[Yarn](https://github.com/cloudfoundry/yarn-cnb) or
-[NPM](https://github.com/cloudfoundry/npm-cnb), can require the node dependency
+[Yarn](https://github.com/paketo-buildpacks/yarn-install-cnb) or
+[NPM](https://github.com/paketo-buildpacks/npm-cnb), can require the node dependency
 by generating a [Build Plan
 TOML](https://github.com/buildpacks/spec/blob/master/buildpack.md#build-plan-toml)
 file that looks like the following:
@@ -33,12 +33,6 @@ file that looks like the following:
     # their build phase. If you are writing a buildpack that needs to run Node
     # during its build process, this flag should be set to true.
     build = true
-
-    # Setting the cache flag to true will enable caching of the Node Engine
-    # dependency between builds. The benefits of caching include improved build
-    # speeds at the cost of a higher storage requirement to store the cached
-    # layer contents.
-    cache = true
 ```
 
 ## Usage
