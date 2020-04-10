@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/node-engine/node"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/cloudfoundry/node-engine-cnb
+module github.com/paketo-buildpacks/node-engine
 
 require (
 	cloud.google.com/go v0.55.0 // indirect

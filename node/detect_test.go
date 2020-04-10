@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
-	"github.com/cloudfoundry/node-engine-cnb/node/fakes"
 	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/node-engine/node"
+	"github.com/paketo-buildpacks/node-engine/node/fakes"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"

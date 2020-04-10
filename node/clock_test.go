@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
+	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
