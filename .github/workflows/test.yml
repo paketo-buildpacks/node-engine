@@ -1,4 +1,4 @@
-name: Go
+name: Run Tests
 
 on:
   pull_request:
@@ -19,6 +19,26 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: test
+    - name: Unit Test
       run: ./scripts/unit.sh
 
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+    - name: Integration Test
+      run: ./scripts/integration.sh
+      env:
+        GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
