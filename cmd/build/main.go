@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudfoundry/node-engine-cnb/node"
 	"github.com/cloudfoundry/packit"
 	"github.com/cloudfoundry/packit/cargo"
 	"github.com/cloudfoundry/packit/postal"
+	"github.com/paketo-buildpacks/node-engine/node"
 )
 
 func main() {
