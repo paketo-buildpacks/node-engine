@@ -53,3 +53,14 @@ $ ./scripts/package.sh
 This builds the buildpack's Go source using `GOOS=linux` by default. You can
 supply another value as the first argument to `package.sh`.
 
+## `buildpack.yml` Configurations
+
+In order to specify a particular version of node you can 
+provide an optional `buildpack.yml` in the root of the application directory.
+
+```yaml
+nodejs:
+  # this allows you to specify a version constraint for the node depdendency
+  # any valid semver constaints (e.g. 10.*) are also acceptable
+  version: ~10
+```
