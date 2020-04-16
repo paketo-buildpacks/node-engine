@@ -63,4 +63,8 @@ nodejs:
   # this allows you to specify a version constraint for the node depdendency
   # any valid semver constaints (e.g. 10.*) are also acceptable
   version: ~10
+
+  # allow node to optimize memory usage based on your system constraints
+  # bool
+  optimize-memory: true
 ```
