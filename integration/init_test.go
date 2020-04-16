@@ -80,9 +80,19 @@ func GetBuildLogs(raw string) []string {
 
 func GetGitVersion() (string, error) {
 	gitExec := pexec.NewExecutable("git")
-	stdout := bytes.NewBuffer(nil)
+	revListOut := bytes.NewBuffer(nil)
+
 	err := gitExec.Execute(pexec.Execution{
-		Args:   []string{"describe", "--abbrev=0", "--tags"},
+		Args:   []string{"rev-list", "--tags", "--max-count=1"},
+		Stdout: revListOut,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	stdout := bytes.NewBuffer(nil)
+	err = gitExec.Execute(pexec.Execution{
+		Args:   []string{"describe", "--tags", strings.TrimSpace(revListOut.String())},
 		Stdout: stdout,
 	})
 	if err != nil {
