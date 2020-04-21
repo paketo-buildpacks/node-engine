@@ -50,12 +50,14 @@ github.com/cloudfoundry/dagger v0.0.0-20200213200846-c2a9723f08c4/go.mod h1:u5NQ
 github.com/cloudfoundry/libcfbuildpack v1.89.0/go.mod h1:ufhp/bp0LxbDDwbf2Ms3Bf4x9YnLr9dkL1RTUYSdKg0=
 github.com/cloudfoundry/libcfbuildpack v1.91.23 h1:RCorc4zL0D4+mG2z/qOueFyYGz1j3rM+e3Vbb37KPLg=
 github.com/cloudfoundry/libcfbuildpack v1.91.23/go.mod h1:h95FwHvbelcd0cSOhLC8SGEZXLwCMYh1dZo2kCr7lsA=
-github.com/cloudfoundry/occam v0.0.1 h1:wF3xCm8HZDbuggxZE3+ndDQx4f3DS3F49qi9eZ4kXCI=
-github.com/cloudfoundry/occam v0.0.1/go.mod h1:stUR8Lj7wzXGPU7zjYqGdfk/Rtlgq44hD3Vf6lCswms=
+github.com/cloudfoundry/occam v0.0.2 h1:YMgij19bFO1zsCz7ttuIMC78J6JRp1hwZs+K2rE8JWM=
+github.com/cloudfoundry/occam v0.0.2/go.mod h1:1zcSwIX+VVUMGuKBNL+XASI5G5eqnDa8cTs6M+eonyU=
 github.com/cloudfoundry/packit v0.0.0-20200213185904-9d0fc689e7af h1:G6pQ5RECHT19D/xLRb25E/mYeTgTvD83PCRnrGlUaNE=
 github.com/cloudfoundry/packit v0.0.0-20200213185904-9d0fc689e7af/go.mod h1:L9r26GHPYpUReBWTpkU5BgyDuNVU01JSG4QsHybI0Bg=
 github.com/cloudfoundry/packit v0.0.3 h1:ABdSvNQ8g63bjiy3rFeoEkI/VYWftYySDYF6R1kmrsk=
 github.com/cloudfoundry/packit v0.0.3/go.mod h1:9xu1MT6SrenSB4oFOXtruMapQ+vdfGXLzBZDnPjhYrM=
+github.com/cloudfoundry/packit v0.0.4 h1:MbdOjqZNtuCvURVxEkpyz36Jrdg6JRvE0O3auK+uX64=
+github.com/cloudfoundry/packit v0.0.4/go.mod h1:9xu1MT6SrenSB4oFOXtruMapQ+vdfGXLzBZDnPjhYrM=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

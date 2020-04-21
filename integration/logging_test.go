@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/packit/cargo"
 	"github.com/sclevine/spec"
 
+	. "github.com/cloudfoundry/occam/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -56,7 +57,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 			buildpackVersion, err := GetGitVersion()
 			Expect(err).ToNot(HaveOccurred())
 
-			sequence := []interface{}{
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -76,10 +77,9 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}
-
-			Expect(GetBuildLogs(logs.String())).To(ContainSequence(sequence), logs.String())
+			))
 		})
+
 		context("when the node version specfied in the app is EOL'd", func() {
 			var (
 				logs                       fmt.Stringer
@@ -135,6 +135,7 @@ api = "0.2"
 			it.After(func() {
 				os.RemoveAll(tmpBuildpackDir)
 			})
+
 			it("logs thats the dependency is deprecated", func() {
 				var err error
 				image, logs, err = pack.WithNoColor().Build.

@@ -65,10 +65,10 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(content).To(ContainSubstring("NodeOptions: --max_old_space_size=96"))
 
-		Expect(GetBuildLogs(logs.String())).To(ContainSequence([]string{
+		Expect(logs).To(ContainLines(
 			"    Writing profile.d/1_optimize_memory.sh",
 			"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
 			"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
-		}), logs.String())
+		))
 	})
 }
