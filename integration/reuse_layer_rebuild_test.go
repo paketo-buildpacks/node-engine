@@ -78,7 +78,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			buildpackVersion, err := GetGitVersion()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -98,7 +98,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}), logs.String())
+			))
 
 			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
 			Expect(err).NotTo(HaveOccurred())
@@ -120,7 +120,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
-			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -129,7 +129,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
 				"  Reusing cached layer /layers/paketo-buildpacks_node-engine/node",
-			}), logs.String())
+			))
 
 			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())
@@ -177,7 +177,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			buildpackVersion, err := GetGitVersion()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -197,7 +197,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}), logs.String())
+			))
 
 			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
 			Expect(err).NotTo(HaveOccurred())
@@ -219,7 +219,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
-			Expect(GetBuildLogs(logs.String())).To(ContainSequence([]interface{}{
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
@@ -239,7 +239,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"    Writing profile.d/0_memory_available.sh",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			}), logs.String())
+			))
 
 			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())

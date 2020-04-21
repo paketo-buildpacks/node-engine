@@ -16,74 +16,59 @@ func ContainLines(expected ...interface{}) types.GomegaMatcher {
 }
 
 type containLinesMatcher struct {
-	expected interface{}
-
-	expectedLine interface{}
+	expected []interface{}
 }
 
 func (matcher *containLinesMatcher) Match(actual interface{}) (success bool, err error) {
-	raw, ok := actual.(string)
+	_, ok := actual.(string)
 	if !ok {
-		stringer, ok := actual.(fmt.Stringer)
+		_, ok := actual.(fmt.Stringer)
 		if !ok {
-			return false, fmt.Errorf("actual is not a string or fmt.Stringer: %#v", actual)
-		}
-		raw = stringer.String()
-	}
-
-	var lines []string
-	for _, line := range strings.Split(raw, "\n") {
-		if strings.HasPrefix(line, "[builder]") {
-			lines = append(lines, strings.TrimPrefix(line, "[builder] "))
+			return false, fmt.Errorf("ContainLinesMatcher requires a string or fmt.Stringer. Got actual: %s", format.Object(actual, 1))
 		}
 	}
 
-	expectedLength := reflect.ValueOf(matcher.expected).Len()
-	actualLength := len(lines)
-	for i := 0; i < (actualLength - expectedLength + 1); i++ {
-		eSlice := reflect.ValueOf(matcher.expected).Slice(0, expectedLength)
+	actualLines := matcher.lines(actual)
 
-		match := true
-		for j := 0; j < eSlice.Len(); j++ {
-			aValue := lines[j]
-			matcher.expectedLine = eSlice.Index(j).Interface()
+	if len(actualLines) == 0 {
+		return false, fmt.Errorf("ContainLinesMatcher requires lines with [builder] prefix, found none: %s", format.Object(actual, 1))
+	}
 
-			if eMatcher, ok := matcher.expectedLine.(types.GomegaMatcher); ok {
-				m, err := eMatcher.Match(aValue)
-				if err != nil {
-					return false, err
-				}
+	for currentActualLineIndex := 0; currentActualLineIndex < len(actualLines); currentActualLineIndex++ {
+		currentActualLine := actualLines[currentActualLineIndex]
+		currentExpectedLine := matcher.expected[currentActualLineIndex]
 
-				if !m {
-					match = false
-				}
-			} else if !reflect.DeepEqual(aValue, matcher.expectedLine) {
-				match = false
-			}
+		match, err := matcher.compare(currentActualLine, currentExpectedLine)
+		if err != nil {
+			return false, err
 		}
 
 		if match {
-			return true, nil
+			if currentActualLineIndex+1 == len(matcher.expected) {
+				return true, nil
+			}
+		} else {
+			if len(actualLines) > 1 {
+				actualLines = actualLines[1:]
+				currentActualLineIndex = -1
+			}
 		}
 	}
 
 	return false, nil
 }
 
-func (matcher *containLinesMatcher) FailureMessage(actual interface{}) (message string) {
-	if matcher.expectedLine != nil {
-		return format.Message(matcher.lines(actual), "to contain line", matcher.expectedLine)
+func (matcher *containLinesMatcher) compare(actual string, expected interface{}) (bool, error) {
+	if m, ok := expected.(types.GomegaMatcher); ok {
+		match, err := m.Match(actual)
+		if err != nil {
+			return false, err
+		}
+
+		return match, nil
 	}
 
-	return format.Message(matcher.lines(actual), "to contain lines", matcher.expected)
-}
-
-func (matcher *containLinesMatcher) NegatedFailureMessage(actual interface{}) (message string) {
-	if matcher.expectedLine != nil {
-		return format.Message(matcher.lines(actual), "not to contain line", matcher.expectedLine)
-	}
-
-	return format.Message(matcher.lines(actual), "not to contain lines", matcher.expected)
+	return reflect.DeepEqual(actual, expected), nil
 }
 
 func (matcher *containLinesMatcher) lines(actual interface{}) []string {
@@ -100,4 +85,39 @@ func (matcher *containLinesMatcher) lines(actual interface{}) []string {
 	}
 
 	return lines
+}
+
+func (matcher *containLinesMatcher) FailureMessage(actual interface{}) (message string) {
+	actualLines := "\n" + strings.Join(matcher.lines(actual), "\n")
+	missing := matcher.linesMatching(actual, false)
+	if len(missing) > 0 {
+		return fmt.Sprintf("Expected\n%s\nto contain lines\n%s\nbut missing\n%s", format.Object(actualLines, 1), format.Object(matcher.expected, 1), format.Object(missing, 1))
+	}
+
+	return fmt.Sprintf("Expected\n%s\nto contain lines\n%s\nall lines appear, but may be misordered", format.Object(actualLines, 1), format.Object(matcher.expected, 1))
+}
+
+func (matcher *containLinesMatcher) NegatedFailureMessage(actual interface{}) (message string) {
+	actualLines := "\n" + strings.Join(matcher.lines(actual), "\n")
+	missing := matcher.linesMatching(actual, true)
+
+	return fmt.Sprintf("Expected\n%s\nnot to contain lines\n%s\nbut includes\n%s", format.Object(actualLines, 1), format.Object(matcher.expected, 1), format.Object(missing, 1))
+}
+
+func (matcher *containLinesMatcher) linesMatching(actual interface{}, matching bool) []interface{} {
+	var set []interface{}
+	for _, expected := range matcher.expected {
+		var match bool
+		for _, line := range matcher.lines(actual) {
+			if ok, _ := matcher.compare(line, expected); ok {
+				match = true
+			}
+		}
+
+		if match == matching {
+			set = append(set, expected)
+		}
+	}
+
+	return set
 }
