@@ -205,6 +205,12 @@ api = "0.2"
     name = "node"
     version_line = "13.x.x"
 
+  [[metadata.dependency_deprecation_dates]]
+    date = 2023-04-30T00:00:00Z
+    link = "https://github.com/nodejs/Release"
+    name = "node"
+    version_line = "14.x.x"
+
 [[stacks]]
   id = "org.cloudfoundry.stacks.cflinuxfs3"
 
