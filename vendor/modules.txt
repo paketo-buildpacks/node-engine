@@ -19,7 +19,7 @@ github.com/cloudfoundry/libcfbuildpack/helper
 # github.com/cloudfoundry/occam v0.0.2
 github.com/cloudfoundry/occam
 github.com/cloudfoundry/occam/matchers
-# github.com/cloudfoundry/packit v0.0.5
+# github.com/cloudfoundry/packit v0.0.6
 github.com/cloudfoundry/packit
 github.com/cloudfoundry/packit/cargo
 github.com/cloudfoundry/packit/internal
