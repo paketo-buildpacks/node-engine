@@ -14,7 +14,6 @@ function main() {
 
         GOOS="linux" \
             go build \
-                -mod=vendor \
                 -ldflags="-s -w" \
                 -o "${BUILDPACKDIR}/bin/${name}" \
                     "${src}/main.go"
