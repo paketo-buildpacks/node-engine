@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/dagger"
-	"github.com/cloudfoundry/occam"
 	"github.com/cloudfoundry/packit/pexec"
+	"github.com/paketo-buildpacks/occam"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 

@@ -221,18 +221,17 @@ type DockerContainerLogs struct {
 }
 
 func (i DockerContainerLogs) Execute(containerID string) (fmt.Stringer, error) {
-	stdout := bytes.NewBuffer(nil)
-	stderr := bytes.NewBuffer(nil)
+	output := bytes.NewBuffer(nil)
 	err := i.executable.Execute(pexec.Execution{
 		Args:   []string{"container", "logs", containerID},
-		Stdout: stdout,
-		Stderr: stderr,
+		Stdout: output,
+		Stderr: output,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch docker container logs: %w: %s", err, strings.TrimSpace(stderr.String()))
+		return nil, fmt.Errorf("failed to fetch docker container logs: %w: %s", err, strings.TrimSpace(output.String()))
 	}
 
-	return stdout, nil
+	return output, nil
 }
 
 type DockerVolumeRemove struct {
