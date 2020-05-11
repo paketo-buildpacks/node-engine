@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cloudfoundry/occam"
 	"github.com/onsi/gomega/types"
+	"github.com/paketo-buildpacks/occam"
 )
 
 func BeAvailable() types.GomegaMatcher {
