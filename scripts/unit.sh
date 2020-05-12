@@ -12,7 +12,7 @@ function main() {
     util::print::title "Run Buildpack Unit Tests"
 
     pushd "${BUILDPACKDIR}" > /dev/null
-        if go test -mod=vendor ./... -v -run Unit; then
+        if go test ./... -v -run Unit; then
             util::print::success "** GO Test Succeeded **"
         else
             util::print::error "** GO Test Failed **"
