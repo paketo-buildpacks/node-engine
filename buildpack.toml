@@ -4,6 +4,7 @@ api = "0.2"
   id = "paketo-buildpacks/node-engine"
   name = "Node Engine Buildpack"
   version = "{{ .Version }}"
+  homepage = "https://github.com/paketo-buildpacks/node-engine"
 
 [metadata]
   include_files = ["bin/build", "bin/detect", "buildpack.toml"]
