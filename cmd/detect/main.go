@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/node-engine/node"
 )
 
