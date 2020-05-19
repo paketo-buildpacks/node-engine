@@ -14,7 +14,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.10.0
-	github.com/paketo-buildpacks/occam v0.0.4
+	github.com/paketo-buildpacks/occam v0.0.8
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sclevine/spec v1.4.0
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
