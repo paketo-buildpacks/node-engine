@@ -123,7 +123,7 @@ function util::tools::jam::install () {
 
     if [[ ! -f "${dir}/jam" ]]; then
         util::print::title "Installing jam"
-        GOBIN="${dir}" go install github.com/cloudfoundry/packit/cargo/jam
+        GOBIN="${dir}" go install github.com/paketo-buildpacks/packit/cargo/jam
     fi
 }
 

@@ -3,7 +3,7 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/packit"
 )
 
 type EntryResolver struct {

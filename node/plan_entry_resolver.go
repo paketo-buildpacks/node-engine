@@ -3,7 +3,7 @@ package node
 import (
 	"sort"
 
-	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/packit"
 )
 
 type PlanEntryResolver struct {
