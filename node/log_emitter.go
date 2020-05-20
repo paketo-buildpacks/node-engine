@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cloudfoundry/packit"
-	"github.com/cloudfoundry/packit/postal"
-	"github.com/cloudfoundry/packit/scribe"
+	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/postal"
+	"github.com/paketo-buildpacks/packit/scribe"
 )
 
 type LogEmitter struct {

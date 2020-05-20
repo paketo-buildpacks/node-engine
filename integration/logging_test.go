@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/cloudfoundry/dagger"
-	"github.com/cloudfoundry/packit/cargo"
+	"github.com/paketo-buildpacks/packit/cargo"
 	"github.com/paketo-buildpacks/occam"
 	"github.com/sclevine/spec"
 

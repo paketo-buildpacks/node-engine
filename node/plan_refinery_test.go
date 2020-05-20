@@ -3,7 +3,7 @@ package node_test
 import (
 	"testing"
 
-	"github.com/cloudfoundry/packit/postal"
+	"github.com/paketo-buildpacks/packit/postal"
 	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 

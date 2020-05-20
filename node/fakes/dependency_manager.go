@@ -3,7 +3,7 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/packit/postal"
+	"github.com/paketo-buildpacks/packit/postal"
 )
 
 type DependencyManager struct {

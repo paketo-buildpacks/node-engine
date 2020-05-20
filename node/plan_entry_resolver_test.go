@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/cloudfoundry/packit"
+	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
