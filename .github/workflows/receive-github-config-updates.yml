@@ -24,12 +24,12 @@ jobs:
         path: current-repo
 
     - name: Run the sync action
-      uses: paketo-buildpacks/config-repo/actions/sync@master
+      uses: paketo-buildpacks/github-config/actions/sync@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         config-repo: config-repo
         current-repo: current-repo
         config-path: "/implementation"
-        ssh-private-key: ${{ secrets.DEPLOY_KEY_PRIVATE }}
+        ssh-private-key: ${{ secrets.PAKETO_BOT_SSH_KEY }}
       id: do-sync
