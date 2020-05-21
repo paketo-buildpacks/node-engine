@@ -43,22 +43,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - name: Tag
       id: tag
-      run: |
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-        TAG="$(./.github/util/tag.sh)"
-        echo "::set-output name=tag::$TAG"
+      uses: paketo-buildpacks/github-config/actions/tag@master
     - name: Package
-      env:
-        TAG: ${{ steps.tag.outputs.tag }}
-      run: PACKAGE_DIR=artifact ./scripts/package.sh --version "${TAG}" --archive
+      run: PACKAGE_DIR=artifact ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}" --archive
     - name: Create Release Notes
       id: create-release-notes
       run: |
         mkdir -p "${HOME}/bin"
         export PATH="${PATH}:${HOME}/bin"
-        curl "https://github.com/paketo-buildpacks/packit/releases/download/v0.0.4/jam-linux" \
+        curl "https://github.com/cloudfoundry/packit/releases/download/v0.0.4/jam-linux" \
           --silent \
           --location \
           --output "${HOME}/bin/jam"
@@ -76,8 +72,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.tag.outputs.tag }}
-        release_name: ${{ steps.tag.outputs.tag }}
+        tag_name: v${{ steps.tag.outputs.tag }}
+        release_name: v${{ steps.tag.outputs.tag }}
         body: ${{ steps.create-release-notes.outputs.release_body }}
         draft: false
         prerelease: false
