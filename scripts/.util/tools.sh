@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -eu
 set -o pipefail
 
@@ -18,118 +19,102 @@ function util::tools::path::export() {
     fi
 }
 
-function util::tools::pack::install() {
-    local dir version os
-
-    util::print::title "Installing pack"
-
-    while [[ "${#}" != 0 ]]; do
-      case "${1}" in
-        --directory)
-          dir="${2}"
-          shift 2
-          ;;
-
-        --version)
-          version="${2}"
-          shift 2
-          ;;
-
-        *)
-          util::print::error "unknown argument \"${1}\""
-      esac
-    done
-
-    mkdir -p "${dir}"
-    util::tools::path::export "${dir}"
-
-    os="$(uname -s)"
-
-    if [[ "${os}" == "Darwin" ]]; then
-        os="macos"
-    elif [[ "${os}" == "Linux" ]]; then
-        os="linux"
-    else
-        util::print::error "Unsupported operating system"
-    fi
-
-    if [[ ! -f "${dir}/pack" ]]; then
-        util::print::info "--> installing..."
-    elif [[ "$("${dir}/pack" version | cut -d ' ' -f 1)" != *${version}* ]]; then
-        rm "${dir}/pack"
-        util::print::info "--> updating..."
-    else
-        util::print::info "--> skipping..."
-        return 0
-    fi
-
-    GIT_TOKEN="$(util::git::token::fetch)"
-
-    if [[ "${version}" == "latest" ]]; then
-        local url
-        if [[ "${os}" == "macos" ]]; then
-            url="$(
-                curl -s \
-                    -H "Authorization: token ${GIT_TOKEN}" \
-                    https://api.github.com/repos/buildpacks/pack/releases/latest \
-                    | jq --raw-output '.assets[1] | .browser_download_url'
-                )"
-        else
-            url="$(
-                curl -s \
-                    -H "Authorization: token ${GIT_TOKEN}" \
-                    https://api.github.com/repos/buildpacks/pack/releases/latest \
-                    | jq --raw-output '.assets[0] | .browser_download_url'
-                )"
-        fi
-        util::tools::pack::expand "${dir}" "${url}"
-    else
-        local tarball
-        tarball="pack-${version}-${os}.tar.gz"
-        url="https://github.com/buildpacks/pack/releases/download/v${version}/${tarball}"
-        util::tools::pack::expand "${dir}" "${url}"
-    fi
-}
-
-function util::tools::pack::expand() {
-    local dir url version
-    dir="${1}"
-    url="${2}"
-    tarball="$(echo "${url}" | sed "s/.*\///")"
-    version="v$(echo "${url}" | sed 's/pack-//' | sed 's/-.*//')"
-
-    curl --location --silent --output "${tarball}" "${url}"
-    tar xzf "${tarball}" -C "${dir}"
-    rm "${tarball}"
-}
-
 function util::tools::jam::install () {
-    local dir
+  echo "-> Installing v0.0.10 jam..."
 
-    while [[ "${#}" != 0 ]]; do
-      case "${1}" in
-        --directory)
-          dir="${2}"
-          shift 2
-          ;;
+  local dir
+  while [[ "${#}" != 0 ]]; do
+    case "${1}" in
+      --directory)
+        dir="${2}"
+        shift 2
+        ;;
 
-        *)
-          util::print::error "unknown argument \"${1}\""
-      esac
-    done
+      *)
+        util::print::error "unknown argument \"${1}\""
+    esac
+  done
 
-    mkdir -p "${dir}"
-    util::tools::path::export "${dir}"
+  local os
+  case "$(uname)" in
+    "Darwin")
+      os="darwin"
+      ;;
 
-    if [[ ! -f "${dir}/jam" ]]; then
-        util::print::title "Installing jam"
-        GOBIN="${dir}" go install github.com/paketo-buildpacks/packit/cargo/jam
-    fi
+    "Linux")
+      os="linux"
+      ;;
+
+    *)
+      echo "Unknown OS \"$(uname)\""
+      exit 1
+  esac
+
+  mkdir -p "${dir}"
+  util::tools::path::export "${dir}"
+
+  if [[ ! -f "${dir}/jam" ]]; then
+    local version
+    version="v0.0.10"
+
+    util::print::title "Installing jam ${version}"
+    curl "https://github.com/paketo-buildpacks/packit/releases/download/${version}/jam-${os}" \
+      --silent \
+      --location \
+      --output "${dir}/jam"
+    chmod +x "${dir}/jam"
+  fi
+}
+
+function util::tools::pack::install() {
+  local dir
+  while [[ "${#}" != 0 ]]; do
+    case "${1}" in
+      --directory)
+        dir="${2}"
+        shift 2
+        ;;
+
+      *)
+        util::print::error "unknown argument \"${1}\""
+    esac
+  done
+
+  mkdir -p "${dir}"
+  util::tools::path::export "${dir}"
+
+  local os
+  case "$(uname)" in
+    "Darwin")
+      os="macos"
+      ;;
+
+    "Linux")
+      os="linux"
+      ;;
+
+    *)
+      echo "Unknown OS \"$(uname)\""
+      exit 1
+  esac
+
+  if [[ ! -f "${dir}/pack" ]]; then
+    local version
+    version="v0.10.0"
+
+    util::print::title "Installing pack ${version}"
+    curl "https://github.com/buildpacks/pack/releases/download/${version}/pack-v0.10.0-${os}.tgz" \
+      --silent \
+      --location \
+      --output /tmp/pack.tgz
+    tar xzf /tmp/pack.tgz -C "${dir}"
+    chmod +x "${dir}/pack"
+    rm /tmp/pack.tgz
+  fi
 }
 
 function util::tools::packager::install () {
     local dir
-
     while [[ "${#}" != 0 ]]; do
       case "${1}" in
         --directory)
