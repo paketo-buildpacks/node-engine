@@ -34,7 +34,7 @@ jobs:
     - name: Run Integration Tests
       run: ./scripts/integration.sh
       env:
-        GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_TOKEN: ${{ github.token }}
 
   release:
     name: Release
@@ -43,22 +43,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - name: Tag
       id: tag
-      run: |
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-        TAG="$(./.github/util/tag.sh)"
-        echo "::set-output name=tag::$TAG"
+      uses: paketo-buildpacks/github-config/actions/tag@master
     - name: Package
-      env:
-        TAG: ${{ steps.tag.outputs.tag }}
-      run: PACKAGE_DIR=artifact ./scripts/package.sh --version "${TAG}" --archive
+      run: PACKAGE_DIR=artifact ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}" --archive
     - name: Create Release Notes
       id: create-release-notes
       run: |
         mkdir -p "${HOME}/bin"
         export PATH="${PATH}:${HOME}/bin"
-        curl "https://github.com/paketo-buildpacks/packit/releases/download/v0.0.4/jam-linux" \
+        curl "https://github.com/paketo-buildpacks/packit/releases/download/v0.0.10/jam-linux" \
           --silent \
           --location \
           --output "${HOME}/bin/jam"
@@ -71,24 +67,20 @@ jobs:
         RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
         echo "::set-output name=release_body::$RELEASE_BODY"
     - name: Create Release
-      id: create-release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: paketo-buildpacks/github-config/actions/release/create@master
       with:
-        tag_name: ${{ steps.tag.outputs.tag }}
-        release_name: ${{ steps.tag.outputs.tag }}
+        repo: ${{ github.repository }}
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        tag_name: v${{ steps.tag.outputs.tag }}
+        target_commitish: ${{ github.sha }}
+        name: v${{ steps.tag.outputs.tag }}
         body: ${{ steps.create-release-notes.outputs.release_body }}
         draft: false
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: artifact.tgz
-        asset_name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz
-        asset_content_type: application/gzip
-
+        assets: |
+          [
+            {
+              "path": "artifact.tgz",
+              "name": "${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz",
+              "content_type": "application/gzip"
+            }
+          ]
