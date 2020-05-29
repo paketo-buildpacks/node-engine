@@ -30,7 +30,7 @@ jobs:
         go-version: 1.14
     - name: Checkout
       uses: actions/checkout@v2
-    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
     - name: Run Integration Tests
       run: ./scripts/integration.sh
       env:
@@ -43,7 +43,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
     - name: Tag
       id: tag
       uses: paketo-buildpacks/github-config/actions/tag@master
