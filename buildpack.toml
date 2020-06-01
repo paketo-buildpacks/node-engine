@@ -202,7 +202,7 @@ api = "0.2"
     version_line = "14.x.x"
 
 [[stacks]]
-  id = "org.cloudfoundry.stacks.cflinuxfs3"
+  id = "io.buildpacks.stacks.bionic"
 
 [[stacks]]
-  id = "io.buildpacks.stacks.bionic"
+  id = "org.cloudfoundry.stacks.cflinuxfs3"
