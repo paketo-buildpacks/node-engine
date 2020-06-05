@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/chronos"
 	"github.com/paketo-buildpacks/packit/postal"
 )
 
@@ -30,7 +31,7 @@ type BuildPlanRefinery interface {
 	BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan
 }
 
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger LogEmitter, clock Clock) packit.BuildFunc {
+func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -88,12 +89,14 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)
-		then := clock.Now()
-		err = dependencies.Install(dependency, context.CNBPath, nodeLayer.Path)
+		duration, err := clock.Measure(func() error {
+			return dependencies.Install(dependency, context.CNBPath, nodeLayer.Path)
+		})
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
-		logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
+
+		logger.Action("Completed in %s", duration.Round(time.Millisecond))
 		logger.Break()
 
 		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
