@@ -8,6 +8,28 @@ readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
 function main() {
     mkdir -p "${BUILDPACKDIR}/bin"
 
+    if [[ -f "${BUILDPACKDIR}/run/main.go" ]]; then
+        pushd "${BUILDPACKDIR}/bin" > /dev/null || return
+            printf "%s" "Building run..."
+
+            GOOS=linux \
+              go build \
+                -ldflags="-s -w" \
+                -o "run" \
+                  "${BUILDPACKDIR}/run"
+
+            echo "Success!"
+
+            for name in detect build; do
+              printf "%s" "Linking ${name}..."
+
+              ln -sf "run" "${name}"
+
+              echo "Success!"
+            done
+        popd > /dev/null || return
+    fi
+
     if [[ -f "${BUILDPACKDIR}/main.go" ]]; then
         pushd "${BUILDPACKDIR}/bin" > /dev/null || return
             printf "%s" "Building run..."
