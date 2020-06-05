@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/postal"
 	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/paketo-buildpacks/node-engine/node/fakes"
+	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/chronos"
+	"github.com/paketo-buildpacks/packit/postal"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -26,7 +27,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		cnbDir            string
 		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
-		clock             node.Clock
+		clock             chronos.Clock
 		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
 		planRefinery      *fakes.BuildPlanRefinery
@@ -80,7 +81,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		planRefinery = &fakes.BuildPlanRefinery{}
 
 		timeStamp = time.Now()
-		clock = node.NewClock(func() time.Time {
+		clock = chronos.NewClock(func() time.Time {
 			return timeStamp
 		})
 
