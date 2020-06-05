@@ -105,7 +105,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			containerIDs[firstContainer.ID] = struct{}{}
 
-			Eventually(firstContainer).Should(BeAvailable())
+			Eventually(firstContainer).Should(BeAvailable(), ContainerLogs(firstContainer.ID))
 
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
@@ -136,7 +136,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			containerIDs[secondContainer.ID] = struct{}{}
 
-			Eventually(secondContainer).Should(BeAvailable())
+			Eventually(secondContainer).Should(BeAvailable(), ContainerLogs(secondContainer.ID))
 
 			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
 			Expect(err).NotTo(HaveOccurred())
@@ -204,7 +204,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			containerIDs[firstContainer.ID] = struct{}{}
 
-			Eventually(firstContainer).Should(BeAvailable())
+			Eventually(firstContainer).Should(BeAvailable(), ContainerLogs(firstContainer.ID))
 
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
@@ -246,7 +246,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			containerIDs[secondContainer.ID] = struct{}{}
 
-			Eventually(secondContainer).Should(BeAvailable())
+			Eventually(secondContainer).Should(BeAvailable(), ContainerLogs(secondContainer.ID))
 
 			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
 			Expect(err).NotTo(HaveOccurred())
