@@ -40,8 +40,8 @@ func TestIntegration(t *testing.T) {
 	offlineNodeBuildpack = fmt.Sprintf("%s.tgz", offlineNodeBuildpack)
 
 	defer func() {
-		dagger.DeleteBuildpack(nodeBuildpack)
-		dagger.DeleteBuildpack(offlineNodeBuildpack)
+		Expect(dagger.DeleteBuildpack(nodeBuildpack)).To(Succeed())
+		Expect(dagger.DeleteBuildpack(offlineNodeBuildpack)).To(Succeed())
 	}()
 
 	SetDefaultEventuallyTimeout(5 * time.Second)

@@ -41,13 +41,14 @@ func (p NvmrcParser) ParseVersion(path string) (string, error) {
 		return "", err
 	}
 
-	if nvmrcVersion == Node {
-		// TODO: logger.Info(".nvmrc specified latest node version, this will be selected from versions available in buildpack.toml")
-	}
-
-	if strings.HasPrefix(nvmrcVersion, "lts") {
-		// TODO: logger.Info(".nvmrc specified an lts version, this will be selected from versions available in buildpack.toml")
-	}
+	// TODO
+	// if nvmrcVersion == Node {
+	// 	logger.Info(".nvmrc specified latest node version, this will be selected from versions available in buildpack.toml")
+	// }
+  //
+	// if strings.HasPrefix(nvmrcVersion, "lts") {
+	// 	logger.Info(".nvmrc specified an lts version, this will be selected from versions available in buildpack.toml")
+	// }
 
 	return p.formatNvmrcContent(nvmrcVersion), nil
 }
