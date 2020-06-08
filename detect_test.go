@@ -1,12 +1,12 @@
-package node_test
+package nodeengine_test
 
 import (
 	"errors"
 	"testing"
 
+	nodeengine "github.com/paketo-buildpacks/node-engine"
+	"github.com/paketo-buildpacks/node-engine/fakes"
 	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/node-engine/node"
-	"github.com/paketo-buildpacks/node-engine/node/fakes"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		nvmrcParser = &fakes.VersionParser{}
 		buildpackYMLParser = &fakes.VersionParser{}
 
-		detect = node.Detect(nvmrcParser, buildpackYMLParser)
+		detect = nodeengine.Detect(nvmrcParser, buildpackYMLParser)
 	})
 
 	it("returns a plan that provides node", func() {
@@ -35,7 +35,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result.Plan).To(Equal(packit.BuildPlan{
 			Provides: []packit.BuildPlanProvision{
-				{Name: node.Node},
+				{Name: nodeengine.Node},
 			},
 		}))
 	})
@@ -52,13 +52,13 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Plan).To(Equal(packit.BuildPlan{
 				Provides: []packit.BuildPlanProvision{
-					{Name: node.Node},
+					{Name: nodeengine.Node},
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    node.Node,
+						Name:    nodeengine.Node,
 						Version: "1.2.3",
-						Metadata: node.BuildPlanMetadata{
+						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: ".nvmrc",
 						},
 					},
@@ -81,13 +81,13 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Plan).To(Equal(packit.BuildPlan{
 				Provides: []packit.BuildPlanProvision{
-					{Name: node.Node},
+					{Name: nodeengine.Node},
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    node.Node,
+						Name:    nodeengine.Node,
 						Version: "4.5.6",
-						Metadata: node.BuildPlanMetadata{
+						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: "buildpack.yml",
 						},
 					},
@@ -111,20 +111,20 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.Plan).To(Equal(packit.BuildPlan{
 				Provides: []packit.BuildPlanProvision{
-					{Name: node.Node},
+					{Name: nodeengine.Node},
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    node.Node,
+						Name:    nodeengine.Node,
 						Version: "1.2.3",
-						Metadata: node.BuildPlanMetadata{
+						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: ".nvmrc",
 						},
 					},
 					{
-						Name:    node.Node,
+						Name:    nodeengine.Node,
 						Version: "4.5.6",
-						Metadata: node.BuildPlanMetadata{
+						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: "buildpack.yml",
 						},
 					},

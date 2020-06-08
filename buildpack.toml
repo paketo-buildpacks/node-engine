@@ -7,7 +7,7 @@ api = "0.2"
   homepage = "https://github.com/paketo-buildpacks/node-engine"
 
 [metadata]
-  include_files = ["bin/build", "bin/detect", "buildpack.toml"]
+  include_files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
   pre_package = "./scripts/build.sh"
   [metadata.default-versions]
     node = "10.x"

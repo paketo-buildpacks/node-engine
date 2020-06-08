@@ -1,13 +1,13 @@
-package node_test
+package nodeengine_test
 
 import (
 	"bytes"
 	"testing"
 	"time"
 
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/postal"
-	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -18,12 +18,12 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 		Expect = NewWithT(t).Expect
 
 		buffer  *bytes.Buffer
-		emitter node.LogEmitter
+		emitter nodeengine.LogEmitter
 	)
 
 	it.Before(func() {
 		buffer = bytes.NewBuffer(nil)
-		emitter = node.NewLogEmitter(buffer)
+		emitter = nodeengine.NewLogEmitter(buffer)
 	})
 
 	context("SelectedDependency", func() {

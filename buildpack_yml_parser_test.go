@@ -1,11 +1,11 @@
-package node_test
+package nodeengine_test
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/paketo-buildpacks/node-engine/node"
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -16,7 +16,7 @@ func testBuildpackYMLParser(t *testing.T, context spec.G, it spec.S) {
 		Expect = NewWithT(t).Expect
 
 		path   string
-		parser node.BuildpackYMLParser
+		parser nodeengine.BuildpackYMLParser
 	)
 
 	it.Before(func() {
@@ -32,7 +32,7 @@ nodejs:
 
 		path = file.Name()
 
-		parser = node.NewBuildpackYMLParser()
+		parser = nodeengine.NewBuildpackYMLParser()
 	})
 
 	it.After(func() {

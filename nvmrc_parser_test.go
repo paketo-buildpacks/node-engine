@@ -1,4 +1,4 @@
-package node_test
+package nodeengine_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/paketo-buildpacks/node-engine/node"
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -17,7 +17,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 		Expect = NewWithT(t).Expect
 
 		path   string
-		parser node.NvmrcParser
+		parser nodeengine.NvmrcParser
 	)
 
 	it.Before(func() {
@@ -27,7 +27,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 
 		path = file.Name()
 
-		parser = node.NewNvmrcParser()
+		parser = nodeengine.NewNvmrcParser()
 	})
 
 	it.After(func() {

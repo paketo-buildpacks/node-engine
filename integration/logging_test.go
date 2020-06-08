@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/cloudfoundry/dagger"
-	"github.com/paketo-buildpacks/packit/cargo"
 	"github.com/paketo-buildpacks/occam"
+	"github.com/paketo-buildpacks/packit/cargo"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -105,7 +105,7 @@ api = "0.2"
   version = "{{ .Version }}"
 
 [metadata]
-  include_files = ["bin/build", "bin/detect", "buildpack.toml"]
+  include_files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
   pre_package = "./scripts/build.sh"
   [metadata.default-versions]
     node = "10.x"
