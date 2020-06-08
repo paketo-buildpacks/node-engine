@@ -1,4 +1,4 @@
-package node_test
+package nodeengine_test
 
 import (
 	"bytes"
@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/paketo-buildpacks/node-engine/node"
-	"github.com/paketo-buildpacks/node-engine/node/fakes"
+	nodeengine "github.com/paketo-buildpacks/node-engine"
+	"github.com/paketo-buildpacks/node-engine/fakes"
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/chronos"
 	"github.com/paketo-buildpacks/packit/postal"
@@ -98,9 +98,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		buffer = bytes.NewBuffer(nil)
-		logEmitter := node.NewLogEmitter(buffer)
+		logEmitter := nodeengine.NewLogEmitter(buffer)
 
-		build = node.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock)
+		build = nodeengine.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock)
 	})
 
 	it.After(func() {
@@ -153,8 +153,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					Launch:    true,
 					Cache:     false,
 					Metadata: map[string]interface{}{
-						node.DepKey: "",
-						"built_at":  timeStamp.Format(time.RFC3339Nano),
+						nodeengine.DepKey: "",
+						"built_at":        timeStamp.Format(time.RFC3339Nano),
 					},
 				},
 			},
@@ -317,8 +317,8 @@ nodejs:
 						Launch:    true,
 						Cache:     true,
 						Metadata: map[string]interface{}{
-							node.DepKey: "",
-							"built_at":  timeStamp.Format(time.RFC3339Nano),
+							nodeengine.DepKey: "",
+							"built_at":        timeStamp.Format(time.RFC3339Nano),
 						},
 					},
 				},
@@ -416,8 +416,8 @@ nodejs:
 						Launch:    true,
 						Cache:     false,
 						Metadata: map[string]interface{}{
-							node.DepKey: "",
-							"built_at":  timeStamp.Format(time.RFC3339Nano),
+							nodeengine.DepKey: "",
+							"built_at":        timeStamp.Format(time.RFC3339Nano),
 						},
 					},
 				},
@@ -560,7 +560,7 @@ nodejs:
 		context("when the layer directory cannot be removed", func() {
 			var layerDir string
 			it.Before(func() {
-				layerDir = filepath.Join(layersDir, node.Node)
+				layerDir = filepath.Join(layersDir, nodeengine.Node)
 				Expect(os.MkdirAll(filepath.Join(layerDir, "baller"), os.ModePerm)).To(Succeed())
 				Expect(os.Chmod(layerDir, 0000)).To(Succeed())
 			})

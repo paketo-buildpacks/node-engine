@@ -1,4 +1,4 @@
-package node_test
+package nodeengine_test
 
 import (
 	"bytes"
@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -36,7 +36,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 		path string
 
 		buffer      *bytes.Buffer
-		environment node.Environment
+		environment nodeengine.Environment
 	)
 
 	it.Before(func() {
@@ -46,7 +46,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 
 		env = packit.Environment{}
 		buffer = bytes.NewBuffer(nil)
-		environment = node.NewEnvironment(node.NewLogEmitter(buffer))
+		environment = nodeengine.NewEnvironment(nodeengine.NewLogEmitter(buffer))
 	})
 
 	it.After(func() {

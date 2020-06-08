@@ -1,10 +1,10 @@
-package node_test
+package nodeengine_test
 
 import (
 	"testing"
 
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/packit/postal"
-	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -14,11 +14,11 @@ func testPlanRefinery(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		planRefinery node.PlanRefinery
+		planRefinery nodeengine.PlanRefinery
 	)
 
 	it.Before(func() {
-		planRefinery = node.NewPlanRefinery()
+		planRefinery = nodeengine.NewPlanRefinery()
 	})
 
 	context("BillOfMaterial", func() {

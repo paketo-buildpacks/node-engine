@@ -1,11 +1,11 @@
-package node_test
+package nodeengine_test
 
 import (
 	"bytes"
 	"testing"
 
+	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/node-engine/node"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -16,12 +16,12 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		Expect = NewWithT(t).Expect
 
 		buffer   *bytes.Buffer
-		resolver node.PlanEntryResolver
+		resolver nodeengine.PlanEntryResolver
 	)
 
 	it.Before(func() {
 		buffer = bytes.NewBuffer(nil)
-		resolver = node.NewPlanEntryResolver(node.NewLogEmitter(buffer))
+		resolver = nodeengine.NewPlanEntryResolver(nodeengine.NewLogEmitter(buffer))
 	})
 
 	context("when a buildpack.yml entry is included", func() {

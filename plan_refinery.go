@@ -1,4 +1,4 @@
-package node
+package nodeengine
 
 import (
 	"github.com/paketo-buildpacks/packit"
