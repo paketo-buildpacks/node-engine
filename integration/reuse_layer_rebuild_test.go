@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
@@ -77,11 +78,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(1))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", version),
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -94,7 +95,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -119,18 +120,18 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(1))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", version),
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
-				"  Reusing cached layer /layers/paketo-buildpacks_node-engine/node",
+				fmt.Sprintf("  Reusing cached layer /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 			))
 
 			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
@@ -182,11 +183,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(1))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", version),
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -199,7 +200,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -227,11 +228,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(1))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", version),
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~12\"",
@@ -244,7 +245,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",

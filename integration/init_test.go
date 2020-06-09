@@ -2,11 +2,13 @@ package integration
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/paketo-buildpacks/occam"
 	"github.com/paketo-buildpacks/packit/pexec"
 	"github.com/sclevine/spec"
@@ -20,6 +22,13 @@ var (
 	offlineNodeBuildpack string
 	root                 string
 	version              string
+
+	config struct {
+		Buildpack struct {
+			ID   string
+			Name string
+		}
+	}
 )
 
 func TestIntegration(t *testing.T) {
@@ -28,6 +37,13 @@ func TestIntegration(t *testing.T) {
 	var err error
 	root, err = filepath.Abs("./..")
 	Expect(err).ToNot(HaveOccurred())
+
+	file, err := os.Open("../buildpack.toml")
+	Expect(err).NotTo(HaveOccurred())
+	defer file.Close()
+
+	_, err = toml.DecodeReader(file, &config)
+	Expect(err).NotTo(HaveOccurred())
 
 	buildpackStore := occam.NewBuildpackStore()
 
