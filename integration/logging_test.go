@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
@@ -60,7 +61,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", version),
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -73,7 +74,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring environment",
 				`    NODE_ENV     -> "production"`,
-				`    NODE_HOME    -> "/layers/paketo-buildpacks_node-engine/node"`,
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"    Writing profile.d/0_memory_available.sh",
@@ -98,13 +99,12 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 
 				Expect(duplicator.Duplicate(root, tmpBuildpackDir)).To(Succeed())
 
-				bpToml := []byte(`
+				bpToml := []byte(fmt.Sprintf(`
 api = "0.2"
 
 [buildpack]
-  id = "paketo-buildpacks_node-engine"
-  name = "Node Engine Buildpack"
-  version = "{{ .Version }}"
+  id = %q
+  name = %q
 
 [metadata]
   include_files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
@@ -125,7 +125,7 @@ api = "0.2"
 
 [[stacks]]
   id = "org.cloudfoundry.stacks.cflinuxfs3"
-`)
+`, config.Buildpack.ID, config.Buildpack.Name))
 
 				err = ioutil.WriteFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), bpToml, os.ModePerm)
 				Expect(err).NotTo(HaveOccurred())
