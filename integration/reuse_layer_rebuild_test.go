@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -25,6 +26,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 		imageIDs     map[string]struct{}
 		containerIDs map[string]struct{}
 		name         string
+		source       string
 	)
 
 	it.Before(func() {
@@ -36,7 +38,6 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 		pack = occam.NewPack()
 		imageIDs = map[string]struct{}{}
 		containerIDs = map[string]struct{}{}
-
 	})
 
 	it.After(func() {
@@ -49,6 +50,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
+		Expect(os.RemoveAll(source)).To(Succeed())
 	})
 
 	context("when an app is rebuilt and does not change", func() {
@@ -63,10 +65,13 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				secondContainer occam.Container
 			)
 
+			source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+			Expect(err).ToNot(HaveOccurred())
+
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
 				WithBuildpacks(nodeBuildpack).
-				Execute(name, filepath.Join("testdata", "simple_app"))
+				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
@@ -75,11 +80,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
-			buildpackVersion, err := GetGitVersion()
-			Expect(err).ToNot(HaveOccurred())
-
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
+				fmt.Sprintf("Node Engine Buildpack %s", version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -111,7 +113,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
 				WithBuildpacks(nodeBuildpack).
-				Execute(name, filepath.Join("testdata", "simple_app"))
+				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
@@ -121,7 +123,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
+				fmt.Sprintf("Node Engine Buildpack %s", version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -151,6 +153,12 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("when an app is rebuilt and there is a change", func() {
+		var modifiedSource string
+
+		it.After(func() {
+			Expect(os.RemoveAll(modifiedSource)).To(Succeed())
+		})
+
 		it("rebuilds the layer", func() {
 			var (
 				err         error
@@ -162,10 +170,13 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				secondContainer occam.Container
 			)
 
+			source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+			Expect(err).ToNot(HaveOccurred())
+
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
 				WithBuildpacks(nodeBuildpack).
-				Execute(name, filepath.Join("testdata", "simple_app"))
+				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
@@ -174,11 +185,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(firstImage.Buildpacks[0].Key).To(Equal("paketo-buildpacks/node-engine"))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
-			buildpackVersion, err := GetGitVersion()
-			Expect(err).ToNot(HaveOccurred())
-
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
+				fmt.Sprintf("Node Engine Buildpack %s", version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
@@ -206,11 +214,14 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			Eventually(firstContainer).Should(BeAvailable(), ContainerLogs(firstContainer.ID))
 
+			modifiedSource, err = occam.Source(filepath.Join("testdata", "different_version_simple_app"))
+			Expect(err).NotTo(HaveOccurred())
+
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
 				WithBuildpacks(nodeBuildpack).
-				Execute(name, filepath.Join("testdata", "different_version_simple_app"))
+				Execute(name, modifiedSource)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
@@ -220,7 +231,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("Node Engine Buildpack %s", buildpackVersion),
+				fmt.Sprintf("Node Engine Buildpack %s", version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~12\"",

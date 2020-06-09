@@ -2,14 +2,13 @@ package integration
 
 import (
 	"bytes"
-	"fmt"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/cloudfoundry/dagger"
-	"github.com/paketo-buildpacks/packit/pexec"
 	"github.com/paketo-buildpacks/occam"
+	"github.com/paketo-buildpacks/packit/pexec"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
@@ -20,29 +19,31 @@ var (
 	nodeBuildpack        string
 	offlineNodeBuildpack string
 	root                 string
+	version              string
 )
 
 func TestIntegration(t *testing.T) {
 	Expect := NewWithT(t).Expect
 
 	var err error
-	root, err = dagger.FindBPRoot()
+	root, err = filepath.Abs("./..")
 	Expect(err).ToNot(HaveOccurred())
 
-	nodeBuildpack, err = dagger.PackageBuildpack(root)
+	buildpackStore := occam.NewBuildpackStore()
+
+	version, err = GetGitVersion()
 	Expect(err).NotTo(HaveOccurred())
 
-	offlineNodeBuildpack, _, err = dagger.PackageCachedBuildpack(root)
+	nodeBuildpack, err = buildpackStore.Get.
+		WithVersion(version).
+		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
-	// HACK: we need to fix dagger and the package.sh scripts so that this isn't required
-	nodeBuildpack = fmt.Sprintf("%s.tgz", nodeBuildpack)
-	offlineNodeBuildpack = fmt.Sprintf("%s.tgz", offlineNodeBuildpack)
-
-	defer func() {
-		Expect(dagger.DeleteBuildpack(nodeBuildpack)).To(Succeed())
-		Expect(dagger.DeleteBuildpack(offlineNodeBuildpack)).To(Succeed())
-	}()
+	offlineNodeBuildpack, err = buildpackStore.Get.
+		WithOfflineDependencies().
+		WithVersion(version).
+		Execute(root)
+	Expect(err).NotTo(HaveOccurred())
 
 	SetDefaultEventuallyTimeout(5 * time.Second)
 

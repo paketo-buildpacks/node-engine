@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -25,6 +26,7 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		image     occam.Image
 		container occam.Container
 		name      string
+		source    string
 	)
 
 	it.Before(func() {
@@ -40,15 +42,19 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 		Expect(docker.Image.Remove.Execute(image.ID)).To(Succeed())
 		Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
+		Expect(os.RemoveAll(source)).To(Succeed())
 	})
 
 	it("sets max_old_space_size when nodejs.optimize-memory is set in buildpack.yml", func() {
 		var err error
+		source, err = occam.Source(filepath.Join("testdata", "optimize_memory"))
+		Expect(err).NotTo(HaveOccurred())
+
 		var logs fmt.Stringer
 		image, logs, err = pack.WithNoColor().Build.
 			WithNoPull().
 			WithBuildpacks(nodeBuildpack).
-			Execute(name, filepath.Join("testdata", "optimize_memory"))
+			Execute(name, source)
 
 		Expect(err).NotTo(HaveOccurred())
 
