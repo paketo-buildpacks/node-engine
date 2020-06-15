@@ -154,12 +154,6 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("when an app is rebuilt and there is a change", func() {
-		var modifiedSource string
-
-		it.After(func() {
-			Expect(os.RemoveAll(modifiedSource)).To(Succeed())
-		})
-
 		it("rebuilds the layer", func() {
 			var (
 				err         error
@@ -215,14 +209,17 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			Eventually(firstContainer).Should(BeAvailable(), ContainerLogs(firstContainer.ID))
 
-			modifiedSource, err = occam.Source(filepath.Join("testdata", "different_version_simple_app"))
+			err = ioutil.WriteFile(filepath.Join(source, "buildpack.yml"), []byte(`---
+nodejs:
+  version: ~12
+`), 0644)
 			Expect(err).NotTo(HaveOccurred())
 
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
 				WithBuildpacks(nodeBuildpack).
-				Execute(name, modifiedSource)
+				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
