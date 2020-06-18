@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/semver v1.5.0
 	github.com/onsi/gomega v1.10.1
-	github.com/paketo-buildpacks/occam v0.0.12
+	github.com/paketo-buildpacks/occam v0.0.13
 	github.com/paketo-buildpacks/packit v0.0.15
 	github.com/sclevine/spec v1.4.0
 	gopkg.in/yaml.v2 v2.3.0
