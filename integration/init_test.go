@@ -71,15 +71,6 @@ func TestIntegration(t *testing.T) {
 	suite.Run(t)
 }
 
-func ContainerLogs(id string) func() string {
-	docker := occam.NewDocker()
-
-	return func() string {
-		logs, _ := docker.Container.Logs.Execute(id)
-		return logs.String()
-	}
-}
-
 func GetGitVersion() (string, error) {
 	gitExec := pexec.NewExecutable("git")
 	revListOut := bytes.NewBuffer(nil)
