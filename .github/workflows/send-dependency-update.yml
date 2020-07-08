@@ -21,6 +21,8 @@ jobs:
     - name: Parse Release Dependency
       id: dependency
       uses: paketo-buildpacks/github-config/actions/dependency/parse@master
+      with:
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
     # Generic repository dispatch sender.
     - name: Send Repository Dispatch
