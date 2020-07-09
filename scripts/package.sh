@@ -1,114 +1,92 @@
-#!/usr/bin/env bash
-set -eu
+#!/bin/bash
+
+set -e
+set -u
 set -o pipefail
 
-readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
+readonly ROOT_DIR="$(cd "$(dirname "${0}")/.." && pwd)"
+readonly BIN_DIR="${ROOT_DIR}/.bin"
+readonly BUILD_DIR="${ROOT_DIR}/build"
 
 # shellcheck source=.util/tools.sh
-source "${PWD}/scripts/.util/tools.sh"
+source "${ROOT_DIR}/scripts/.util/tools.sh"
 
 # shellcheck source=.util/print.sh
-source "${PWD}/scripts/.util/print.sh"
+source "${ROOT_DIR}/scripts/.util/print.sh"
 
-if ! command -v realpath > /dev/null; then
-  function realpath() {
-      [[ "${1}" = /* ]] && echo "${1}" || echo "${PWD}/${1#./}"
-  }
-fi
+function main {
+  local version
 
-function main() {
-    local full_path args version cached archive offline
-    PACKAGE_DIR=${PACKAGE_DIR:-"${BUILDPACKDIR}/$(basename ${BUILDPACKDIR})_$(openssl rand -hex 4)"}
+  while [[ "${#}" != 0 ]]; do
+    case "${1}" in
+      --version|-v)
+        version="${2}"
+        shift 2
+        ;;
 
-    full_path="$(realpath "${PACKAGE_DIR}")"
+      "")
+        # skip if the argument is empty
+        shift 1
+        ;;
 
-    while [[ "${#}" != 0 ]]; do
-      case "${1}" in
-        --archive|-a)
-          archive="true"
-          shift 1
-          ;;
+      *)
+        util::print::error "unknown argument \"${1}\""
+    esac
+  done
 
-        --cached|-c)
-          cached="true"
-          offline="true"
-          shift 1
-          ;;
+  if [[ "${version:-}" == "" ]]; then
+    util::print::error "--version is required"
+  fi
 
-        --version|-v)
-          version="${2}"
-          shift 2
-          ;;
+  repo::prepare
+  buildpack::archive "${version}"
+  buildpackage::create
+}
 
-        "")
-          # skip if the argument is empty
-          shift 1
-          ;;
+function repo::prepare() {
+  util::print::title "Preparing repo..."
 
-        *)
-          util::print::error "unknown argument \"${1}\""
-      esac
-    done
+  rm -rf "${BUILD_DIR}"
 
-    if [[ -f "${BUILDPACKDIR}/.packit" ]]; then
-        #use jam
-        util::tools::jam::install --directory "${BUILDPACKDIR}/.bin"
-        if [[ -z "${version:-}" ]]; then #version not provided, use latest git tag
-          git_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo "v0.0.0")
-          version=${git_tag:1}
-        fi
+  mkdir -p "${BIN_DIR}"
+  mkdir -p "${BUILD_DIR}"
 
-        extra_args=""
+  export PATH="${BIN_DIR}:${PATH}"
+}
 
-        if [[ -n "${offline:-}" ]]; then
-            PACKAGE_DIR="${PACKAGE_DIR}-cached"
-            extra_args+="--offline"
-        fi
+function buildpack::archive() {
+  local version
+  version="${1}"
 
-        if [[ "${PACKAGE_DIR}" != "*.tgz" ]]; then
-            PACKAGE_DIR="${PACKAGE_DIR}.tgz"
-        fi
+  util::print::title "Packaging buildpack into ${BUILD_DIR}/buildpack.tgz..."
 
+  if [[ -f "${ROOT_DIR}/.packit" ]]; then
+    util::tools::jam::install --directory "${BIN_DIR}"
 
-        .bin/jam pack \
-        --buildpack "$(pwd)/buildpack.toml" \
-        --version "${version}" \
-        --output "${PACKAGE_DIR}" \
-        ${extra_args}
+    jam pack \
+      --buildpack "${ROOT_DIR}/buildpack.toml" \
+      --version "${version}" \
+      --output "${BUILD_DIR}/buildpack.tgz"
+  else
+    util::tools::packager::install --directory "${BIN_DIR}"
 
-    else
-        # use old packager
-        util::tools::packager::install --directory "${BUILDPACKDIR}/.bin"
+    packager \
+      --uncached \
+      --archive \
+      --version "${version}" \
+      "${BUILD_DIR}/buildpack"
+  fi
+}
 
-        args="${BUILDPACKDIR}/.bin/packager"
-        if [[ -n "${cached:-}" ]]; then
-            full_path="${full_path}-cached"
-        else
-            args="${args} --uncached"
-        fi
+function buildpackage::create() {
+  util::print::title "Packaging buildpack..."
 
-        if [[ -n "${archive:-}" ]]; then
-            args="${args} -archive"
-        fi
+  util::tools::pack::install --directory "${BIN_DIR}"
 
-        if [[ -z "${version:-}" ]]; then
-            version="$(cd "${BUILDPACKDIR}" && git describe --tags "$(git rev-list --tags --max-count=1)" || echo "v0.0.0")"
-        fi
-
-        args="${args} -version ${version}"
-
-        pushd "${BUILDPACKDIR}" > /dev/null
-            eval "${args}" "${full_path}"
-        popd > /dev/null
-
-        if [[ -n "${BP_REWRITE_HOST:-}" ]]; then
-            sed -i '' -e "s|^uri = \"https:\/\/buildpacks\.cloudfoundry\.org\(.*\)\"$|uri = \"http://${BP_REWRITE_HOST}\1\"|g" "${full_path}/buildpack.toml"
-        fi
-    fi
-
-
-
+  pack \
+    package-buildpack "${BUILD_DIR}/buildpackage.cnb" \
+      --package-config "${ROOT_DIR}/package.toml" \
+      --format file
 }
 
 main "${@:-}"

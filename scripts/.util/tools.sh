@@ -6,9 +6,6 @@ set -o pipefail
 # shellcheck source=./print.sh
 source "$(dirname "${BASH_SOURCE[0]}")/print.sh"
 
-# shellcheck source=./git.sh
-source "$(dirname "${BASH_SOURCE[0]}")/git.sh"
-
 function util::tools::path::export() {
     local dir
     dir="${1}"
@@ -101,7 +98,7 @@ function util::tools::pack::install() {
     version="v0.10.0"
 
     util::print::title "Installing pack ${version}"
-    curl "https://github.com/buildpacks/pack/releases/download/${version}/pack-v0.10.0-${os}.tgz" \
+    curl "https://github.com/buildpacks/pack/releases/download/${version}/pack-${version}-${os}.tgz" \
       --silent \
       --location \
       --output /tmp/pack.tgz
@@ -130,6 +127,6 @@ function util::tools::packager::install () {
 
     if [[ ! -f "${dir}/packager" ]]; then
         util::print::title "Installing packager"
-        GOBIN="${dir}" go get github.com/cloudfoundry/libcfbuildpack/packager
+        GOBIN="${dir}" go get -u github.com/cloudfoundry/libcfbuildpack/packager
     fi
 }
