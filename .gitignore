@@ -1,6 +1,5 @@
 .DS_Store
-*.tgz
 .idea
 .bin
-node-engine-cnb_*
 /bin
+/build

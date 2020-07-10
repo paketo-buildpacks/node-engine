@@ -48,7 +48,7 @@ jobs:
       id: tag
       uses: paketo-buildpacks/github-config/actions/tag@master
     - name: Package
-      run: PACKAGE_DIR=artifact ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}" --archive
+      run: ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}"
     - name: Create Release Notes
       id: create-release-notes
       run: |
@@ -59,7 +59,7 @@ jobs:
           --location \
           --output "${HOME}/bin/jam"
         chmod +x "${HOME}/bin/jam"
-        RELEASE_BODY=$(jam summarize --buildpack "${PWD}/artifact.tgz" --format markdown)
+        RELEASE_BODY=$(jam summarize --buildpack "${PWD}/build/buildpack.tgz" --format markdown)
         # Coz of this messed up issue
         # https://github.community/t5/GitHub-Actions/set-output-Truncates-Multiline-Strings/m-p/38372#M3322
         RELEASE_BODY="${RELEASE_BODY//'%'/'%25'}"
@@ -79,8 +79,13 @@ jobs:
         assets: |
           [
             {
-              "path": "artifact.tgz",
+              "path": "build/buildpack.tgz",
               "name": "${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz",
+              "content_type": "application/gzip"
+            },
+            {
+              "path": "build/buildpackage.cnb",
+              "name": "${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.cnb",
               "content_type": "application/gzip"
             }
           ]
