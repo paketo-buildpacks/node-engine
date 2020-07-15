@@ -51,21 +51,7 @@ jobs:
       run: ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}"
     - name: Create Release Notes
       id: create-release-notes
-      run: |
-        mkdir -p "${HOME}/bin"
-        export PATH="${PATH}:${HOME}/bin"
-        curl "https://github.com/paketo-buildpacks/packit/releases/download/v0.0.14/jam-linux" \
-          --silent \
-          --location \
-          --output "${HOME}/bin/jam"
-        chmod +x "${HOME}/bin/jam"
-        RELEASE_BODY=$(jam summarize --buildpack "${PWD}/build/buildpack.tgz" --format markdown)
-        # Coz of this messed up issue
-        # https://github.community/t5/GitHub-Actions/set-output-Truncates-Multiline-Strings/m-p/38372#M3322
-        RELEASE_BODY="${RELEASE_BODY//'%'/'%25'}"
-        RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"
-        RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
-        echo "::set-output name=release_body::$RELEASE_BODY"
+      uses: paketo-buildpacks/github-config/actions/release/notes@master
     - name: Create Release
       uses: paketo-buildpacks/github-config/actions/release/create@master
       with:
