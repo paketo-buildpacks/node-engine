@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -eu
+
+set -e
+set -u
 set -o pipefail
 
 readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -17,28 +19,6 @@ function main() {
                 -ldflags="-s -w" \
                 -o "run" \
                   "${BUILDPACKDIR}/run"
-
-            echo "Success!"
-
-            for name in detect build; do
-              printf "%s" "Linking ${name}..."
-
-              ln -sf "run" "${name}"
-
-              echo "Success!"
-            done
-        popd > /dev/null || return
-    fi
-
-    if [[ -f "${BUILDPACKDIR}/main.go" ]]; then
-        pushd "${BUILDPACKDIR}/bin" > /dev/null || return
-            printf "%s" "Building run..."
-
-            GOOS=linux \
-              go build \
-                -ldflags="-s -w" \
-                -o "run" \
-                  "${BUILDPACKDIR}"
 
             echo "Success!"
 
