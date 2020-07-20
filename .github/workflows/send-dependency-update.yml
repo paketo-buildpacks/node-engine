@@ -16,13 +16,11 @@ jobs:
     name: Send Dispatch
     steps:
 
-    # Parses the release event JSON and fetches the details that make up a dependency update.
-    # Dependency update details are provided as outputs.
-    - name: Parse Release Dependency
+    - name: Parse ID and Version
       id: dependency
-      uses: paketo-buildpacks/github-config/actions/dependency/parse@master
-      with:
-        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+      run: |
+        echo "::set-output name=id::$(jq -r .repository.full_name ${{ github.event_path }})"
+        echo "::set-output name=version::$(jq -r .release.tag_name ${{ github.event_path }} | sed 's/^v//')"
 
     # Generic repository dispatch sender.
     - name: Send Repository Dispatch
@@ -36,11 +34,6 @@ jobs:
             "strategy": "replace",
             "dependency": {
               "id": "${{ steps.dependency.outputs.id }}",
-              "sha256": "${{ steps.dependency.outputs.sha256 }}",
-              "source": "${{ steps.dependency.outputs.source }}",
-              "source_sha256": "${{ steps.dependency.outputs.source_sha256 }}",
-              "stacks": ${{ steps.dependency.outputs.stacks }},
-              "uri": "${{ steps.dependency.outputs.uri }}",
               "version": "${{ steps.dependency.outputs.version }}"
             }
           }
