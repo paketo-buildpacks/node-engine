@@ -1,12 +1,12 @@
 pull_request_rules:
-  - name: Auto merge pull requests from github-actions bot
+  - name: Auto merge pull requests from dependabot
     conditions:
-      - author=github-actions[bot]
-      # TODO: Fill in these conditions when they are finalized
-      # - status-success=Unit Tests
-      # - status-success=Integration Tests
+      - author=dependabot[bot]
+      - status-success=Unit Tests
+      - status-success=Integration Tests
     actions:
       merge:
-        strict: true
+        strict: smart
         method: rebase
+        bot_account: paketo-bot
       delete_head_branch: {}
