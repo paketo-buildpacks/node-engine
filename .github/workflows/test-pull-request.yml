@@ -49,7 +49,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Approve
-      uses: paketo-buildpacks/github-config/actions/pull-request/approve@autoapprove
+      uses: paketo-buildpacks/github-config/actions/pull-request/approve@master
       with:
         user: paketo-bot
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
