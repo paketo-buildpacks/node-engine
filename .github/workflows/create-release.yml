@@ -35,7 +35,6 @@ jobs:
       run: ./scripts/integration.sh
       env:
         GIT_TOKEN: ${{ github.token }}
-        CNB_BUILDER_IMAGE: ${{ secrets.CNB_BUILDER_IMAGE }}
 
   release:
     name: Release
