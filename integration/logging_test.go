@@ -123,8 +123,22 @@ api = "0.2"
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-cflinuxfs3-ad0376cb.tgz"
     version = "10.18.1"
 
+  [[metadata.dependencies]]
+		deprecation_date = 2000-04-01T00:00:00Z
+    id = "node"
+    name = "Node Engine"
+    sha256 = "528414d1987c8ff9d74f6b5baef604632a2d1d1fbce4a33c7302debcbfa53e1b"
+    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1-linux-x64.tar.gz"
+    source_sha256 = "812fe7d421894b792027d19c78c919faad3bf32d8bc16bde67f5c7eea2469eac"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-bionic-528414d1.tgz"
+    version = "10.18.1"
+
 [[stacks]]
   id = "org.cloudfoundry.stacks.cflinuxfs3"
+
+[[stacks]]
+  id = "io.buildpacks.stacks.bionic"
 `, config.Buildpack.ID, config.Buildpack.Name))
 
 				err = ioutil.WriteFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), bpToml, os.ModePerm)
