@@ -25,7 +25,7 @@ jobs:
 
     # Generic repository dispatch sender.
     - name: Send Repository Dispatch
-      uses: paketo-buildpacks/github-config/actions/dispatch@master
+      uses: paketo-buildpacks/github-config/actions/dispatch@main
       with:
         repos: ${{ secrets.LANGUAGE_FAMILY_REPO }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
