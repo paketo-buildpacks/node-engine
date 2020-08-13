@@ -2,7 +2,7 @@ api = "0.2"
 
 [buildpack]
   id = "paketo-buildpacks/node-engine"
-  name = "Node Engine Buildpack"
+  name = "Paketo Node Engine Buildpack"
   homepage = "https://github.com/paketo-buildpacks/node-engine"
 
 [metadata]
