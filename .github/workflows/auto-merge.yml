@@ -1,0 +1,37 @@
+name: Auto-Merge
+
+on:
+  pull_request_review:
+    types:
+    - submitted
+
+jobs:
+  merge:
+    name: Merge
+    if: ${{ github.event.review.user.login == 'paketo-bot-reviewer' && github.event.pull_request.mergeable_state == 'clean' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Merge
+      uses: paketo-buildpacks/github-config/actions/pull-request/merge@main
+      with:
+        user: paketo-bot
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        number: ${{ github.event.pull_request.number }}
+
+  rebase:
+    name: Rebase
+    if: ${{ github.event.review.user.login == 'paketo-bot-reviewer' && github.event.pull_request.mergeable_state == 'behind' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Rebase
+      uses: paketo-buildpacks/github-config/actions/pull-request/merge@main
+      with:
+        user: paketo-bot
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        number: ${{ github.event.pull_request.number }}
