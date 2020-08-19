@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -eu
 set -o pipefail
 
@@ -9,15 +10,48 @@ readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
 source "${PROGDIR}/.util/print.sh"
 
 function main() {
-    util::print::title "Run Buildpack Unit Tests"
+  while [[ "${#}" != 0 ]]; do
+    case "${1}" in
+      --help|-h)
+        shift 1
+        usage
+        exit 0
+        ;;
 
-    pushd "${BUILDPACKDIR}" > /dev/null
-        if go test ./... -v -run Unit; then
-            util::print::success "** GO Test Succeeded **"
-        else
-            util::print::error "** GO Test Failed **"
-        fi
-    popd > /dev/null
+      "")
+        # skip if the argument is empty
+        shift 1
+        ;;
+
+      *)
+        util::print::error "unknown argument \"${1}\""
+    esac
+  done
+
+  unit::run
+}
+
+function usage() {
+  cat <<-USAGE
+unit.sh [OPTIONS]
+
+Runs the unit test suite.
+
+OPTIONS
+  --help  -h  prints the command usage
+USAGE
+}
+
+function unit::run() {
+  util::print::title "Run Buildpack Unit Tests"
+
+  pushd "${BUILDPACKDIR}" > /dev/null
+    if go test ./... -v -run Unit; then
+      util::print::success "** GO Test Succeeded **"
+    else
+      util::print::error "** GO Test Failed **"
+    fi
+  popd > /dev/null
 }
 
 main "${@:-}"

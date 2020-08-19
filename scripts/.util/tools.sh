@@ -7,13 +7,13 @@ set -o pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/print.sh"
 
 function util::tools::path::export() {
-    local dir
-    dir="${1}"
+  local dir
+  dir="${1}"
 
-    if ! echo "${PATH}" | grep -q "${dir}"; then
-        PATH="${dir}:$PATH"
-        export PATH
-    fi
+  if ! echo "${PATH}" | grep -q "${dir}"; then
+    PATH="${dir}:$PATH"
+    export PATH
+  fi
 }
 
 function util::tools::jam::install () {
@@ -119,6 +119,8 @@ function util::tools::packager::install () {
 
         *)
           util::print::error "unknown argument \"${1}\""
+          ;;
+
       esac
     done
 
@@ -126,7 +128,7 @@ function util::tools::packager::install () {
     util::tools::path::export "${dir}"
 
     if [[ ! -f "${dir}/packager" ]]; then
-        util::print::title "Installing packager"
-        GOBIN="${dir}" go get -u github.com/cloudfoundry/libcfbuildpack/packager
+      util::print::title "Installing packager"
+      GOBIN="${dir}" go get -u github.com/cloudfoundry/libcfbuildpack/packager
     fi
 }
