@@ -1,8 +1,8 @@
 package nodeengine
 
 const (
-	Node       = "node"
-	Dependency = Node // NOTE: alias for old constant name
+	Node = "node"
+	Npm  = "npm"
 
 	DepKey             = "dependency-sha"
 	NvmrcSource        = ".nvmrc"
