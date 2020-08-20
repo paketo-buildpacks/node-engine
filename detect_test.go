@@ -37,6 +37,14 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			Provides: []packit.BuildPlanProvision{
 				{Name: nodeengine.Node},
 			},
+			Or: []packit.BuildPlan{
+				{
+					Provides: []packit.BuildPlanProvision{
+						{Name: nodeengine.Node},
+						{Name: nodeengine.Npm},
+					},
+				},
+			},
 		}))
 	})
 
@@ -60,6 +68,23 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						Version: "1.2.3",
 						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: ".nvmrc",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name:    nodeengine.Node,
+								Version: "1.2.3",
+								Metadata: nodeengine.BuildPlanMetadata{
+									VersionSource: ".nvmrc",
+								},
+							},
 						},
 					},
 				},
@@ -89,6 +114,23 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						Version: "4.5.6",
 						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: "buildpack.yml",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name:    nodeengine.Node,
+								Version: "4.5.6",
+								Metadata: nodeengine.BuildPlanMetadata{
+									VersionSource: "buildpack.yml",
+								},
+							},
 						},
 					},
 				},
@@ -126,6 +168,30 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						Version: "4.5.6",
 						Metadata: nodeengine.BuildPlanMetadata{
 							VersionSource: "buildpack.yml",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name:    nodeengine.Node,
+								Version: "1.2.3",
+								Metadata: nodeengine.BuildPlanMetadata{
+									VersionSource: ".nvmrc",
+								},
+							},
+							{
+								Name:    nodeengine.Node,
+								Version: "4.5.6",
+								Metadata: nodeengine.BuildPlanMetadata{
+									VersionSource: "buildpack.yml",
+								},
+							},
 						},
 					},
 				},

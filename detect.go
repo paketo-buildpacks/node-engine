@@ -54,6 +54,15 @@ func Detect(nvmrcParser, buildpackYMLParser VersionParser) packit.DetectFunc {
 					{Name: Node},
 				},
 				Requires: requirements,
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: Node},
+							{Name: Npm},
+						},
+						Requires: requirements,
+					},
+				},
 			},
 		}, nil
 	}

@@ -2,6 +2,7 @@ package integration
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,6 +21,7 @@ import (
 var (
 	nodeBuildpack        string
 	offlineNodeBuildpack string
+	buildPlanBuildpack   string
 	root                 string
 	version              string
 
@@ -28,6 +30,10 @@ var (
 			ID   string
 			Name string
 		}
+	}
+
+	integrationjson struct {
+		BuildPlan string `json:"build-plan"`
 	}
 )
 
@@ -45,6 +51,12 @@ func TestIntegration(t *testing.T) {
 	_, err = toml.DecodeReader(file, &config)
 	Expect(err).NotTo(HaveOccurred())
 
+	file, err = os.Open("../integration.json")
+	Expect(err).NotTo(HaveOccurred())
+
+	Expect(json.NewDecoder(file).Decode(&integrationjson)).To(Succeed())
+	Expect(file.Close()).To(Succeed())
+
 	buildpackStore := occam.NewBuildpackStore()
 
 	version, err = GetGitVersion()
@@ -61,12 +73,17 @@ func TestIntegration(t *testing.T) {
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
+	buildPlanBuildpack, err = buildpackStore.Get.
+		Execute(integrationjson.BuildPlan)
+	Expect(err).NotTo(HaveOccurred())
+
 	SetDefaultEventuallyTimeout(5 * time.Second)
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
 	suite("Logging", testLogging)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
+	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
 	suite.Run(t)
 }

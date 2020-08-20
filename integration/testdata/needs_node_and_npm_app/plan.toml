@@ -1,0 +1,11 @@
+[[requires]]
+  name = "node"
+
+  [requires.metadata]
+    launch = true
+
+[[requires]]
+  name = "npm"
+
+  [requires.metadata]
+    launch = true
