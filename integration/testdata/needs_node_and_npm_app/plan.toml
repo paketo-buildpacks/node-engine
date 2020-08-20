@@ -8,4 +8,4 @@
   name = "npm"
 
   [requires.metadata]
-    launch = true
+    version-source = "this should not appear"

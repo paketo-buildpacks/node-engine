@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
+	. "github.com/paketo-buildpacks/occam/matchers"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -58,6 +60,28 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
+
+			Expect(logs).To(ContainLines(
+				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				"  Resolving Node Engine version",
+				"    Candidate version sources (in priority order):",
+				"      <unknown> -> \"*\"",
+				"",
+				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 10\.\d+\.\d+`),
+				"",
+				"  Executing build process",
+				MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+				MatchRegexp(`      Completed in \d+\.\d+`),
+				"",
+				"  Configuring environment",
+				`    NODE_ENV     -> "production"`,
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				`    NODE_VERBOSE -> "false"`,
+				"",
+				"    Writing profile.d/0_memory_available.sh",
+				"      Calculates available memory based on container limits at launch time.",
+				"      Made available in the MEMORY_AVAILABLE environment variable.",
+			))
 		})
 	})
 }

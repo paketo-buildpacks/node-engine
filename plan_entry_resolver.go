@@ -26,29 +26,37 @@ func (r PlanEntryResolver) Resolve(entries []packit.BuildpackPlanEntry) packit.B
 		}
 	)
 
-	sort.Slice(entries, func(i, j int) bool {
-		leftSource := entries[i].Metadata["version-source"]
+	filteredEntries := []packit.BuildpackPlanEntry{}
+	// The metadata from "npm" entry are not relevant
+	for _, e := range entries {
+		if e.Name == Node {
+			filteredEntries = append(filteredEntries, e)
+		}
+	}
+
+	sort.Slice(filteredEntries, func(i, j int) bool {
+		leftSource := filteredEntries[i].Metadata["version-source"]
 		left, _ := leftSource.(string)
 
-		rightSource := entries[j].Metadata["version-source"]
+		rightSource := filteredEntries[j].Metadata["version-source"]
 		right, _ := rightSource.(string)
 
 		return priorities[left] > priorities[right]
 	})
 
-	chosenEntry := entries[0]
+	chosenEntry := filteredEntries[0]
 
 	if chosenEntry.Metadata == nil {
 		chosenEntry.Metadata = map[string]interface{}{}
 	}
 
-	for _, entry := range entries {
+	for _, entry := range filteredEntries {
 		if entry.Metadata["build"] == true {
 			chosenEntry.Metadata["build"] = true
 		}
 	}
 
-	r.logger.Candidates(entries)
+	r.logger.Candidates(filteredEntries)
 
 	return chosenEntry
 }
