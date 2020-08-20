@@ -46,6 +46,13 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 				{
+					Name:    "npm",
+					Version: "npm-version",
+					Metadata: map[string]interface{}{
+						"version-source": ".npmrc",
+					},
+				},
+				{
 					Name:    "node",
 					Version: "nvmrc-version",
 					Metadata: map[string]interface{}{
@@ -66,6 +73,7 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 			Expect(buffer.String()).To(ContainSubstring("      package.json  -> \"package-json-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      .nvmrc        -> \"nvmrc-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      <unknown>     -> \"other-version\""))
+			Expect(buffer.String()).NotTo(ContainSubstring("      .npmrc        -> \"npm-version\""))
 		})
 	})
 
