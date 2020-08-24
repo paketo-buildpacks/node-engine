@@ -1,8 +1,7 @@
-# This workflow triggers on a published release event.
-# Requires the following secrets:
-# - LANGUAGE_FAMILY_REPO -> comma-separated list of repos that should receive the dispatch event
-#   (eg. "paketo-buildpacks/nodejs, paketo-buildpacks/dotnet-core")
-# - PAKETO_BOT_GITHUB_TOKEN -> a token with permissions to send the dispatch to the language family repo
+# This workflow notifies language families on release of impl cnbs
+# Requires the following:
+# - secret PAKETO_BOT_GITHUB_TOKEN -> token with permissions to send dispatch to language family repos
+# - file .github/language-family-membership listing target <org>/<repo> per line
 
 name: Send Dependency Update Dispatch
 
@@ -17,6 +16,19 @@ jobs:
     name: Send Dispatch
     steps:
 
+    - name: Check out
+      uses: actions/checkout@v2
+
+    - name: List enrolled language families
+      id: language-families
+      run : |
+        if [ ! -f .github/language-family-membership ]; then
+          echo "requires line record file .github/language-family-membership"
+          exit 1
+        fi
+        list=$(awk -vORS=, '{print}' .github/language-family-membership | sed 's#,$#\n#')
+        echo "::set-output name=list::$list"
+
     - name: Parse ID and Version
       id: dependency
       run: |
@@ -27,7 +39,7 @@ jobs:
     - name: Send Repository Dispatch
       uses: paketo-buildpacks/github-config/actions/dispatch@main
       with:
-        repos: ${{ secrets.LANGUAGE_FAMILY_REPO }}
+        repos: ${{ steps.language-families.outputs.list }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
         event: dependency-update
         payload: |
