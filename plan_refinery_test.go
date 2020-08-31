@@ -33,13 +33,13 @@ func testPlanRefinery(t *testing.T, context spec.G, it spec.S) {
 			})
 			Expect(refinedBuildPlan.Entries).To(HaveLen(1))
 			Expect(refinedBuildPlan.Entries[0].Name).To(Equal("some-id"))
-			Expect(refinedBuildPlan.Entries[0].Version).To(Equal("some-version"))
 			Expect(refinedBuildPlan.Entries[0].Metadata).To(Equal(map[string]interface{}{
 				"licenses": []string{},
 				"name":     "some-name",
 				"sha256":   "some-sha",
 				"stacks":   []string{"some-stack"},
 				"uri":      "some-uri",
+				"version":  "some-version",
 			},
 			))
 		})

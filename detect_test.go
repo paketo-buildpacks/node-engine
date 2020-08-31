@@ -64,9 +64,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    nodeengine.Node,
-						Version: "1.2.3",
+						Name: nodeengine.Node,
 						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "1.2.3",
 							VersionSource: ".nvmrc",
 						},
 					},
@@ -79,9 +79,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						},
 						Requires: []packit.BuildPlanRequirement{
 							{
-								Name:    nodeengine.Node,
-								Version: "1.2.3",
+								Name: nodeengine.Node,
 								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "1.2.3",
 									VersionSource: ".nvmrc",
 								},
 							},
@@ -110,9 +110,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    nodeengine.Node,
-						Version: "4.5.6",
+						Name: nodeengine.Node,
 						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "4.5.6",
 							VersionSource: "buildpack.yml",
 						},
 					},
@@ -125,9 +125,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						},
 						Requires: []packit.BuildPlanRequirement{
 							{
-								Name:    nodeengine.Node,
-								Version: "4.5.6",
+								Name: nodeengine.Node,
 								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "4.5.6",
 									VersionSource: "buildpack.yml",
 								},
 							},
@@ -157,16 +157,16 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 				Requires: []packit.BuildPlanRequirement{
 					{
-						Name:    nodeengine.Node,
-						Version: "1.2.3",
+						Name: nodeengine.Node,
 						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "1.2.3",
 							VersionSource: ".nvmrc",
 						},
 					},
 					{
-						Name:    nodeengine.Node,
-						Version: "4.5.6",
+						Name: nodeengine.Node,
 						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "4.5.6",
 							VersionSource: "buildpack.yml",
 						},
 					},
@@ -179,16 +179,16 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 						},
 						Requires: []packit.BuildPlanRequirement{
 							{
-								Name:    nodeengine.Node,
-								Version: "1.2.3",
+								Name: nodeengine.Node,
 								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "1.2.3",
 									VersionSource: ".nvmrc",
 								},
 							},
 							{
-								Name:    nodeengine.Node,
-								Version: "4.5.6",
+								Name: nodeengine.Node,
 								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "4.5.6",
 									VersionSource: "buildpack.yml",
 								},
 							},

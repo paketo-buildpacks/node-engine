@@ -162,27 +162,29 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 		it("prints a formatted map of version source inputs", func() {
 			emitter.Candidates([]packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "package-json-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "package-json-version",
 						"version-source": "package.json",
 					},
 				},
 				{
-					Name:    "node",
-					Version: "other-version",
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version": "other-version",
+					},
 				},
 				{
-					Name:    "node",
-					Version: "buildpack-yml-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "buildpack-yml-version",
 						"version-source": "buildpack.yml",
 					},
 				},
 				{
-					Name:    "node",
-					Version: "nvmrc-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "nvmrc-version",
 						"version-source": ".nvmrc",
 					},
 				},

@@ -28,42 +28,44 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		it("resolves the best plan entry", func() {
 			entry := resolver.Resolve([]packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "package-json-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "package-json-version",
 						"version-source": "package.json",
 					},
 				},
 				{
-					Name:    "node",
-					Version: "other-version",
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version": "other-version",
+					},
 				},
 				{
-					Name:    "node",
-					Version: "buildpack-yml-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "buildpack-yml-version",
 						"version-source": "buildpack.yml",
 					},
 				},
 				{
-					Name:    "npm",
-					Version: "npm-version",
+					Name: "npm",
 					Metadata: map[string]interface{}{
+						"version":        "npm-version",
 						"version-source": ".npmrc",
 					},
 				},
 				{
-					Name:    "node",
-					Version: "nvmrc-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "nvmrc-version",
 						"version-source": ".nvmrc",
 					},
 				},
 			})
 			Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-				Name:    "node",
-				Version: "buildpack-yml-version",
+				Name: "node",
 				Metadata: map[string]interface{}{
+					"version":        "buildpack-yml-version",
 					"version-source": "buildpack.yml",
 				},
 			}))
@@ -81,28 +83,30 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		it("resolves the best plan entry", func() {
 			entry := resolver.Resolve([]packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "package-json-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "package-json-version",
 						"version-source": "package.json",
 					},
 				},
 				{
-					Name:    "node",
-					Version: "other-version",
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version": "other-version",
+					},
 				},
 				{
-					Name:    "node",
-					Version: "nvmrc-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "nvmrc-version",
 						"version-source": ".nvmrc",
 					},
 				},
 			})
 			Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-				Name:    "node",
-				Version: "package-json-version",
+				Name: "node",
 				Metadata: map[string]interface{}{
+					"version":        "package-json-version",
 					"version-source": "package.json",
 				},
 			}))
@@ -113,21 +117,23 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		it("resolves the best plan entry", func() {
 			entry := resolver.Resolve([]packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "other-version",
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version": "other-version",
+					},
 				},
 				{
-					Name:    "node",
-					Version: "nvmrc-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "nvmrc-version",
 						"version-source": ".nvmrc",
 					},
 				},
 			})
 			Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-				Name:    "node",
-				Version: "nvmrc-version",
+				Name: "node",
 				Metadata: map[string]interface{}{
+					"version":        "nvmrc-version",
 					"version-source": ".nvmrc",
 				},
 			}))
@@ -139,25 +145,25 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 			it("has all flags", func() {
 				entry := resolver.Resolve([]packit.BuildpackPlanEntry{
 					{
-						Name:    "node",
-						Version: "package-json-version",
+						Name: "node",
 						Metadata: map[string]interface{}{
+							"version":        "package-json-version",
 							"version-source": "package.json",
 						},
 					},
 					{
-						Name:    "node",
-						Version: "nvmrc-version",
+						Name: "node",
 						Metadata: map[string]interface{}{
+							"version":        "nvmrc-version",
 							"version-source": ".nvmrc",
 							"build":          true,
 						},
 					},
 				})
 				Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-					Name:    "node",
-					Version: "package-json-version",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "package-json-version",
 						"version-source": "package.json",
 						"build":          true,
 					},
@@ -170,14 +176,17 @@ func testPlanEntryResolver(t *testing.T, context spec.G, it spec.S) {
 		it("resolves the best plan entry", func() {
 			entry := resolver.Resolve([]packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "other-version",
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version": "other-version",
+					},
 				},
 			})
 			Expect(entry).To(Equal(packit.BuildpackPlanEntry{
-				Name:     "node",
-				Version:  "other-version",
-				Metadata: map[string]interface{}{},
+				Name: "node",
+				Metadata: map[string]interface{}{
+					"version": "other-version",
+				},
 			}))
 		})
 	})

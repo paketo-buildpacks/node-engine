@@ -12,6 +12,7 @@ type VersionParser interface {
 }
 
 type BuildPlanMetadata struct {
+	Version       string `toml:"version"`
 	VersionSource string `toml:"version-source"`
 }
 
@@ -25,9 +26,9 @@ func Detect(nvmrcParser, buildpackYMLParser VersionParser) packit.DetectFunc {
 
 		if version != "" {
 			requirements = append(requirements, packit.BuildPlanRequirement{
-				Name:    Node,
-				Version: version,
+				Name: Node,
 				Metadata: BuildPlanMetadata{
+					Version:       version,
 					VersionSource: NvmrcSource,
 				},
 			})
@@ -40,9 +41,9 @@ func Detect(nvmrcParser, buildpackYMLParser VersionParser) packit.DetectFunc {
 
 		if version != "" {
 			requirements = append(requirements, packit.BuildPlanRequirement{
-				Name:    Node,
-				Version: version,
+				Name: Node,
 				Metadata: BuildPlanMetadata{
+					Version:       version,
 					VersionSource: BuildpackYMLSource,
 				},
 			})
