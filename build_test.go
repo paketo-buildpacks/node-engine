@@ -67,9 +67,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		entryResolver = &fakes.EntryResolver{}
 		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
-			Name:    "node",
-			Version: "~10",
+			Name: "node",
 			Metadata: map[string]interface{}{
+				"version":        "~10",
 				"version-source": "buildpack.yml",
 			},
 		}
@@ -88,9 +88,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
 			Entries: []packit.BuildpackPlanEntry{
 				{
-					Name:    "node",
-					Version: "~10",
+					Name: "node",
 					Metadata: map[string]interface{}{
+						"version":        "~10",
 						"version-source": "buildpack.yml",
 					},
 				},
@@ -119,9 +119,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Plan: packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
 					{
-						Name:    "node",
-						Version: "~10",
+						Name: "node",
 						Metadata: map[string]interface{}{
+							"version":        "~10",
 							"version-source": "buildpack.yml",
 						},
 					},
@@ -134,9 +134,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Plan: packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
 					{
-						Name:    "node",
-						Version: "~10",
+						Name: "node",
 						Metadata: map[string]interface{}{
+							"version":        "~10",
 							"version-source": "buildpack.yml",
 						},
 					},
@@ -164,9 +164,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(entryResolver.ResolveCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
 			{
-				Name:    "node",
-				Version: "~10",
+				Name: "node",
 				Metadata: map[string]interface{}{
+					"version":        "~10",
 					"version-source": "buildpack.yml",
 				},
 			},
@@ -220,9 +220,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 							},
 						},
@@ -247,9 +247,9 @@ nodejs:
 			Expect(err).NotTo(HaveOccurred())
 
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
-				Name:    "node",
-				Version: "~10",
+				Name: "node",
 				Metadata: map[string]interface{}{
+					"version":        "~10",
 					"version-source": "buildpack.yml",
 					"build":          true,
 				},
@@ -258,9 +258,9 @@ nodejs:
 			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
 					{
-						Name:    "node",
-						Version: "~10",
+						Name: "node",
 						Metadata: map[string]interface{}{
+							"version":        "~10",
 							"version-source": "buildpack.yml",
 							"build":          true,
 						},
@@ -281,9 +281,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 								"build":          true,
 							},
@@ -297,9 +297,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 								"build":          true,
 							},
@@ -342,9 +342,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 							},
 						},
@@ -365,9 +365,9 @@ nodejs:
 			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
 					{
-						Name:    "new-dep",
-						Version: "some-version",
+						Name: "new-dep",
 						Metadata: map[string]interface{}{
+							"version":          "some-version",
 							"some-extra-field": "an-extra-value",
 						},
 					},
@@ -381,9 +381,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 							},
 						},
@@ -397,9 +397,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "new-dep",
-							Version: "some-version",
+							Name: "new-dep",
 							Metadata: map[string]interface{}{
+								"version":          "some-version",
 								"some-extra-field": "an-extra-value",
 							},
 						},
@@ -448,9 +448,9 @@ nodejs:
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "node",
-							Version: "~10",
+							Name: "node",
 							Metadata: map[string]interface{}{
+								"version":        "~10",
 								"version-source": "buildpack.yml",
 							},
 						},
@@ -489,9 +489,9 @@ nodejs:
 					Plan: packit.BuildpackPlan{
 						Entries: []packit.BuildpackPlanEntry{
 							{
-								Name:    "node",
-								Version: "~10",
+								Name: "node",
 								Metadata: map[string]interface{}{
+									"version":        "~10",
 									"version-source": "buildpack.yml",
 								},
 							},
@@ -514,9 +514,9 @@ nodejs:
 					Plan: packit.BuildpackPlan{
 						Entries: []packit.BuildpackPlanEntry{
 							{
-								Name:    "node",
-								Version: "~10",
+								Name: "node",
 								Metadata: map[string]interface{}{
+									"version":        "~10",
 									"version-source": "buildpack.yml",
 								},
 							},
@@ -543,9 +543,9 @@ nodejs:
 					Plan: packit.BuildpackPlan{
 						Entries: []packit.BuildpackPlanEntry{
 							{
-								Name:    "node",
-								Version: "~10",
+								Name: "node",
 								Metadata: map[string]interface{}{
+									"version":        "~10",
 									"version-source": "buildpack.yml",
 								},
 							},
@@ -576,9 +576,9 @@ nodejs:
 					Plan: packit.BuildpackPlan{
 						Entries: []packit.BuildpackPlanEntry{
 							{
-								Name:    "node",
-								Version: "~10",
+								Name: "node",
 								Metadata: map[string]interface{}{
+									"version":        "~10",
 									"version-source": "buildpack.yml",
 								},
 							},
@@ -601,9 +601,9 @@ nodejs:
 					Plan: packit.BuildpackPlan{
 						Entries: []packit.BuildpackPlanEntry{
 							{
-								Name:    "node",
-								Version: "~10",
+								Name: "node",
 								Metadata: map[string]interface{}{
+									"version":        "~10",
 									"version-source": "buildpack.yml",
 								},
 							},
