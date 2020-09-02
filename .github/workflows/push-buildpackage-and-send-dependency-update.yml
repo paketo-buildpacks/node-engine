@@ -1,0 +1,75 @@
+name: Push Buildpackage and Send Dependency Update Dispatch
+
+on:
+  release:
+    types:
+    - published
+
+jobs:
+  push:
+    name: Push
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Parse Event
+      id: event
+      run: |
+        echo "::set-output name=tag::$(jq -r '.release.tag_name' "${GITHUB_EVENT_PATH}" | sed s/^v//)"
+        echo "::set-output name=download_url::$(jq -r '.release.assets[] | select(.name | endswith(".cnb")) | .url' "${GITHUB_EVENT_PATH}")"
+
+    - name: Download
+      id: download
+      uses: paketo-buildpacks/github-config/actions/release/download-asset@main
+      with:
+        url: ${{ steps.event.outputs.download_url }}
+        output: "/github/workspace/buildpackage.cnb"
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+
+    - name: Push
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        GCR_PUSH_BOT_JSON_KEY: ${{ secrets.GCR_PUSH_BOT_JSON_KEY }}
+      run: |
+        echo "${GCR_PUSH_BOT_JSON_KEY}" | docker login --username _json_key --password-stdin gcr.io
+        sudo skopeo copy "oci-archive:${GITHUB_WORKSPACE}/buildpackage.cnb" "docker://gcr.io/${{ github.repository }}:${{ steps.event.outputs.tag }}"
+        sudo skopeo copy "oci-archive:${GITHUB_WORKSPACE}/buildpackage.cnb" "docker://gcr.io/${{ github.repository }}:latest"
+
+    - name: Check out
+      uses: actions/checkout@v2
+
+    # This workflow notifies language families on release of impl cnbs
+    # Requires the following:
+    # - secret PAKETO_BOT_GITHUB_TOKEN -> token with permissions to send dispatch to language family repos
+    # - file .github/language-family-membership listing target <org>/<repo> per line
+
+    - name: List enrolled language families
+      id: language-families
+      run : |
+        if [ ! -f .github/language-family-membership ]; then
+          echo "requires line record file .github/language-family-membership"
+          exit 1
+        fi
+        list=$(awk -vORS=, '{print}' .github/language-family-membership | sed 's#,$#\n#')
+        echo "::set-output name=list::$list"
+
+    - name: Parse ID and Version
+      id: dependency
+      run: |
+        echo "::set-output name=id::$(jq -r .repository.full_name ${{ github.event_path }})"
+        echo "::set-output name=version::$(jq -r .release.tag_name ${{ github.event_path }} | sed 's/^v//')"
+
+    # Generic repository dispatch sender.
+    - name: Send Repository Dispatch
+      uses: paketo-buildpacks/github-config/actions/dispatch@main
+      with:
+        repos: ${{ steps.language-families.outputs.list }}
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        event: dependency-update
+        payload: |
+          {
+            "strategy": "replace",
+            "dependency": {
+              "id": "${{ steps.dependency.outputs.id }}",
+              "version": "${{ steps.dependency.outputs.version }}"
+            }
+          }
