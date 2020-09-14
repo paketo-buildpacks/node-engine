@@ -6,6 +6,9 @@ set -o pipefail
 readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
 
+# shellcheck source=SCRIPTDIR/.util/tools.sh
+source "${PROGDIR}/.util/tools.sh"
+
 # shellcheck source=SCRIPTDIR/.util/print.sh
 source "${PROGDIR}/.util/print.sh"
 
@@ -45,8 +48,10 @@ USAGE
 function unit::run() {
   util::print::title "Run Buildpack Unit Tests"
 
+  testout=$(mktemp)
   pushd "${BUILDPACKDIR}" > /dev/null
-    if go test ./... -v -run Unit; then
+    if go test ./... -v -run Unit | tee "${testout}"; then
+      util::tools::tests::checkfocus "${testout}"
       util::print::success "** GO Test Succeeded **"
     else
       util::print::error "** GO Test Failed **"
