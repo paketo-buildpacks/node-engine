@@ -82,11 +82,12 @@ Or they can require both `node` and `npm` using a Build Plan that looks like the
 To package this buildpack for consumption:
 
 ```
-$ ./scripts/package.sh
+$ ./scripts/package.sh --version <version-number>
 ```
 
-This builds the buildpack's Go source using `GOOS=linux` by default. You can
-supply another value as the first argument to `package.sh`.
+This will create a `buildpackage.cnb` file under the `build` directory which you
+can use to build your app as follows:
+`pack build <app-name> -p <path-to-app> -b build/buildpackage.cnb`
 
 ## `buildpack.yml` Configurations
 
@@ -102,4 +103,16 @@ nodejs:
   # allow node to optimize memory usage based on your system constraints
   # bool
   optimize-memory: true
+```
+
+## Run Tests
+
+To run all unit tests, run:
+```
+./scripts/unit.sh
+```
+
+To run all integration tests, run:
+```
+/scripts/integration.sh
 ```
