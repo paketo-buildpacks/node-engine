@@ -57,7 +57,10 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			var logs fmt.Stringer
 			image, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(offlineNodeBuildpack).
+				WithBuildpacks(
+					offlineNodeBuildpack,
+					buildPlanBuildpack,
+				).
 				WithNetwork("none").
 				Execute(name, source)
 

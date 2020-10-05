@@ -54,6 +54,10 @@ func (r PlanEntryResolver) Resolve(entries []packit.BuildpackPlanEntry) packit.B
 		if entry.Metadata["build"] == true {
 			chosenEntry.Metadata["build"] = true
 		}
+
+		if entry.Metadata["launch"] == true {
+			chosenEntry.Metadata["launch"] = true
+		}
 	}
 
 	r.logger.Candidates(filteredEntries)

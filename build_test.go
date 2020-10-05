@@ -150,7 +150,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					BuildEnv:  packit.Environment{},
 					LaunchEnv: packit.Environment{},
 					Build:     false,
-					Launch:    true,
+					Launch:    false,
 					Cache:     false,
 					Metadata: map[string]interface{}{
 						nodeengine.DepKey: "",
@@ -238,7 +238,7 @@ nodejs:
 		})
 	})
 
-	context("when the build plan entry includes the build flag", func() {
+	context("when the build plan entry includes the build, launch flags", func() {
 		var workingDir string
 
 		it.Before(func() {
@@ -251,6 +251,7 @@ nodejs:
 				Metadata: map[string]interface{}{
 					"version":        "~10",
 					"version-source": "buildpack.yml",
+					"launch":         true,
 					"build":          true,
 				},
 			}
@@ -262,6 +263,7 @@ nodejs:
 						Metadata: map[string]interface{}{
 							"version":        "~10",
 							"version-source": "buildpack.yml",
+							"launch":         true,
 							"build":          true,
 						},
 					},
@@ -273,7 +275,7 @@ nodejs:
 			Expect(os.RemoveAll(workingDir)).To(Succeed())
 		})
 
-		it("marks the node layer as cached", func() {
+		it("marks the node layer as build, cached and launch", func() {
 			result, err := build(packit.BuildContext{
 				CNBPath:    cnbDir,
 				Stack:      "some-stack",
@@ -285,6 +287,7 @@ nodejs:
 							Metadata: map[string]interface{}{
 								"version":        "~10",
 								"version-source": "buildpack.yml",
+								"launch":         true,
 								"build":          true,
 							},
 						},
@@ -301,6 +304,7 @@ nodejs:
 							Metadata: map[string]interface{}{
 								"version":        "~10",
 								"version-source": "buildpack.yml",
+								"launch":         true,
 								"build":          true,
 							},
 						},
@@ -413,7 +417,7 @@ nodejs:
 						BuildEnv:  packit.Environment{},
 						LaunchEnv: packit.Environment{},
 						Build:     false,
-						Launch:    true,
+						Launch:    false,
 						Cache:     false,
 						Metadata: map[string]interface{}{
 							nodeengine.DepKey: "",

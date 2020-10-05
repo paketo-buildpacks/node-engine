@@ -71,13 +71,16 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(nodeBuildpack).
+				WithBuildpacks(
+					nodeBuildpack,
+					buildPlanBuildpack,
+				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
 
-			Expect(firstImage.Buildpacks).To(HaveLen(1))
+			Expect(firstImage.Buildpacks).To(HaveLen(2))
 			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
@@ -86,6 +89,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
+				"      <unknown>     -> \"*\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
@@ -113,13 +117,16 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(nodeBuildpack).
+				WithBuildpacks(
+					nodeBuildpack,
+					buildPlanBuildpack,
+				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
 
-			Expect(secondImage.Buildpacks).To(HaveLen(1))
+			Expect(secondImage.Buildpacks).To(HaveLen(2))
 			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
@@ -128,6 +135,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
+				"      <unknown>     -> \"*\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
@@ -170,13 +178,16 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(nodeBuildpack).
+				WithBuildpacks(
+					nodeBuildpack,
+					buildPlanBuildpack,
+				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
 
-			Expect(firstImage.Buildpacks).To(HaveLen(1))
+			Expect(firstImage.Buildpacks).To(HaveLen(2))
 			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
@@ -185,6 +196,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
+				"      <unknown>     -> \"*\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
@@ -218,13 +230,16 @@ nodejs:
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(nodeBuildpack).
+				WithBuildpacks(
+					nodeBuildpack,
+					buildPlanBuildpack,
+				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
 
-			Expect(secondImage.Buildpacks).To(HaveLen(1))
+			Expect(secondImage.Buildpacks).To(HaveLen(2))
 			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
@@ -233,6 +248,7 @@ nodejs:
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~12\"",
+				"      <unknown>     -> \"*\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 12\.\d+\.\d+`),
 				"",
