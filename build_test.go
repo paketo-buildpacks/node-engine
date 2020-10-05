@@ -90,8 +90,11 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				{
 					Name: "node",
 					Metadata: map[string]interface{}{
-						"version":        "~10",
-						"version-source": "buildpack.yml",
+						"name":    "node-dependency-name",
+						"sha256":  "node-dependency-sha",
+						"stacks":  []string{"some-stack"},
+						"uri":     "node-dependency-uri",
+						"version": "~10",
 					},
 				},
 			},
@@ -136,8 +139,11 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					{
 						Name: "node",
 						Metadata: map[string]interface{}{
-							"version":        "~10",
-							"version-source": "buildpack.yml",
+							"name":    "node-dependency-name",
+							"sha256":  "node-dependency-sha",
+							"stacks":  []string{"some-stack"},
+							"uri":     "node-dependency-uri",
+							"version": "~10",
 						},
 					},
 				},
@@ -261,10 +267,11 @@ nodejs:
 					{
 						Name: "node",
 						Metadata: map[string]interface{}{
-							"version":        "~10",
-							"version-source": "buildpack.yml",
-							"launch":         true,
-							"build":          true,
+							"name":    "node-dependency-name",
+							"sha256":  "node-dependency-sha",
+							"stacks":  []string{"some-stack"},
+							"uri":     "node-dependency-uri",
+							"version": "~10",
 						},
 					},
 				},
@@ -302,10 +309,11 @@ nodejs:
 						{
 							Name: "node",
 							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "buildpack.yml",
-								"launch":         true,
-								"build":          true,
+								"name":    "node-dependency-name",
+								"sha256":  "node-dependency-sha",
+								"stacks":  []string{"some-stack"},
+								"uri":     "node-dependency-uri",
+								"version": "~10",
 							},
 						},
 					},
