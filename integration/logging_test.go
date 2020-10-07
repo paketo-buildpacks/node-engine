@@ -56,7 +56,10 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 			var logs fmt.Stringer
 			image, logs, err = pack.WithNoColor().Build.
 				WithNoPull().
-				WithBuildpacks(nodeBuildpack).
+				WithBuildpacks(
+					nodeBuildpack,
+					buildPlanBuildpack,
+				).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -65,6 +68,7 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      buildpack.yml -> \"~10\"",
+				"      <unknown>     -> \"*\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 				"",
@@ -159,7 +163,10 @@ api = "0.2"
 
 				image, logs, err = pack.WithNoColor().Build.
 					WithNoPull().
-					WithBuildpacks(deprecatedDepNodeBuildpack).
+					WithBuildpacks(
+						deprecatedDepNodeBuildpack,
+						buildPlanBuildpack,
+					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 

@@ -1,0 +1,5 @@
+[[requires]]
+  name = "node"
+
+  [requires.metadata]
+    launch = true

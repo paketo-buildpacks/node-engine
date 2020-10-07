@@ -40,6 +40,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		var dependency postal.Dependency
 		var err error
+
 		version, _ := entry.Metadata["version"].(string)
 		dependency, err = dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
 
@@ -49,11 +50,12 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
 
-		nodeLayer, err := context.Layers.Get(Node, packit.LaunchLayer)
+		nodeLayer, err := context.Layers.Get(Node)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
+		nodeLayer.Launch = entry.Metadata["launch"] == true
 		nodeLayer.Build = entry.Metadata["build"] == true
 		nodeLayer.Cache = entry.Metadata["build"] == true
 

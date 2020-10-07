@@ -40,6 +40,12 @@ file that looks like the following:
     # their build phase. If you are writing a buildpack that needs to run Node
     # during its build process, this flag should be set to true.
     build = true
+
+    # Setting the launch flag to true will ensure that the Node Engine
+    # dependency is available on the $PATH for the running application. If you are
+    # writing an application that needs to run node at runtime, this flag should
+    # be set to true.
+    launch = true
 ```
 
 Or they can require both `node` and `npm` using a Build Plan that looks like the following:
@@ -68,6 +74,12 @@ Or they can require both `node` and `npm` using a Build Plan that looks like the
     # their build phase. If you are writing a buildpack that needs to run Node
     # during its build process, this flag should be set to true.
     build = true
+
+    # Setting the launch flag to true will ensure that the Node Engine
+    # dependency is available on the $PATH for the running application. If you are
+    # writing an application that needs to run node at runtime, this flag should
+    # be set to true.
+    launch = true
 
 [[requires]]
 
