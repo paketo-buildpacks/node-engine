@@ -70,7 +70,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 
 			firstImage, logs, err = pack.WithNoColor().Build.
-				WithNoPull().
+				WithPullPolicy("never").
 				WithBuildpacks(
 					nodeBuildpack,
 					buildPlanBuildpack,
@@ -116,7 +116,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
-				WithNoPull().
+				WithPullPolicy("never").
 				WithBuildpacks(
 					nodeBuildpack,
 					buildPlanBuildpack,
@@ -177,7 +177,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 
 			firstImage, logs, err = pack.WithNoColor().Build.
-				WithNoPull().
+				WithPullPolicy("never").
 				WithBuildpacks(
 					nodeBuildpack,
 					buildPlanBuildpack,
@@ -229,7 +229,7 @@ nodejs:
 
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
-				WithNoPull().
+				WithPullPolicy("never").
 				WithBuildpacks(
 					nodeBuildpack,
 					buildPlanBuildpack,
