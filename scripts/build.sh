@@ -53,6 +53,11 @@ function run::build() {
           -o "run" \
             "${BUILDPACKDIR}/run"
 
+      if command -v upx > /dev/null; then
+        printf "%s" "compressing... "
+        upx -q -9 run > /dev/null
+      fi
+
       echo "Success!"
 
       for name in detect build; do
@@ -79,6 +84,11 @@ function cmd::build() {
           -ldflags="-s -w" \
           -o "${BUILDPACKDIR}/bin/${name}" \
             "${src}/main.go"
+
+      if command -v upx > /dev/null; then
+        printf "%s" "compressing... "
+        upx -q -9 "${BUILDPACKDIR}/bin/${name}" > /dev/null
+      fi
 
       echo "Success!"
     done
