@@ -77,6 +77,17 @@ api = "0.2"
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_14.14.0_linux_x64_cflinuxfs3_4ac6c1ed.tgz"
     version = "14.14.0"
 
+  [[metadata.dependencies]]
+    deprecation_date = "2021-06-01T00:00:00Z"
+    id = "node"
+    name = "Node Engine"
+    sha256 = "d87f6e4ece97c37b878a8e2af065d3aa8a61933ec3150989fbddf2d25642c8ee"
+    source = "https://nodejs.org/dist/v15.0.0/node-v15.0.0.tar.gz"
+    source_sha256 = "72f6234594877ab212c43a76f2f5b05d409d7c025e0eb36d675d9acfd0d3f2d8"
+    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_15.0.0_linux_x64_cflinuxfs3_d87f6e4e.tgz"
+    version = "15.0.0"
+
   [[metadata.dependency_deprecation_dates]]
     date = 2021-04-01T00:00:00Z
     link = "https://github.com/nodejs/Release"
