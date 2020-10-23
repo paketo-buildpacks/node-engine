@@ -111,8 +111,8 @@ api = "0.2"
   name = %q
 
 [metadata]
-  include_files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
-  pre_package = "./scripts/build.sh"
+  include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
+  pre-package = "./scripts/build.sh"
   [metadata.default-versions]
     node = "10.x"
 
