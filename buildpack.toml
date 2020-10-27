@@ -9,7 +9,7 @@ api = "0.2"
   include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
   [metadata.default-versions]
-    node = "10.x"
+    node = "14.*.*"
 
   [[metadata.dependencies]]
     deprecation_date = "2021-04-01T00:00:00Z"
