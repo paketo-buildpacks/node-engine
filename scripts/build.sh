@@ -49,15 +49,9 @@ function run::build() {
 
       GOOS=linux \
         go build \
-          -buildmode=pie \
           -ldflags="-s -w" \
           -o "run" \
             "${BUILDPACKDIR}/run"
-
-      if command -v upx > /dev/null; then
-        printf "%s" "compressing... "
-        upx -q -9 run > /dev/null
-      fi
 
       echo "Success!"
 
@@ -82,15 +76,9 @@ function cmd::build() {
 
       GOOS="linux" \
         go build \
-          -buildmode=pie \
           -ldflags="-s -w" \
           -o "${BUILDPACKDIR}/bin/${name}" \
             "${src}/main.go"
-
-      if command -v upx > /dev/null; then
-        printf "%s" "compressing... "
-        upx -q -9 "${BUILDPACKDIR}/bin/${name}" > /dev/null
-      fi
 
       echo "Success!"
     done
