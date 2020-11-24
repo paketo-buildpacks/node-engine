@@ -37,23 +37,23 @@ api = "0.2"
     deprecation_date = "2022-04-01T00:00:00Z"
     id = "node"
     name = "Node Engine"
-    sha256 = "03ab83e564d3cfc824e6cb1c8f167d063056f907adfe90a4d7ff7033c7186e99"
-    source = "https://nodejs.org/dist/v12.19.0/node-v12.19.0.tar.gz"
-    source_sha256 = "1279e49be60d92cf4c1a48c9d92397db4e9284a100bc47689ce7924686bbddd1"
-    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_12.19.0_linux_x64_cflinuxfs3_03ab83e5.tgz"
-    version = "12.19.0"
-
-  [[metadata.dependencies]]
-    deprecation_date = "2022-04-01T00:00:00Z"
-    id = "node"
-    name = "Node Engine"
     sha256 = "117259832364fb8fa729e0877478e132e2d55d72fdd089b9099ee507770014ab"
     source = "https://nodejs.org/dist/v12.19.1/node-v12.19.1.tar.gz"
     source_sha256 = "83c36a4b8e9fd0111af8338657395c2fc05b2c34ecfc2618f6347fc284949889"
     stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_12.19.1_linux_x64_cflinuxfs3_11725983.tgz"
     version = "12.19.1"
+
+  [[metadata.dependencies]]
+    deprecation_date = "2022-04-01T00:00:00Z"
+    id = "node"
+    name = "Node Engine"
+    sha256 = "0b7da2ac2c1b6f3fb97e6d81926f0e52754a3b47e93408205fa1bb39133ed069"
+    source = "https://nodejs.org/dist/v12.20.0/node-v12.20.0.tar.gz"
+    source_sha256 = "b91065ebe60981faa0e1f0a37d1788154141c710bb0521635a900895a7ce8dd8"
+    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_12.20.0_linux_x64_cflinuxfs3_0b7da2ac.tgz"
+    version = "12.20.0"
 
   [[metadata.dependencies]]
     deprecation_date = "2023-04-30T00:00:00Z"
