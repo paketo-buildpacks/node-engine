@@ -55,10 +55,6 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		nodeLayer.Launch = entry.Metadata["launch"] == true
-		nodeLayer.Build = entry.Metadata["build"] == true
-		nodeLayer.Cache = entry.Metadata["build"] == true
-
 		bom := planRefinery.BillOfMaterial(postal.Dependency{
 			ID:      dependency.ID,
 			Name:    dependency.Name,
@@ -81,10 +77,14 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		logger.Process("Executing build process")
 
-		err = nodeLayer.Reset()
+		nodeLayer, err = nodeLayer.Reset()
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
+
+		nodeLayer.Launch = entry.Metadata["launch"] == true
+		nodeLayer.Build = entry.Metadata["build"] == true
+		nodeLayer.Cache = entry.Metadata["build"] == true
 
 		nodeLayer.Metadata = map[string]interface{}{
 			DepKey:     dependency.SHA256,
