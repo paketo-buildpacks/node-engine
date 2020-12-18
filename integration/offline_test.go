@@ -66,12 +66,16 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 
 			Expect(err).NotTo(HaveOccurred(), logs.String())
 
-			container, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(image.ID)
+			container, err = docker.Container.Run.
+				WithMemory("128m").
+				WithCommand("node server.js").
+				WithPublish("8080").
+				Execute(image.ID)
 			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(container).Should(BeAvailable())
 
-			response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort()))
+			response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 

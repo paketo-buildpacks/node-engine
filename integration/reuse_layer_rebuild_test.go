@@ -107,7 +107,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
 
-			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
+			firstContainer, err = docker.Container.Run.
+				WithMemory("128m").
+				WithCommand("node server.js").
+				WithPublish("8080").
+				Execute(firstImage.ID)
 			Expect(err).NotTo(HaveOccurred())
 
 			containerIDs[firstContainer.ID] = struct{}{}
@@ -142,14 +146,18 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("  Reusing cached layer /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 			))
 
-			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
+			secondContainer, err = docker.Container.Run.
+				WithMemory("128m").
+				WithCommand("node server.js").
+				WithPublish("8080").
+				Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())
 
 			containerIDs[secondContainer.ID] = struct{}{}
 
 			Eventually(secondContainer).Should(BeAvailable())
 
-			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
+			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort("8080")))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
@@ -214,7 +222,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
 
-			firstContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(firstImage.ID)
+			firstContainer, err = docker.Container.Run.
+				WithMemory("128m").
+				WithCommand("node server.js").
+				WithPublish("8080").
+				Execute(firstImage.ID)
 			Expect(err).NotTo(HaveOccurred())
 
 			containerIDs[firstContainer.ID] = struct{}{}
@@ -266,14 +278,18 @@ nodejs:
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
 
-			secondContainer, err = docker.Container.Run.WithMemory("128m").WithCommand("node server.js").Execute(secondImage.ID)
+			secondContainer, err = docker.Container.Run.
+				WithMemory("128m").
+				WithCommand("node server.js").
+				WithPublish("8080").
+				Execute(secondImage.ID)
 			Expect(err).NotTo(HaveOccurred())
 
 			containerIDs[secondContainer.ID] = struct{}{}
 
 			Eventually(secondContainer).Should(BeAvailable())
 
-			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort()))
+			response, err := http.Get(fmt.Sprintf("http://localhost:%s", secondContainer.HostPort("8080")))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
