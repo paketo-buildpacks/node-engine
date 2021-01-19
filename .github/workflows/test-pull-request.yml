@@ -37,7 +37,7 @@ jobs:
     - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
 
     - name: Run Integration Tests
-      run: ./scripts/integration.sh
+      run: ./scripts/integration.sh --use-token
       env:
         GIT_TOKEN: ${{ github.token }}
 
