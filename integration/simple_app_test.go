@@ -3,6 +3,7 @@ package integration
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,9 +17,11 @@ import (
 	. "github.com/paketo-buildpacks/occam/matchers"
 )
 
-func testLogging(t *testing.T, context spec.G, it spec.S) {
+func testSimple(t *testing.T, context spec.G, it spec.S) {
 	var (
-		Expect = NewWithT(t).Expect
+		Expect     = NewWithT(t).Expect
+		Eventually = NewWithT(t).Eventually
+
 		pack   occam.Pack
 		docker occam.Docker
 	)
@@ -30,9 +33,10 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 
 	context("when the buildpack is run with pack build", func() {
 		var (
-			image  occam.Image
-			name   string
-			source string
+			image     occam.Image
+			container occam.Container
+			name      string
+			source    string
 		)
 
 		it.Before(func() {
@@ -47,44 +51,75 @@ func testLogging(t *testing.T, context spec.G, it spec.S) {
 			Expect(os.RemoveAll(source)).To(Succeed())
 		})
 
-		it("logs useful information for the user", func() {
-			var err error
+		context("simple app", func() {
 
-			source, err = occam.Source(filepath.Join("testdata", "simple_app"))
-			Expect(err).ToNot(HaveOccurred())
+			it.After(func() {
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+			})
 
-			var logs fmt.Stringer
-			image, logs, err = pack.WithNoColor().Build.
-				WithPullPolicy("never").
-				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
-				).
-				Execute(name, source)
-			Expect(err).ToNot(HaveOccurred(), logs.String)
+			it("builds, logs and runs correctly", func() {
+				var err error
 
-			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
-				"  Resolving Node Engine version",
-				"    Candidate version sources (in priority order):",
-				"      buildpack.yml -> \"~10\"",
-				"      <unknown>     -> \"*\"",
-				"",
-				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
-				"",
-				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
-				MatchRegexp(`      Completed in \d+\.\d+`),
-				"",
-				"  Configuring environment",
-				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
-				`    NODE_VERBOSE -> "false"`,
-				"",
-				"    Writing profile.d/0_memory_available.sh",
-				"      Calculates available memory based on container limits at launch time.",
-				"      Made available in the MEMORY_AVAILABLE environment variable.",
-			))
+				source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+				Expect(err).ToNot(HaveOccurred())
+
+				var logs fmt.Stringer
+				image, logs, err = pack.WithNoColor().Build.
+					WithPullPolicy("never").
+					WithBuildpacks(
+						nodeBuildpack,
+						buildPlanBuildpack,
+					).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      buildpack.yml -> \"~10\"",
+					"      <unknown>     -> \"*\"",
+					"",
+					MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+					"",
+					"  Executing build process",
+					MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+					MatchRegexp(`      Completed in \d+\.\d+`),
+					"",
+					"  Configuring environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"    Writing profile.d/0_memory_available.sh",
+					"      Calculates available memory based on container limits at launch time.",
+					"      Made available in the MEMORY_AVAILABLE environment variable.",
+				))
+
+				container, err = docker.Container.Run.
+					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
+					WithPublish("8080").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container).Should(BeAvailable())
+
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+				content, err := ioutil.ReadAll(response.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("hello world"))
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container.ID)
+					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(
+					ContainSubstring("NODE_ENV=production"),
+				)
+			})
 		})
 
 		context("when the node version specfied in the app is EOL'd", func() {
