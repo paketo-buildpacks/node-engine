@@ -32,9 +32,18 @@ func NewEnvironment(logger LogEmitter) Environment {
 }
 
 func (e Environment) Configure(env packit.Environment, path string, optimizeMemory bool) error {
-	env.Override("NODE_HOME", path)
-	env.Override("NODE_ENV", "production")
-	env.Override("NODE_VERBOSE", "false")
+	env.Default("NODE_HOME", path)
+	if val, ok := os.LookupEnv("NODE_ENV"); ok {
+		env.Default("NODE_ENV", val)
+	} else {
+		env.Default("NODE_ENV", "production")
+	}
+
+	if val, ok := os.LookupEnv("NODE_VERBOSE"); ok {
+		env.Default("NODE_VERBOSE", val)
+	} else {
+		env.Default("NODE_VERBOSE", "false")
+	}
 
 	profileDPath := filepath.Join(path, "profile.d")
 	err := os.MkdirAll(profileDPath, os.ModePerm)

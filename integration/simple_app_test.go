@@ -120,6 +120,60 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					ContainSubstring("NODE_ENV=production"),
 				)
 			})
+
+			context("NODE_ENV, NODE_VERBOSE are set by user", func() {
+				it("sets its value as default value in build and launch phase", func() {
+					var err error
+
+					source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+					Expect(err).ToNot(HaveOccurred())
+
+					var logs fmt.Stringer
+					image, logs, err = pack.WithNoColor().Build.
+						WithPullPolicy("never").
+						WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
+						WithBuildpacks(
+							nodeBuildpack,
+							buildPlanBuildpack,
+						).
+						Execute(name, source)
+					Expect(err).ToNot(HaveOccurred(), logs.String)
+
+					Expect(logs).To(ContainLines(
+						"  Configuring environment",
+						`    NODE_ENV     -> "development"`,
+						fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+						`    NODE_VERBOSE -> "true"`,
+					))
+
+					container, err = docker.Container.Run.
+						WithCommand("echo ENV=$NODE_ENV && echo VERBOSE=$NODE_VERBOSE && node server.js").
+						WithPublish("8080").
+						Execute(image.ID)
+					Expect(err).NotTo(HaveOccurred())
+
+					Eventually(container).Should(BeAvailable())
+
+					response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+					content, err := ioutil.ReadAll(response.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(string(content)).To(ContainSubstring("hello world"))
+
+					Eventually(func() string {
+						cLogs, err := docker.Container.Logs.Execute(container.ID)
+						Expect(err).NotTo(HaveOccurred())
+						return cLogs.String()
+					}).Should(
+						And(
+							ContainSubstring("ENV=development"),
+							ContainSubstring("VERBOSE=true"),
+						),
+					)
+				})
+			})
 		})
 
 		context("when the node version specfied in the app is EOL'd", func() {
