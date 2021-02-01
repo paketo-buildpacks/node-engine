@@ -59,10 +59,30 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(env).To(Equal(packit.Environment{
-				"NODE_HOME.override":    path,
-				"NODE_ENV.override":     "production",
-				"NODE_VERBOSE.override": "false",
+				"NODE_HOME.default":    path,
+				"NODE_ENV.default":     "production",
+				"NODE_VERBOSE.default": "false",
 			}))
+		})
+
+		context("when NODE_ENV, NODE_VERBOSE are set", func() {
+			it.Before(func() {
+				os.Setenv("NODE_ENV", "some-node-env-val")
+				os.Setenv("NODE_VERBOSE", "some-node-verbose-val")
+			})
+
+			it.After(func() {
+				os.Unsetenv("NODE_ENV")
+				os.Unsetenv("NODE_VERBOSE")
+			})
+
+			it("configures variables using given value", func() {
+				err := environment.Configure(env, path, false)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(env["NODE_ENV.default"]).To(Equal("some-node-env-val"))
+				Expect(env["NODE_VERBOSE.default"]).To(Equal("some-node-verbose-val"))
+			})
 		})
 
 		it("writes a profile.d script for available memory", func() {

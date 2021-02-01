@@ -80,7 +80,7 @@ func TestIntegration(t *testing.T) {
 	SetDefaultEventuallyTimeout(5 * time.Second)
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
-	suite("Logging", testLogging)
+	suite("Simple", testSimple)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
 	suite("Provides", testProvides)

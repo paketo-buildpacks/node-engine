@@ -27,9 +27,9 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 	context("Environment", func() {
 		it("prints details about the environment", func() {
 			emitter.Environment(packit.Environment{
-				"NODE_HOME.override":    "/some/path",
-				"NODE_ENV.override":     "production",
-				"NODE_VERBOSE.override": "false",
+				"NODE_HOME.default":    "/some/path",
+				"NODE_ENV.default":     "production",
+				"NODE_VERBOSE.default": "false",
 			}, true)
 
 			Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
@@ -47,9 +47,9 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 		context("when not optimizing memory", func() {
 			it("omits those details", func() {
 				emitter.Environment(packit.Environment{
-					"NODE_HOME.override":    "/some/path",
-					"NODE_ENV.override":     "production",
-					"NODE_VERBOSE.override": "false",
+					"NODE_HOME.default":    "/some/path",
+					"NODE_ENV.default":     "production",
+					"NODE_VERBOSE.default": "false",
 				}, false)
 
 				Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
