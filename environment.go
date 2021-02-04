@@ -31,18 +31,22 @@ func NewEnvironment(logger LogEmitter) Environment {
 	}
 }
 
-func (e Environment) Configure(env packit.Environment, path string, optimizeMemory bool) error {
-	env.Default("NODE_HOME", path)
+func (e Environment) Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error {
+	launchEnv.Default("NODE_HOME", path)
+	launchEnv.Default("NODE_ENV", "production")
+	launchEnv.Default("NODE_VERBOSE", "false")
+
+	buildEnv.Default("NODE_HOME", path)
 	if val, ok := os.LookupEnv("NODE_ENV"); ok {
-		env.Default("NODE_ENV", val)
+		buildEnv.Default("NODE_ENV", val)
 	} else {
-		env.Default("NODE_ENV", "production")
+		buildEnv.Default("NODE_ENV", "production")
 	}
 
 	if val, ok := os.LookupEnv("NODE_VERBOSE"); ok {
-		env.Default("NODE_VERBOSE", val)
+		buildEnv.Default("NODE_VERBOSE", val)
 	} else {
-		env.Default("NODE_VERBOSE", "false")
+		buildEnv.Default("NODE_VERBOSE", "false")
 	}
 
 	profileDPath := filepath.Join(path, "profile.d")
@@ -63,7 +67,7 @@ func (e Environment) Configure(env packit.Environment, path string, optimizeMemo
 		}
 	}
 
-	e.logger.Environment(env, optimizeMemory)
+	e.logger.Environment(buildEnv, launchEnv, optimizeMemory)
 
 	return nil
 }

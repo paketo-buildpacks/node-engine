@@ -190,7 +190,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.InstallCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 
-		Expect(environment.ConfigureCall.Receives.Env).To(Equal(packit.Environment{}))
+		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
+		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
 		Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 		Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
@@ -238,7 +239,8 @@ nodejs:
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(environment.ConfigureCall.Receives.Env).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 		})
@@ -366,7 +368,8 @@ nodejs:
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(environment.ConfigureCall.Receives.Env).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 		})
