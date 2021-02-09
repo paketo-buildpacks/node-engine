@@ -20,9 +20,12 @@ func NewLogEmitter(output io.Writer) LogEmitter {
 	}
 }
 
-func (e LogEmitter) Environment(env packit.Environment, optimizeMemory bool) {
-	e.Process("Configuring environment")
-	e.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(env))
+func (e LogEmitter) Environment(buildEnv, launchEnv packit.Environment, optimizeMemory bool) {
+	e.Process("Configuring build environment")
+	e.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(buildEnv))
+	e.Break()
+	e.Process("Configuring launch environment")
+	e.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(launchEnv))
 	e.Break()
 	e.Subprocess("Writing profile.d/0_memory_available.sh")
 	e.Action("Calculates available memory based on container limits at launch time.")

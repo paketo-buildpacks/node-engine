@@ -28,14 +28,22 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 		it("prints details about the environment", func() {
 			emitter.Environment(packit.Environment{
 				"NODE_HOME.default":    "/some/path",
-				"NODE_ENV.default":     "production",
-				"NODE_VERBOSE.default": "false",
+				"NODE_ENV.default":     "some-env",
+				"NODE_VERBOSE.default": "some-bool",
+			}, packit.Environment{
+				"NODE_HOME.default":    "/some/path",
+				"NODE_ENV.default":     "another-env",
+				"NODE_VERBOSE.default": "another-bool",
 			}, true)
 
-			Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
-			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"production\""))
+			Expect(buffer.String()).To(ContainSubstring("  Configuring build environment"))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"some-env\""))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_HOME    -> \"/some/path\""))
-			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"false\""))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"some-bool\""))
+			Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"another-env\""))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_HOME    -> \"/some/path\""))
+			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"another-bool\""))
 			Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
 			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
@@ -48,11 +56,16 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 			it("omits those details", func() {
 				emitter.Environment(packit.Environment{
 					"NODE_HOME.default":    "/some/path",
-					"NODE_ENV.default":     "production",
-					"NODE_VERBOSE.default": "false",
+					"NODE_ENV.default":     "some-env",
+					"NODE_VERBOSE.default": "some-bool",
+				}, packit.Environment{
+					"NODE_HOME.default":    "/some/path",
+					"NODE_ENV.default":     "another-env",
+					"NODE_VERBOSE.default": "another-bool",
 				}, false)
 
-				Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
+				Expect(buffer.String()).To(ContainSubstring("  Configuring build environment"))
+				Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
 				Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
 				Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 				Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))

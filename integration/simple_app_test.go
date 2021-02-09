@@ -86,7 +86,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					"  Configuring environment",
+					"  Configuring build environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
@@ -122,7 +127,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 			})
 
 			context("NODE_ENV, NODE_VERBOSE are set by user", func() {
-				it("sets its value as default value in build and launch phase", func() {
+				it("uses user-set value in build and buildpack-set value in launch phase", func() {
 					var err error
 
 					source, err = occam.Source(filepath.Join("testdata", "simple_app"))
@@ -140,10 +145,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					Expect(err).ToNot(HaveOccurred(), logs.String)
 
 					Expect(logs).To(ContainLines(
-						"  Configuring environment",
+						"  Configuring build environment",
 						`    NODE_ENV     -> "development"`,
 						fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 						`    NODE_VERBOSE -> "true"`,
+						"",
+						"  Configuring launch environment",
+						`    NODE_ENV     -> "production"`,
+						fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+						`    NODE_VERBOSE -> "false"`,
 					))
 
 					container, err = docker.Container.Run.
@@ -168,8 +178,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 						return cLogs.String()
 					}).Should(
 						And(
-							ContainSubstring("ENV=development"),
-							ContainSubstring("VERBOSE=true"),
+							ContainSubstring("ENV=production"),
+							ContainSubstring("VERBOSE=false"),
 						),
 					)
 				})

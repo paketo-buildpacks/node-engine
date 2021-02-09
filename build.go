@@ -23,7 +23,7 @@ type DependencyManager interface {
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
 type EnvironmentConfiguration interface {
-	Configure(env packit.Environment, path string, optimizeMemory bool) error
+	Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error
 }
 
 //go:generate faux --interface BuildPlanRefinery --output fakes/build_plan_refinery.go
@@ -107,7 +107,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, fmt.Errorf("unable to parse buildpack.yml file: %s", err)
 		}
 
-		err = environment.Configure(nodeLayer.SharedEnv, nodeLayer.Path, config.OptimizedMemory)
+		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, config.OptimizedMemory)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}

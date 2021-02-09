@@ -32,8 +32,9 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		env  packit.Environment
-		path string
+		buildEnv  packit.Environment
+		launchEnv packit.Environment
+		path      string
 
 		buffer      *bytes.Buffer
 		environment nodeengine.Environment
@@ -44,7 +45,8 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 		path, err = ioutil.TempDir("", "layer-dir")
 		Expect(err).NotTo(HaveOccurred())
 
-		env = packit.Environment{}
+		buildEnv = packit.Environment{}
+		launchEnv = packit.Environment{}
 		buffer = bytes.NewBuffer(nil)
 		environment = nodeengine.NewEnvironment(nodeengine.NewLogEmitter(buffer))
 	})
@@ -55,10 +57,16 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 
 	context("Configure", func() {
 		it("configures the environment variables", func() {
-			err := environment.Configure(env, path, false)
+			err := environment.Configure(buildEnv, launchEnv, path, false)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(env).To(Equal(packit.Environment{
+			Expect(buildEnv).To(Equal(packit.Environment{
+				"NODE_HOME.default":    path,
+				"NODE_ENV.default":     "production",
+				"NODE_VERBOSE.default": "false",
+			}))
+
+			Expect(launchEnv).To(Equal(packit.Environment{
 				"NODE_HOME.default":    path,
 				"NODE_ENV.default":     "production",
 				"NODE_VERBOSE.default": "false",
@@ -76,24 +84,27 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 				os.Unsetenv("NODE_VERBOSE")
 			})
 
-			it("configures variables using given value", func() {
-				err := environment.Configure(env, path, false)
+			it("configures build envs using given value", func() {
+				err := environment.Configure(buildEnv, launchEnv, path, false)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(env["NODE_ENV.default"]).To(Equal("some-node-env-val"))
-				Expect(env["NODE_VERBOSE.default"]).To(Equal("some-node-verbose-val"))
+				Expect(buildEnv["NODE_ENV.default"]).To(Equal("some-node-env-val"))
+				Expect(buildEnv["NODE_VERBOSE.default"]).To(Equal("some-node-verbose-val"))
+
+				Expect(launchEnv["NODE_ENV.default"]).To(Equal("production"))
+				Expect(launchEnv["NODE_VERBOSE.default"]).To(Equal("false"))
 			})
 		})
 
 		it("writes a profile.d script for available memory", func() {
-			err := environment.Configure(env, path, false)
+			err := environment.Configure(buildEnv, launchEnv, path, false)
 			Expect(err).NotTo(HaveOccurred())
 
 			contents, err := ioutil.ReadFile(filepath.Join(path, "profile.d", "0_memory_available.sh"))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(contents)).To(Equal(MemoryAvailableScript))
 
-			Expect(buffer.String()).To(ContainSubstring("  Configuring environment"))
+			Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"production\""))
 			Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME    -> %q", path)))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"false\""))
@@ -103,7 +114,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		it("does not write a profile.d script for optimizing memory", func() {
-			err := environment.Configure(env, path, false)
+			err := environment.Configure(buildEnv, launchEnv, path, false)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(filepath.Join(path, "profile.d", "1_optimize_memory.sh")).NotTo(BeARegularFile())
@@ -112,7 +123,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 
 		context("when memory should be optimized", func() {
 			it("writes a profile.d script for optimizing memory", func() {
-				err := environment.Configure(env, path, true)
+				err := environment.Configure(buildEnv, launchEnv, path, true)
 				Expect(err).NotTo(HaveOccurred())
 
 				contents, err := ioutil.ReadFile(filepath.Join(path, "profile.d", "1_optimize_memory.sh"))
@@ -136,7 +147,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 				})
 
 				it("returns an error", func() {
-					err := environment.Configure(env, path, false)
+					err := environment.Configure(buildEnv, launchEnv, path, false)
 					Expect(err).To(MatchError(ContainSubstring("permission denied")))
 				})
 			})
@@ -158,7 +169,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 				})
 
 				it("returns an error", func() {
-					err := environment.Configure(env, path, false)
+					err := environment.Configure(buildEnv, launchEnv, path, false)
 					Expect(err).To(MatchError(ContainSubstring("permission denied")))
 				})
 			})
@@ -180,7 +191,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 				})
 
 				it("returns an error", func() {
-					err := environment.Configure(env, path, true)
+					err := environment.Configure(buildEnv, launchEnv, path, true)
 					Expect(err).To(MatchError(ContainSubstring("permission denied")))
 				})
 			})
