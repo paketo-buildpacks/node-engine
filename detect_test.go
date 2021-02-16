@@ -18,12 +18,14 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 		nvmrcParser        *fakes.VersionParser
 		buildpackYMLParser *fakes.VersionParser
+		nodeVersionParser  *fakes.VersionParser
 		detect             packit.DetectFunc
 	)
 
 	it.Before(func() {
 		nvmrcParser = &fakes.VersionParser{}
 		buildpackYMLParser = &fakes.VersionParser{}
+		nodeVersionParser = &fakes.VersionParser{}
 
 		detect = nodeengine.Detect(nvmrcParser, buildpackYMLParser)
 	})
@@ -140,10 +142,57 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
-	context("when the source code contains a both .nvmrc and buildpack.yml files", func() {
+	context("when the source code contains a .node-version file", func() {
+		it.Before(func() {
+			nodeVersionParser.ParseVersionCall.Returns.Version = "7.8.9"
+		})
+
+		it("returns a plan that provides and requires that version of node", func() {
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Node,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "7.8.9",
+							VersionSource: ".node-version",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Node,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "7.8.9",
+									VersionSource: ".node-version",
+								},
+							},
+						},
+					},
+				},
+			}))
+
+			Expect(nodeVersionParser.ParseVersionCall.Receives.Path).To(Equal("/working-dir/.node-version"))
+		})
+	})
+
+	context("when the source code contains .nvmrc, buildpack.yml and .node-version files", func() {
 		it.Before(func() {
 			nvmrcParser.ParseVersionCall.Returns.Version = "1.2.3"
 			buildpackYMLParser.ParseVersionCall.Returns.Version = "4.5.6"
+			nodeVersionParser.ParseVersionCall.Returns.Version = "7.8.9"
 		})
 
 		it("returns a plan that provides and requires that version of node", func() {
@@ -170,6 +219,13 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							VersionSource: "buildpack.yml",
 						},
 					},
+					{
+						Name: nodeengine.Node,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "7.8.9.",
+							VersionSource: ".node-version",
+						},
+					},
 				},
 				Or: []packit.BuildPlan{
 					{
@@ -190,6 +246,13 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 								Metadata: nodeengine.BuildPlanMetadata{
 									Version:       "4.5.6",
 									VersionSource: "buildpack.yml",
+								},
+							},
+							{
+								Name: nodeengine.Node,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "7.8.9.",
+									VersionSource: ".node-version",
 								},
 							},
 						},
@@ -225,6 +288,19 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 					WorkingDir: "/working-dir",
 				})
 				Expect(err).To(MatchError("failed to parse buildpack.yml"))
+			})
+		})
+
+		context("when the .node-version parser fails", func() {
+			it.Before(func() {
+				buildpackYMLParser.ParseVersionCall.Returns.Err = errors.New("failed to parse .node-version")
+			})
+
+			it("returns an error", func() {
+				_, err := detect(packit.DetectContext{
+					WorkingDir: "/working-dir",
+				})
+				Expect(err).To(MatchError("failed to parse .node-version"))
 			})
 		})
 	})
