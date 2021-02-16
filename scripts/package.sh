@@ -116,7 +116,7 @@ function buildpackage::create() {
   util::tools::pack::install --directory "${BIN_DIR}"
 
   pack \
-    package-buildpack "${output}" \
+    buildpack package "${output}" \
       --config "${ROOT_DIR}/package.toml" \
       --format file
 }
