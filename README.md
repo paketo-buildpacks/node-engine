@@ -101,7 +101,7 @@ This will create a `buildpackage.cnb` file under the `build` directory which you
 can use to build your app as follows:
 `pack build <app-name> -p <path-to-app> -b build/buildpackage.cnb`
 
-## `buildpack.yml` Configurations
+## Configuration via `buildpack.yml`, `.nvmrc` or `.node-version`
 
 In order to specify a particular version of node you can 
 provide an optional `buildpack.yml` in the root of the application directory.
@@ -116,6 +116,8 @@ nodejs:
   # bool
   optimize-memory: true
 ```
+
+You can also specify a node version via an `.nvmrc` or `.node-version` file, also at the application directory root.
 
 ## Run Tests
 
