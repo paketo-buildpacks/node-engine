@@ -27,7 +27,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		buildpackYMLParser = &fakes.VersionParser{}
 		nodeVersionParser = &fakes.VersionParser{}
 
-		detect = nodeengine.Detect(nvmrcParser, buildpackYMLParser)
+		detect = nodeengine.Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser)
 	})
 
 	it("returns a plan that provides node", func() {
@@ -222,7 +222,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 					{
 						Name: nodeengine.Node,
 						Metadata: nodeengine.BuildPlanMetadata{
-							Version:       "7.8.9.",
+							Version:       "7.8.9",
 							VersionSource: ".node-version",
 						},
 					},
@@ -251,7 +251,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							{
 								Name: nodeengine.Node,
 								Metadata: nodeengine.BuildPlanMetadata{
-									Version:       "7.8.9.",
+									Version:       "7.8.9",
 									VersionSource: ".node-version",
 								},
 							},

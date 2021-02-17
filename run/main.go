@@ -13,6 +13,7 @@ import (
 func main() {
 	nvmrcParser := nodeengine.NewNvmrcParser()
 	buildpackYMLParser := nodeengine.NewBuildpackYMLParser()
+	nodeVersionParser := nodeengine.NewNodeVersionParser()
 	logEmitter := nodeengine.NewLogEmitter(os.Stdout)
 	entryResolver := nodeengine.NewPlanEntryResolver(logEmitter)
 	dependencyManager := postal.NewService(cargo.NewTransport())
@@ -23,6 +24,7 @@ func main() {
 		nodeengine.Detect(
 			nvmrcParser,
 			buildpackYMLParser,
+			nodeVersionParser,
 		),
 		nodeengine.Build(
 			entryResolver,
