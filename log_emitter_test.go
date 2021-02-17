@@ -108,6 +108,13 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 				},
 				{
 					Name: "node",
+					Metadata: map[string]interface{}{
+						"version":        "node-version-version",
+						"version-source": ".node-version",
+					},
+				},
+				{
+					Name: "node",
 				},
 			})
 
@@ -115,6 +122,7 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 			Expect(buffer.String()).To(ContainSubstring("      buildpack.yml -> \"buildpack-yml-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      package.json  -> \"package-json-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      .nvmrc        -> \"nvmrc-version\""))
+			Expect(buffer.String()).To(ContainSubstring("      .node-version -> \"node-version-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      <unknown>     -> \"other-version\""))
 			Expect(buffer.String()).To(ContainSubstring("      <unknown>     -> \"*\""))
 		})
