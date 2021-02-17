@@ -86,5 +86,29 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).To(MatchError("invalid version specified in .node-version: \"1.2.this is not a number\""))
 			})
 		})
+
+		context("when the .node-version contains a value prefixed with `lts/`", func() {
+			it.Before(func() {
+				err := ioutil.WriteFile(path, []byte("lts/*"), 0644)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("returns an error", func() {
+				_, err := parser.ParseVersion(path)
+				Expect(err).To(MatchError("invalid version specified in .node-version: \"lts/*\""))
+			})
+		})
+
+		context("when the .node-version contains the value `node`", func() {
+			it.Before(func() {
+				err := ioutil.WriteFile(path, []byte("node"), 0644)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("returns an error", func() {
+				_, err := parser.ParseVersion(path)
+				Expect(err).To(MatchError("invalid version specified in .node-version: \"node\""))
+			})
+		})
 	})
 }
