@@ -7,4 +7,5 @@ const (
 	DepKey             = "dependency-sha"
 	NvmrcSource        = ".nvmrc"
 	BuildpackYMLSource = "buildpack.yml"
+	NodeVersionSource  = ".node-version"
 )
