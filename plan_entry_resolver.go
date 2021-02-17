@@ -19,9 +19,10 @@ func NewPlanEntryResolver(logger LogEmitter) PlanEntryResolver {
 func (r PlanEntryResolver) Resolve(entries []packit.BuildpackPlanEntry) packit.BuildpackPlanEntry {
 	var (
 		priorities = map[string]int{
-			"buildpack.yml": 3,
-			"package.json":  2,
-			".nvmrc":        1,
+			"buildpack.yml": 4,
+			"package.json":  3,
+			".nvmrc":        2,
+			".node-version": 1,
 			"":              -1,
 		}
 	)
