@@ -35,16 +35,6 @@ func (p NodeVersionParser) ParseVersion(path string) (string, error) {
 func (p NodeVersionParser) validateNodeVersion(content string) (string, error) {
 	content = strings.TrimSpace(strings.ToLower(content))
 
-	if content == "lts/*" || content == Node {
-		return content, nil
-	}
-
-	for key := range lts {
-		if content == strings.ToLower("lts/"+key) {
-			return content, nil
-		}
-	}
-
 	content = strings.TrimPrefix(content, "v")
 
 	if _, err := semver.NewVersion(content); err != nil {
@@ -55,26 +45,6 @@ func (p NodeVersionParser) validateNodeVersion(content string) (string, error) {
 }
 
 func (p NodeVersionParser) formatNodeVersionContent(version string) string {
-	if version == Node {
-		return "*"
-	}
-
-	if strings.HasPrefix(version, "lts") {
-		ltsName := strings.SplitN(version, "/", 2)[1]
-		if ltsName == "*" {
-			var maxVersion int
-			for _, versionValue := range lts {
-				if maxVersion < versionValue {
-					maxVersion = versionValue
-				}
-			}
-
-			return fmt.Sprintf("%d.*.*", maxVersion)
-		}
-
-		return fmt.Sprintf("%d.*.*", lts[ltsName])
-	}
-
 	var groups []string
 	for _, part := range semverRegex.FindStringSubmatch(version) {
 		if part != "" {
