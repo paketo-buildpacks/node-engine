@@ -195,7 +195,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 			it("builds, logs and runs correctly", func() {
 				var err error
 
-				source, err = occam.Source(filepath.Join("testdata", "simple_app", "node_version"))
+				source, err = occam.Source(filepath.Join("testdata", "node_version_app"))
 				Expect(err).ToNot(HaveOccurred())
 
 				var logs fmt.Stringer
@@ -271,7 +271,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 			it("builds, logs and runs correctly", func() {
 				var err error
 
-				source, err = occam.Source(filepath.Join("testdata", "simple_app", "nvmrc"))
+				source, err = occam.Source(filepath.Join("testdata", "nvmrc_app"))
 				Expect(err).ToNot(HaveOccurred())
 
 				var logs fmt.Stringer
