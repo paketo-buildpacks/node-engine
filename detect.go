@@ -1,6 +1,7 @@
 package nodeengine
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit"
@@ -30,6 +31,17 @@ func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) pa
 				Metadata: BuildPlanMetadata{
 					Version:       version,
 					VersionSource: NvmrcSource,
+				},
+			})
+		}
+
+		version = os.Getenv("BP_NODE_VERSION")
+		if version != "" {
+			requirements = append(requirements, packit.BuildPlanRequirement{
+				Name: Node,
+				Metadata: BuildPlanMetadata{
+					Version:       version,
+					VersionSource: "BP_NODE_VERSION",
 				},
 			})
 		}

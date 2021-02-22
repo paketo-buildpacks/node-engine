@@ -2,6 +2,7 @@ package nodeengine_test
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
@@ -138,6 +139,118 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 			}))
 
+			Expect(buildpackYMLParser.ParseVersionCall.Receives.Path).To(Equal("/working-dir/buildpack.yml"))
+		})
+	})
+
+	context("when $BP_NODE_VERSION is set", func() {
+		it.Before(func() {
+			os.Setenv("BP_NODE_VERSION", "4.5.6")
+		})
+
+		it.After(func() {
+			os.Unsetenv("BP_NODE_VERSION")
+		})
+
+		it("returns a plan that provides and requires that version of node", func() {
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Node,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "4.5.6",
+							VersionSource: "BP_NODE_VERSION",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Node,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "4.5.6",
+									VersionSource: "BP_NODE_VERSION",
+								},
+							},
+						},
+					},
+				},
+			}))
+		})
+	})
+
+	context("when $BP_NODE_VERSION is set and buildpack.yml exists", func() {
+		it.Before(func() {
+			os.Setenv("BP_NODE_VERSION", "4.5.6")
+			buildpackYMLParser.ParseVersionCall.Returns.Version = "4.5.7"
+		})
+
+		it.After(func() {
+			os.Unsetenv("BP_NODE_VERSION")
+		})
+
+		it("returns a plan that provides and requires that version of node", func() {
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Node,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "4.5.6",
+							VersionSource: "BP_NODE_VERSION",
+						},
+					},
+					{
+						Name: nodeengine.Node,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "4.5.7",
+							VersionSource: "buildpack.yml",
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Node,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "4.5.6",
+									VersionSource: "BP_NODE_VERSION",
+								},
+							},
+							{
+								Name: nodeengine.Node,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "4.5.7",
+									VersionSource: "buildpack.yml",
+								},
+							},
+						},
+					},
+				},
+			}))
 			Expect(buildpackYMLParser.ParseVersionCall.Receives.Path).To(Equal("/working-dir/buildpack.yml"))
 		})
 	})
