@@ -198,6 +198,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
 		Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 		Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
+		Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
+		Expect(buffer.String()).ToNot(ContainSubstring("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information."))
 		Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 	})
 
@@ -509,7 +511,7 @@ nodejs:
 				Stack:   "some-stack",
 				BuildpackInfo: packit.BuildpackInfo{
 					Name:    "Some Buildpack",
-					Version: "some-version",
+					Version: "1.0.0",
 				},
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
@@ -587,7 +589,7 @@ nodejs:
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
-			Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
+			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.0.0"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using buildpack.yml): "))
 			Expect(buffer.String()).To(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))

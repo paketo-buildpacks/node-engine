@@ -81,6 +81,7 @@ func TestIntegration(t *testing.T) {
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
 	suite("Simple", testSimple)
+	suite("Buildpack.yml", testBuildpackYML)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
 	suite("Provides", testProvides)

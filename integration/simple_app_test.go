@@ -51,7 +51,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 			Expect(os.RemoveAll(source)).To(Succeed())
 		})
 
-		context("simple app with buildpack.yml", func() {
+		context("simple app", func() {
 
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
@@ -77,13 +77,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      buildpack.yml -> \"~10\"",
-					"      <unknown>     -> \"*\"",
+					"      <unknown> -> \"*\"",
 					"",
-					MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
 					"",
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
 					"  Configuring build environment",
@@ -125,64 +124,141 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					ContainSubstring("NODE_ENV=production"),
 				)
 			})
+		})
 
-			context("NODE_ENV, NODE_VERBOSE are set by user", func() {
-				it("uses user-set value in build and buildpack-set value in launch phase", func() {
-					var err error
+		context("simple app with BP_NODE_VERSION set and a buildpack.yml", func() {
+			it.After(func() {
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+			})
 
-					source, err = occam.Source(filepath.Join("testdata", "simple_app"))
-					Expect(err).ToNot(HaveOccurred())
+			it.Focus("builds, logs and runs correctly with BP_NODE_VERSION", func() {
+				var err error
 
-					var logs fmt.Stringer
-					image, logs, err = pack.WithNoColor().Build.
-						WithPullPolicy("never").
-						WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
-						WithBuildpacks(
-							nodeBuildpack,
-							buildPlanBuildpack,
-						).
-						Execute(name, source)
-					Expect(err).ToNot(HaveOccurred(), logs.String)
+				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
+				Expect(err).ToNot(HaveOccurred())
 
-					Expect(logs).To(ContainLines(
-						"  Configuring build environment",
-						`    NODE_ENV     -> "development"`,
-						fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
-						`    NODE_VERBOSE -> "true"`,
-						"",
-						"  Configuring launch environment",
-						`    NODE_ENV     -> "production"`,
-						fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
-						`    NODE_VERBOSE -> "false"`,
-					))
+				var logs fmt.Stringer
+				image, logs, err = pack.WithNoColor().Build.
+					WithPullPolicy("never").
+					WithBuildpacks(
+						nodeBuildpack,
+						buildPlanBuildpack,
+					).
+					WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
 
-					container, err = docker.Container.Run.
-						WithCommand("echo ENV=$NODE_ENV && echo VERBOSE=$NODE_VERBOSE && node server.js").
-						WithPublish("8080").
-						Execute(image.ID)
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      BP_NODE_VERSION -> \"~12\"",
+					"      buildpack.yml   -> \"~10\"",
+					"      <unknown>       -> \"*\"",
+					"",
+					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
+					"",
+					"  Executing build process",
+					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
+					MatchRegexp(`      Completed in \d+\.\d+`),
+					"",
+					"  Configuring build environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"  Configuring launch environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"    Writing profile.d/0_memory_available.sh",
+					"      Calculates available memory based on container limits at launch time.",
+					"      Made available in the MEMORY_AVAILABLE environment variable.",
+				))
+
+				container, err = docker.Container.Run.
+					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
+					WithPublish("8080").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container).Should(BeAvailable())
+
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+				content, err := ioutil.ReadAll(response.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("hello world"))
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container.ID)
 					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(
+					ContainSubstring("NODE_ENV=production"),
+				)
+			})
+		})
 
-					Eventually(container).Should(BeAvailable())
+		context("NODE_ENV, NODE_VERBOSE are set by user", func() {
+			it("uses user-set value in build and buildpack-set value in launch phase", func() {
+				var err error
 
-					response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+				source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+				Expect(err).ToNot(HaveOccurred())
+
+				var logs fmt.Stringer
+				image, logs, err = pack.WithNoColor().Build.
+					WithPullPolicy("never").
+					WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
+					WithBuildpacks(
+						nodeBuildpack,
+						buildPlanBuildpack,
+					).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs).To(ContainLines(
+					"  Configuring build environment",
+					`    NODE_ENV     -> "development"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "true"`,
+					"",
+					"  Configuring launch environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+				))
+
+				container, err = docker.Container.Run.
+					WithCommand("echo ENV=$NODE_ENV && echo VERBOSE=$NODE_VERBOSE && node server.js").
+					WithPublish("8080").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container).Should(BeAvailable())
+
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+				content, err := ioutil.ReadAll(response.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("hello world"))
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container.ID)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(response.StatusCode).To(Equal(http.StatusOK))
-
-					content, err := ioutil.ReadAll(response.Body)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(string(content)).To(ContainSubstring("hello world"))
-
-					Eventually(func() string {
-						cLogs, err := docker.Container.Logs.Execute(container.ID)
-						Expect(err).NotTo(HaveOccurred())
-						return cLogs.String()
-					}).Should(
-						And(
-							ContainSubstring("ENV=production"),
-							ContainSubstring("VERBOSE=false"),
-						),
-					)
-				})
+					return cLogs.String()
+				}).Should(
+					And(
+						ContainSubstring("ENV=production"),
+						ContainSubstring("VERBOSE=false"),
+					),
+				)
 			})
 		})
 

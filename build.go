@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/chronos"
 	"github.com/paketo-buildpacks/packit/postal"
@@ -43,12 +44,19 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		version, _ := entry.Metadata["version"].(string)
 		dependency, err = dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
-
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
+
+		versionSource, _ := entry.Metadata["version-source"].(string)
+		if versionSource == "buildpack.yml" {
+			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
+			logger.Subprocess("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
+			logger.Subprocess("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information.")
+			logger.Break()
+		}
 
 		nodeLayer, err := context.Layers.Get(Node)
 		if err != nil {
