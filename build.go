@@ -13,7 +13,8 @@ import (
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
 type EntryResolver interface {
-	Resolve([]packit.BuildpackPlanEntry) packit.BuildpackPlanEntry
+	Resolve(name string, entries []packit.BuildpackPlanEntry, priorities []interface{}) (packit.BuildpackPlanEntry, []packit.BuildpackPlanEntry)
+	MergeLayerTypes(name string, entries []packit.BuildpackPlanEntry) (launch bool, build bool)
 }
 
 //go:generate faux --interface DependencyManager --output fakes/dependency_manager.go
@@ -37,12 +38,20 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
 
-		entry := entries.Resolve(context.Plan.Entries)
+		priorities := []interface{}{
+			"BP_NODE_VERSION",
+			"buildpack.yml",
+			"package.json",
+			".nvmrc",
+			".node-version",
+		}
 
-		var dependency postal.Dependency
-		var err error
+		entry, allEntries := entries.Resolve("node", context.Plan.Entries, priorities)
+		logger.Candidates(allEntries)
 
 		version, _ := entry.Metadata["version"].(string)
+		var dependency postal.Dependency
+		var err error
 		dependency, err = dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
 		if err != nil {
 			return packit.BuildResult{}, err
@@ -90,9 +99,8 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		nodeLayer.Launch = entry.Metadata["launch"] == true
-		nodeLayer.Build = entry.Metadata["build"] == true
-		nodeLayer.Cache = entry.Metadata["build"] == true
+		nodeLayer.Launch, nodeLayer.Build = entries.MergeLayerTypes("node", context.Plan.Entries)
+		nodeLayer.Cache = nodeLayer.Build
 
 		nodeLayer.Metadata = map[string]interface{}{
 			DepKey:     dependency.SHA256,

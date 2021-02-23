@@ -7,6 +7,7 @@ import (
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/cargo"
 	"github.com/paketo-buildpacks/packit/chronos"
+	"github.com/paketo-buildpacks/packit/draft"
 	"github.com/paketo-buildpacks/packit/postal"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	buildpackYMLParser := nodeengine.NewBuildpackYMLParser()
 	nodeVersionParser := nodeengine.NewNodeVersionParser()
 	logEmitter := nodeengine.NewLogEmitter(os.Stdout)
-	entryResolver := nodeengine.NewPlanEntryResolver(logEmitter)
+	entryResolver := draft.NewPlanner()
 	dependencyManager := postal.NewService(cargo.NewTransport())
 	environment := nodeengine.NewEnvironment(logEmitter)
 	planRefinery := nodeengine.NewPlanRefinery()

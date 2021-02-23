@@ -77,7 +77,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      <unknown> -> \"*\"",
+					"      <unknown> -> \"\"",
 					"",
 					MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
 					"",
@@ -131,7 +131,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
 
-			it.Focus("builds, logs and runs correctly with BP_NODE_VERSION", func() {
+			it("builds, logs and runs correctly with BP_NODE_VERSION", func() {
 				var err error
 
 				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
@@ -154,7 +154,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"    Candidate version sources (in priority order):",
 					"      BP_NODE_VERSION -> \"~12\"",
 					"      buildpack.yml   -> \"~10\"",
-					"      <unknown>       -> \"*\"",
+					"      <unknown>       -> \"\"",
 					"",
 					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
 					"",
@@ -204,6 +204,10 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("NODE_ENV, NODE_VERBOSE are set by user", func() {
+			it.After(func() {
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+			})
+
 			it("uses user-set value in build and buildpack-set value in launch phase", func() {
 				var err error
 
@@ -263,7 +267,6 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("simple app with .node-version", func() {
-
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
@@ -289,7 +292,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .node-version -> \"10.23.*\"",
-					"      <unknown>     -> \"*\"",
+					"      <unknown>     -> \"\"",
 					"",
 					MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 10\.23\.\d+`),
 					"",
@@ -339,7 +342,6 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("simple app with .nvmrc", func() {
-
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
@@ -365,7 +367,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .nvmrc    -> \"10.23.*\"",
-					"      <unknown> -> \"*\"",
+					"      <unknown> -> \"\"",
 					"",
 					MatchRegexp(`    Selected Node Engine version \(using \.nvmrc\): 10\.23\.\d+`),
 					"",

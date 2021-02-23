@@ -2,7 +2,6 @@ package nodeengine
 
 import (
 	"io"
-	"strconv"
 
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/scribe"
@@ -36,38 +35,5 @@ func (e LogEmitter) Environment(buildEnv, launchEnv packit.Environment, optimize
 		e.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
 		e.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
 	}
-	e.Break()
-}
-
-func (e LogEmitter) Candidates(entries []packit.BuildpackPlanEntry) {
-	e.Subprocess("Candidate version sources (in priority order):")
-
-	var (
-		sources [][2]string
-		maxLen  int
-	)
-
-	for _, entry := range entries {
-		versionSource, ok := entry.Metadata["version-source"].(string)
-		if !ok {
-			versionSource = "<unknown>"
-		}
-
-		version, ok := entry.Metadata["version"].(string)
-		if !ok {
-			version = "*"
-		}
-
-		if len(versionSource) > maxLen {
-			maxLen = len(versionSource)
-		}
-
-		sources = append(sources, [2]string{versionSource, version})
-	}
-
-	for _, source := range sources {
-		e.Action(("%-" + strconv.Itoa(maxLen) + "s -> %q"), source[0], source[1])
-	}
-
 	e.Break()
 }
