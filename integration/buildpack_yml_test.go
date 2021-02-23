@@ -77,7 +77,7 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      buildpack.yml -> \"~10\"",
-					"      <unknown>     -> \"*\"",
+					"      <unknown>     -> \"\"",
 					"",
 					MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
 					"",

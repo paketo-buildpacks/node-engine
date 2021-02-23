@@ -65,7 +65,7 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      <unknown> -> \"*\"",
+				"      <unknown> -> \"\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 14\.\d+\.\d+`),
 				"",

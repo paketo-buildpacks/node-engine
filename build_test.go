@@ -73,6 +73,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				"version-source": "BP_NODE_VERSION",
 			},
 		}
+		entryResolver.MergeLayerTypesCall.Returns.Launch = false
+		entryResolver.MergeLayerTypesCall.Returns.Build = false
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
@@ -117,7 +119,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Stack:   "some-stack",
 			BuildpackInfo: packit.BuildpackInfo{
 				Name:    "Some Buildpack",
-				Version: "some-version",
+				Version: "1.2.3",
 			},
 			Plan: packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
@@ -168,7 +170,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(filepath.Join(layersDir, "node")).To(BeADirectory())
 
-		Expect(entryResolver.ResolveCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
+		Expect(entryResolver.ResolveCall.Receives.Entries).To(Equal([]packit.BuildpackPlanEntry{
 			{
 				Name: "node",
 				Metadata: map[string]interface{}{
@@ -177,7 +179,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 		}))
-
+		Expect(entryResolver.MergeLayerTypesCall.Receives.Name).To(Equal("node"))
+		Expect(entryResolver.MergeLayerTypesCall.Receives.Entries).To(Equal(
+			[]packit.BuildpackPlanEntry{
+				{
+					Name: "node",
+					Metadata: map[string]interface{}{
+						"version":        "~10",
+						"version-source": "BP_NODE_VERSION",
+					},
+				},
+			}))
 		Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
 		Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal("node"))
 		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal("~10"))
@@ -195,7 +207,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 		Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
-		Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
+		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 		Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 		Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
 		Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
@@ -223,6 +235,10 @@ nodejs:
 
 		it("tells the environment to optimize memory", func() {
 			_, err := build(packit.BuildContext{
+				BuildpackInfo: packit.BuildpackInfo{
+					Name:    "Some Buildpack",
+					Version: "1.2.3",
+				},
 				CNBPath:    cnbDir,
 				Stack:      "some-stack",
 				WorkingDir: workingDir,
@@ -232,7 +248,7 @@ nodejs:
 							Name: "node",
 							Metadata: map[string]interface{}{
 								"version":        "~10",
-								"version-source": "buildpack.yml",
+								"version-source": "BP_NODE_VERSION",
 							},
 						},
 					},
@@ -265,6 +281,9 @@ nodejs:
 					"build":          true,
 				},
 			}
+
+			entryResolver.MergeLayerTypesCall.Returns.Launch = true
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
 
 			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
@@ -361,7 +380,7 @@ nodejs:
 							Name: "node",
 							Metadata: map[string]interface{}{
 								"version":        "~10",
-								"version-source": "buildpack.yml",
+								"version-source": "BP_NODE_VERSION",
 							},
 						},
 					},
@@ -493,7 +512,6 @@ nodejs:
 			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
 		})
 	})
-
 	context("when the entry version source is buildpack.yml", func() {
 		it.Before(func() {
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
@@ -511,7 +529,7 @@ nodejs:
 				Stack:   "some-stack",
 				BuildpackInfo: packit.BuildpackInfo{
 					Name:    "Some Buildpack",
-					Version: "1.0.0",
+					Version: "1.2.3",
 				},
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
@@ -562,7 +580,7 @@ nodejs:
 
 			Expect(filepath.Join(layersDir, "node")).To(BeADirectory())
 
-			Expect(entryResolver.ResolveCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
+			Expect(entryResolver.ResolveCall.Receives.Entries).To(Equal([]packit.BuildpackPlanEntry{
 				{
 					Name: "node",
 					Metadata: map[string]interface{}{
@@ -589,14 +607,13 @@ nodejs:
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
-			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.0.0"))
+			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using buildpack.yml): "))
 			Expect(buffer.String()).To(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
 			Expect(buffer.String()).To(ContainSubstring("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information."))
 			Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 		})
-
 	})
 
 	context("failure cases", func() {
@@ -726,7 +743,7 @@ nodejs:
 								Name: "node",
 								Metadata: map[string]interface{}{
 									"version":        "~10",
-									"version-source": "buildpack.yml",
+									"version-source": "BP_NODE_VERSION",
 								},
 							},
 						},
