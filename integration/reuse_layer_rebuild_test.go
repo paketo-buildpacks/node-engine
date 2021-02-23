@@ -88,13 +88,12 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      buildpack.yml -> \"~10\"",
-				"      <unknown>     -> \"*\"",
+				"      <unknown> -> \"*\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
 				"",
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring build environment",
@@ -143,10 +142,9 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      buildpack.yml -> \"~10\"",
-				"      <unknown>     -> \"*\"",
+				"      <unknown> -> \"*\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
 				"",
 				fmt.Sprintf("  Reusing cached layer /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 			))
@@ -195,6 +193,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					nodeBuildpack,
 					buildPlanBuildpack,
 				).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~10"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -208,10 +207,10 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      buildpack.yml -> \"~10\"",
-				"      <unknown>     -> \"*\"",
+				"      BP_NODE_VERSION -> \"~10\"",
+				"      <unknown>       -> \"*\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 10\.\d+\.\d+`),
 				"",
 				"  Executing build process",
 				MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
@@ -243,12 +242,6 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			Eventually(firstContainer).Should(BeAvailable())
 
-			err = ioutil.WriteFile(filepath.Join(source, "buildpack.yml"), []byte(`---
-nodejs:
-  version: ~12
-`), 0644)
-			Expect(err).NotTo(HaveOccurred())
-
 			// Second pack build
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
@@ -256,6 +249,7 @@ nodejs:
 					nodeBuildpack,
 					buildPlanBuildpack,
 				).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -269,10 +263,10 @@ nodejs:
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      buildpack.yml -> \"~12\"",
-				"      <unknown>     -> \"*\"",
+				"      BP_NODE_VERSION -> \"~12\"",
+				"      <unknown>       -> \"*\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 12\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
 				"",
 				"  Executing build process",
 				MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
