@@ -2,8 +2,6 @@ package integration
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -50,13 +48,12 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 			Expect(os.RemoveAll(source)).To(Succeed())
 		})
 
-		context("simple app with buildpack.yml", func() {
-
+		context("simple app with version and optimize memory set in buildpack.yml", func() {
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
 
-			it("builds, logs and runs correctly", func() {
+			it("builds, logs and runs correctly but gives a deprecation warning", func() {
 				var err error
 
 				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
@@ -88,6 +85,9 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v1.0.0.",
+					"    Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.",
+					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
@@ -104,28 +104,20 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 				))
 
 				container, err = docker.Container.Run.
+					WithMemory("128m").
 					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
 					WithPublish("8080").
 					Execute(image.ID)
 				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(container).Should(BeAvailable())
+				Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 
-				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusOK))
-
-				content, err := ioutil.ReadAll(response.Body)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(string(content)).To(ContainSubstring("hello world"))
-
-				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container.ID)
-					Expect(err).NotTo(HaveOccurred())
-					return cLogs.String()
-				}).Should(
-					ContainSubstring("NODE_ENV=production"),
-				)
+				Expect(logs).To(ContainLines(
+					"    Writing profile.d/1_optimize_memory.sh",
+					"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
+					"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
+				))
 			})
 		})
 	})

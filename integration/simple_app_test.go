@@ -127,14 +127,24 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("simple app with BP_NODE_VERSION set and a buildpack.yml", func() {
+			it.Before(func() {
+				err := ioutil.WriteFile(filepath.Join("testdata", "simple_app", "buildpack.yml"),
+					[]byte(`---
+nodejs:
+  version: "~10"
+`), 0644)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+				Expect(os.Remove(filepath.Join("testdata", "simple_app", "buildpack.yml"))).To(Succeed())
 			})
 
 			it("builds, logs and runs correctly with BP_NODE_VERSION", func() {
 				var err error
 
-				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
+				source, err = occam.Source(filepath.Join("testdata", "simple_app"))
 				Expect(err).ToNot(HaveOccurred())
 
 				var logs fmt.Stringer

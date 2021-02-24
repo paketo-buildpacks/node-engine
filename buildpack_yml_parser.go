@@ -34,11 +34,6 @@ func (p BuildpackYMLParser) Parse(path string) (Config, error) {
 			return Config{}, err
 		}
 	}
-
-	if os.Getenv("OPTIMIZE_MEMORY") == "true" {
-		buildpack.NodeJS.OptimizedMemory = true
-	}
-
 	return buildpack.NodeJS, nil
 }
 
