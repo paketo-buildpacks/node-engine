@@ -49,7 +49,7 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 
 		it("sets max_old_space_size when nodejs.optimize-memory is set with env variable BP_NODE_OPTIMIZE_MEMORY", func() {
 			var err error
-			source, err = occam.Source(filepath.Join("testdata", "optimize_mem_app"))
+			source, err = occam.Source(filepath.Join("testdata", "optimize_memory"))
 			Expect(err).NotTo(HaveOccurred())
 
 			var logs fmt.Stringer
