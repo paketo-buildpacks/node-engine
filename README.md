@@ -103,6 +103,8 @@ can use to build your app as follows:
 
 ## Configurations
 
+### Specifying a Node version
+
 Specifying the `Node` version through `buildpack.yml` configuration will be
 deprecated in Node Engine Buildpack v1.0.0.
 
@@ -121,6 +123,8 @@ nodejs:
 ```
 
 You can also specify a node version via an `.nvmrc` or `.node-version` file, also at the application directory root.
+
+### Enabling memory optimization
 
 Enabling memory optimization through `buildpack.yml` configuration will be
 deprecated in Node Engine Buildpack v1.0.0.
