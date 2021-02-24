@@ -33,7 +33,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		planRefinery      *fakes.BuildPlanRefinery
 		buffer            *bytes.Buffer
 
-		build packit.BuildFunc
+		build        packit.BuildFunc
+		buildContext packit.BuildContext
 	)
 
 	it.Before(func() {
@@ -106,15 +107,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		logEmitter := nodeengine.NewLogEmitter(buffer)
 
 		build = nodeengine.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock)
-	})
 
-	it.After(func() {
-		Expect(os.RemoveAll(layersDir)).To(Succeed())
-		Expect(os.RemoveAll(cnbDir)).To(Succeed())
-	})
-
-	it("returns a result that installs node", func() {
-		result, err := build(packit.BuildContext{
+		buildContext = packit.BuildContext{
 			CNBPath: cnbDir,
 			Stack:   "some-stack",
 			BuildpackInfo: packit.BuildpackInfo{
@@ -133,7 +127,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 			Layers: packit.Layers{Path: layersDir},
-		})
+		}
+
+	})
+
+	it.After(func() {
+		Expect(os.RemoveAll(layersDir)).To(Succeed())
+		Expect(os.RemoveAll(cnbDir)).To(Succeed())
+	})
+
+	it("returns a result that installs node", func() {
+		result, err := build(buildContext)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result).To(Equal(packit.BuildResult{
 			Plan: packit.BuildpackPlan{
@@ -234,27 +238,28 @@ nodejs:
 		})
 
 		it("tells the environment to optimize memory", func() {
-			_, err := build(packit.BuildContext{
-				BuildpackInfo: packit.BuildpackInfo{
-					Name:    "Some Buildpack",
-					Version: "1.2.3",
-				},
-				CNBPath:    cnbDir,
-				Stack:      "some-stack",
-				WorkingDir: workingDir,
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "BP_NODE_VERSION",
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
+			buildContext.WorkingDir = workingDir
+			_, err := build(buildContext)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
+			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
+		})
+	})
+
+	context("when the os environment contains a directive to optimize memory", func() {
+		it.Before(func() {
+			Expect(os.Setenv("OPTIMIZE_MEMORY", "true")).To(Succeed())
+		})
+
+		it.After(func() {
+			Expect(os.Unsetenv("OPTIMIZE_MEMORY")).To(Succeed())
+		})
+
+		it("tells the environment to optimize memory", func() {
+			_, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
@@ -306,25 +311,9 @@ nodejs:
 		})
 
 		it("marks the node layer as build, cached and launch", func() {
-			result, err := build(packit.BuildContext{
-				CNBPath:    cnbDir,
-				Stack:      "some-stack",
-				WorkingDir: workingDir,
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "BP_NODE_VERSION",
-								"launch":         true,
-								"build":          true,
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
+			buildContext.Plan.Entries[0].Metadata["launch"] = true
+			buildContext.Plan.Entries[0].Metadata["build"] = true
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(packit.BuildResult{
 				Plan: packit.BuildpackPlan{
@@ -361,41 +350,6 @@ nodejs:
 		})
 	})
 
-	context("when the os environment contains a directive to optimize memory", func() {
-		it.Before(func() {
-			Expect(os.Setenv("OPTIMIZE_MEMORY", "true")).To(Succeed())
-		})
-
-		it.After(func() {
-			Expect(os.Unsetenv("OPTIMIZE_MEMORY")).To(Succeed())
-		})
-
-		it("tells the environment to optimize memory", func() {
-			_, err := build(packit.BuildContext{
-				CNBPath: cnbDir,
-				Stack:   "some-stack",
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "BP_NODE_VERSION",
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
-			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
-		})
-	})
-
 	context("when we refine the buildpack plan", func() {
 		it.Before(func() {
 			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
@@ -411,22 +365,7 @@ nodejs:
 			}
 		})
 		it("refines the BuildpackPlan", func() {
-			result, err := build(packit.BuildContext{
-				CNBPath: cnbDir,
-				Stack:   "some-stack",
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "BP_NODE_VERSION",
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(result).To(Equal(packit.BuildResult{
@@ -474,26 +413,7 @@ nodejs:
 		})
 
 		it("exits build process early", func() {
-			_, err := build(packit.BuildContext{
-				CNBPath: cnbDir,
-				Stack:   "some-stack",
-				BuildpackInfo: packit.BuildpackInfo{
-					Name:    "Some Buildpack",
-					Version: "some-version",
-				},
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "BP_NODE_VERSION",
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
+			_, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
@@ -505,13 +425,14 @@ nodejs:
 			Expect(dependencyManager.InstallCall.CallCount).To(Equal(0))
 			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
 
-			Expect(buffer.String()).To(ContainSubstring("Some Buildpack some-version"))
+			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
 			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
 			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
 		})
 	})
+
 	context("when the entry version source is buildpack.yml", func() {
 		it.Before(func() {
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
@@ -524,26 +445,8 @@ nodejs:
 		})
 
 		it("returns result that installs version in buildpack.yml and provides deprecation warning", func() {
-			result, err := build(packit.BuildContext{
-				CNBPath: cnbDir,
-				Stack:   "some-stack",
-				BuildpackInfo: packit.BuildpackInfo{
-					Name:    "Some Buildpack",
-					Version: "1.2.3",
-				},
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"version":        "~10",
-								"version-source": "buildpack.yml",
-							},
-						},
-					},
-				},
-				Layers: packit.Layers{Path: layersDir},
-			})
+			buildContext.Plan.Entries[0].Metadata["version-source"] = "buildpack.yml"
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(packit.BuildResult{
 				Plan: packit.BuildpackPlan{
@@ -623,21 +526,7 @@ nodejs:
 			})
 
 			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name: "node",
-								Metadata: map[string]interface{}{
-									"version":        "~10",
-									"version-source": "BP_NODE_VERSION",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
+				_, err := build(buildContext)
 				Expect(err).To(MatchError("failed to resolve dependency"))
 			})
 		})
@@ -648,21 +537,7 @@ nodejs:
 			})
 
 			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name: "node",
-								Metadata: map[string]interface{}{
-									"version":        "~10",
-									"version-source": "BP_NODE_VERSION",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
+				_, err := build(buildContext)
 				Expect(err).To(MatchError("failed to install dependency"))
 			})
 		})
@@ -677,21 +552,7 @@ nodejs:
 			})
 
 			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name: "node",
-								Metadata: map[string]interface{}{
-									"version":        "~10",
-									"version-source": "BP_NODE_VERSION",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
+				_, err := build(buildContext)
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
 			})
 		})
@@ -710,21 +571,7 @@ nodejs:
 			})
 
 			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name: "node",
-								Metadata: map[string]interface{}{
-									"version":        "~10",
-									"version-source": "BP_NODE_VERSION",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
+				_, err := build(buildContext)
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
 			})
 		})
@@ -735,21 +582,7 @@ nodejs:
 			})
 
 			it("returns an error", func() {
-				_, err := build(packit.BuildContext{
-					CNBPath: cnbDir,
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{
-								Name: "node",
-								Metadata: map[string]interface{}{
-									"version":        "~10",
-									"version-source": "BP_NODE_VERSION",
-								},
-							},
-						},
-					},
-					Layers: packit.Layers{Path: layersDir},
-				})
+				_, err := build(buildContext)
 				Expect(err).To(MatchError("failed to configure environment"))
 			})
 		})
