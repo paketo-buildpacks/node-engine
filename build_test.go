@@ -246,16 +246,23 @@ nodejs:
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
+
+			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
+			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
+			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
+			Expect(buffer.String()).To(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
+			Expect(buffer.String()).To(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
+			Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 		})
 	})
 
 	context("when the os environment contains a directive to optimize memory", func() {
 		it.Before(func() {
-			Expect(os.Setenv("OPTIMIZE_MEMORY", "true")).To(Succeed())
+			Expect(os.Setenv("BP_NODE_OPTIMIZE_MEMORY", "true")).To(Succeed())
 		})
 
 		it.After(func() {
-			Expect(os.Unsetenv("OPTIMIZE_MEMORY")).To(Succeed())
+			Expect(os.Unsetenv("BP_NODE_OPTIMIZE_MEMORY")).To(Succeed())
 		})
 
 		it("tells the environment to optimize memory", func() {
@@ -266,6 +273,8 @@ nodejs:
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
+			Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
+			Expect(buffer.String()).ToNot(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
 		})
 	})
 

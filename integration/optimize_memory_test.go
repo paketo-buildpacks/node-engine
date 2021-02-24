@@ -2,8 +2,6 @@ package integration
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -45,9 +43,9 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Expect(os.RemoveAll(source)).To(Succeed())
 	})
 
-	it("sets max_old_space_size when nodejs.optimize-memory is set in buildpack.yml", func() {
+	it("sets max_old_space_size when nodejs.optimize-memory is set with env variable BP_NODE_OPTIMIZE_MEMORY", func() {
 		var err error
-		source, err = occam.Source(filepath.Join("testdata", "optimize_memory"))
+		source, err = occam.Source(filepath.Join("testdata", "optimize_mem_app"))
 		Expect(err).NotTo(HaveOccurred())
 
 		var logs fmt.Stringer
@@ -57,6 +55,7 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 				nodeBuildpack,
 				buildPlanBuildpack,
 			).
+			WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
 			Execute(name, source)
 
 		Expect(err).NotTo(HaveOccurred())
@@ -69,14 +68,7 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(container).Should(BeAvailable())
-
-		response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
-		Expect(err).NotTo(HaveOccurred())
-		Expect(response.StatusCode).To(Equal(http.StatusOK))
-
-		content, err := ioutil.ReadAll(response.Body)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(content).To(ContainSubstring("NodeOptions: --max_old_space_size=96"))
+		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 
 		Expect(logs).To(ContainLines(
 			"    Writing profile.d/1_optimize_memory.sh",

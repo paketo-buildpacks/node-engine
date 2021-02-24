@@ -2,6 +2,7 @@ package nodeengine
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -118,9 +119,20 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		logger.Action("Completed in %s", duration.Round(time.Millisecond))
 		logger.Break()
 
+		// Check if buildpack.yml specifies optimize_memory
 		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
 		if err != nil {
 			return packit.BuildResult{}, fmt.Errorf("unable to parse buildpack.yml file: %s", err)
+		}
+		if config.OptimizedMemory {
+			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
+			logger.Subprocess("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
+			logger.Subprocess("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.")
+			logger.Break()
+		}
+
+		if os.Getenv("BP_NODE_OPTIMIZE_MEMORY") == "true" {
+			config.OptimizedMemory = true
 		}
 
 		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, config.OptimizedMemory)
