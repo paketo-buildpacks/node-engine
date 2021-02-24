@@ -101,23 +101,44 @@ This will create a `buildpackage.cnb` file under the `build` directory which you
 can use to build your app as follows:
 `pack build <app-name> -p <path-to-app> -b build/buildpackage.cnb`
 
-## Configuration via `buildpack.yml`, `.nvmrc` or `.node-version`
+## Configurations
 
-In order to specify a particular version of node you can 
-provide an optional `buildpack.yml` in the root of the application directory.
+Specifying the `Node` version through `buildpack.yml` configuration will be
+deprecated in Node Engine Buildpack v1.0.0.
 
+To migrate from using `buildpack.yml` please set the `$BP_NODE_VERSION`
+environment variable at build time either directly (ex. `pack build my-app
+--env BP_NODE_VERSION=~10`) or through a [`project.toml`
+file](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md)
+
+```shell
+$BP_NODE_VERSION="~10"
+```
+This will replace the following structure in `buildpack.yml`:
 ```yaml
 nodejs:
-  # this allows you to specify a version constraint for the node depdendency
-  # any valid semver constaints (e.g. 10.*) are also acceptable
   version: ~10
-
-  # allow node to optimize memory usage based on your system constraints
-  # bool
-  optimize-memory: true
 ```
 
 You can also specify a node version via an `.nvmrc` or `.node-version` file, also at the application directory root.
+
+Enabling memory optimization through `buildpack.yml` configuration will be
+deprecated in Node Engine Buildpack v1.0.0.
+
+To migrate from using `buildpack.yml` please set the `$BP_NODE_OPTIMIZE_MEMORY`
+environment variable at build time either directly (ex. `pack build my-app
+--env BP_NODE_OPTIMIZE_MEMORY=true`) or through a [`project.toml`
+file](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md)
+
+```shell
+$BP_NODE_OPTIMIZE_MEMORY="true"
+```
+This will replace the following structure in `buildpack.yml`:
+
+```
+nodejs:
+  optimize-memory: true
+```
 
 ## Run Tests
 
