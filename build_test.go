@@ -289,10 +289,9 @@ nodejs:
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 				Name: "node",
 				Metadata: map[string]interface{}{
-					"version":        "~10",
-					"version-source": "BP_NODE_VERSION",
-					"launch":         true,
-					"build":          true,
+					"version": "~10",
+					"launch":  true,
+					"build":   true,
 				},
 			}
 
@@ -320,8 +319,6 @@ nodejs:
 		})
 
 		it("marks the node layer as build, cached and launch", func() {
-			buildContext.Plan.Entries[0].Metadata["launch"] = true
-			buildContext.Plan.Entries[0].Metadata["build"] = true
 			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(packit.BuildResult{
