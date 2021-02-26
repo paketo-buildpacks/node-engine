@@ -101,6 +101,10 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					"    Writing profile.d/0_memory_available.sh",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
+					"",
+					"    Writing profile.d/1_optimize_memory.sh",
+					"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
+					"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 				))
 
 				container, err = docker.Container.Run.
@@ -113,11 +117,6 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 				Eventually(container).Should(BeAvailable())
 				Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 
-				Expect(logs).To(ContainLines(
-					"    Writing profile.d/1_optimize_memory.sh",
-					"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
-					"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
-				))
 			})
 		})
 	})
