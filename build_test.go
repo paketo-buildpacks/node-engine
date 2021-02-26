@@ -289,9 +289,8 @@ nodejs:
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 				Name: "node",
 				Metadata: map[string]interface{}{
-					"version": "~10",
-					"launch":  true,
-					"build":   true,
+					"version":        "~10",
+					"version-source": "BP_NODE_VERSION",
 				},
 			}
 
