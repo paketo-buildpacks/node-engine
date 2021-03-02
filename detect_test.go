@@ -399,8 +399,6 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		it("it uses the custom path for config file parsers", func() {
-			fmt.Println("AAAAA")
-			fmt.Println(workingDir)
 			_, err := detect(packit.DetectContext{
 				WorkingDir: workingDir,
 			})
