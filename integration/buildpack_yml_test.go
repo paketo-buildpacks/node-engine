@@ -73,16 +73,16 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      buildpack.yml -> \"~10\"",
+					"      buildpack.yml -> \"~12\"",
 					"      <unknown>     -> \"\"",
 					"",
-					MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 10\.\d+\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using buildpack\.yml\): 12\.\d+\.\d+`),
 					"",
 					"    WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v1.0.0.",
 					"    Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information.",
 					"",
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
 					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v1.0.0.",
@@ -117,6 +117,72 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 				Eventually(container).Should(BeAvailable())
 				Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 
+			})
+		})
+
+		context("app with BP_NODE_VERSION set and a buildpack.yml", func() {
+			it.After(func() {
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+			})
+
+			it("builds, logs and runs correctly with BP_NODE_VERSION", func() {
+				var err error
+
+				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
+				Expect(err).ToNot(HaveOccurred())
+
+				var logs fmt.Stringer
+				image, logs, err = pack.WithNoColor().Build.
+					WithPullPolicy("never").
+					WithBuildpacks(
+						nodeBuildpack,
+						buildPlanBuildpack,
+					).
+					WithEnv(map[string]string{"BP_NODE_VERSION": "~14.15"}).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      BP_NODE_VERSION -> \"~14.15\"",
+					"      buildpack.yml   -> \"~12\"",
+					"      <unknown>       -> \"\"",
+					"",
+					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 14\.15\.\d+`),
+					"",
+					"  Executing build process",
+					MatchRegexp(`    Installing Node Engine 14\.15\.\d+`),
+					MatchRegexp(`      Completed in \d+\.\d+`),
+					"",
+					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v1.0.0.",
+					"    Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.",
+					"",
+					"  Configuring build environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"  Configuring launch environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE -> "false"`,
+					"",
+					"    Writing profile.d/0_memory_available.sh",
+					"      Calculates available memory based on container limits at launch time.",
+					"      Made available in the MEMORY_AVAILABLE environment variable.",
+				))
+
+				container, err = docker.Container.Run.
+					WithMemory("128m").
+					WithCommand("node server.js").
+					WithPublish("8080").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container).Should(BeAvailable())
+				Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 			})
 		})
 	})
