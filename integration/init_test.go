@@ -84,6 +84,7 @@ func TestIntegration(t *testing.T) {
 	suite("Buildpack.yml", testBuildpackYML)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
+	suite("ProjectPath", testProjectPath)
 	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
 	suite.Run(t)

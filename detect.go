@@ -1,6 +1,7 @@
 package nodeengine
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -20,7 +21,25 @@ type BuildPlanMetadata struct {
 func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
 		var requirements []packit.BuildPlanRequirement
-		version, err := nvmrcParser.ParseVersion(filepath.Join(context.WorkingDir, NvmrcSource))
+
+		projectPath := context.WorkingDir
+		customProjPath := os.Getenv("BP_NODE_PROJECT_PATH")
+
+		if customProjPath != "" {
+			customProjPath = filepath.Clean(customProjPath)
+			projectPath = filepath.Join(projectPath, customProjPath)
+			_, err := os.Stat(projectPath)
+			if err != nil {
+				if errors.Is(err, os.ErrNotExist) {
+					return packit.DetectResult{},
+						packit.Fail.WithMessage("expected value derived from BP_NODE_PROJECT_PATH [%s] to be an existing directory", projectPath)
+				} else {
+					return packit.DetectResult{}, err
+				}
+			}
+		}
+
+		version, err := nvmrcParser.ParseVersion(filepath.Join(projectPath, NvmrcSource))
 		if err != nil {
 			return packit.DetectResult{}, err
 		}
@@ -61,7 +80,7 @@ func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) pa
 			})
 		}
 
-		version, err = nodeVersionParser.ParseVersion(filepath.Join(context.WorkingDir, NodeVersionSource))
+		version, err = nodeVersionParser.ParseVersion(filepath.Join(projectPath, NodeVersionSource))
 		if err != nil {
 			return packit.DetectResult{}, err
 		}
