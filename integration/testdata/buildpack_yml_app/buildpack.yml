@@ -1,4 +1,4 @@
 ---
 nodejs:
-  version: ~10
+  version: ~12
   optimize-memory: true

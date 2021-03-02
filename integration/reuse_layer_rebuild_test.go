@@ -193,7 +193,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					nodeBuildpack,
 					buildPlanBuildpack,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~10"}).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -207,13 +207,13 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      BP_NODE_VERSION -> \"~10\"",
+				"      BP_NODE_VERSION -> \"~12\"",
 				"      <unknown>       -> \"\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 10\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
 				"",
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 10\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring build environment",
@@ -249,7 +249,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					nodeBuildpack,
 					buildPlanBuildpack,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~14"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -263,13 +263,13 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      BP_NODE_VERSION -> \"~12\"",
+				"      BP_NODE_VERSION -> \"~14\"",
 				"      <unknown>       -> \"\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 14\.\d+\.\d+`),
 				"",
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine 14\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				"  Configuring build environment",
