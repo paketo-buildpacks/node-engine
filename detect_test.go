@@ -2,7 +2,10 @@ package nodeengine_test
 
 import (
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
@@ -377,7 +380,77 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
+	context("when $BP_NODE_PROJECT_PATH is set", func() {
+		var workingDir string
+		it.Before(func() {
+			var err error
+			workingDir, err = ioutil.TempDir("", "working-dir")
+			Expect(err).NotTo(HaveOccurred())
+			err = os.MkdirAll(filepath.Join(workingDir, "custom", "path"), os.ModePerm)
+			Expect(err).NotTo(HaveOccurred())
+
+			os.Setenv("BP_NODE_PROJECT_PATH", "custom/path")
+		})
+
+		it.After(func() {
+			os.Unsetenv("BP_NODE_PROJECT_PATH")
+			err := os.RemoveAll(workingDir)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		it("it uses the custom path for config file parsers", func() {
+			_, err := detect(packit.DetectContext{
+				WorkingDir: workingDir,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(nvmrcParser.ParseVersionCall.Receives.Path).To(Equal(fmt.Sprintf("%s/.nvmrc", filepath.Join(workingDir, "custom", "path"))))
+			Expect(nodeVersionParser.ParseVersionCall.Receives.Path).To(Equal(fmt.Sprintf("%s/.node-version", filepath.Join(workingDir, "custom", "path"))))
+		})
+	})
+
 	context("failure cases", func() {
+		context("when the dir specified by BP_NODE_PROJECT_PATH does not exist", func() {
+			var workingDir string
+
+			it.Before(func() {
+				var err error
+				workingDir, err = ioutil.TempDir("", "working-dir")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(os.Setenv("BP_NODE_PROJECT_PATH", "src/does/not/exist")).To(Succeed())
+			})
+
+			it.After(func() {
+				Expect(os.Unsetenv("BP_NODE_PROJECT_PATH")).To(Succeed())
+			})
+
+			it("fails with helpful error", func() {
+				_, err := detect(packit.DetectContext{
+					WorkingDir: workingDir,
+				})
+				Expect(err).To(
+					MatchError(
+						ContainSubstring(
+							fmt.Sprintf("expected value derived from BP_NODE_PROJECT_PATH [%s] to be an existing directory", filepath.Join(workingDir, "src", "does", "not", "exist")),
+						),
+					),
+				)
+			})
+		})
+
+		context("when the nvmrc parser fails", func() {
+			it.Before(func() {
+				nvmrcParser.ParseVersionCall.Returns.Err = errors.New("failed to parse .nvmrc")
+			})
+
+			it("returns an error", func() {
+				_, err := detect(packit.DetectContext{
+					WorkingDir: "/working-dir",
+				})
+				Expect(err).To(MatchError("failed to parse .nvmrc"))
+			})
+		})
+
 		context("when the nvmrc parser fails", func() {
 			it.Before(func() {
 				nvmrcParser.ParseVersionCall.Returns.Err = errors.New("failed to parse .nvmrc")
