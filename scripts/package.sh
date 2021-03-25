@@ -117,7 +117,7 @@ function buildpackage::create() {
 
   pack \
     buildpack package "${output}" \
-      --config "${ROOT_DIR}/package.toml" \
+      --path "${BUILD_DIR}/buildpack.tgz" \
       --format file
 }
 
