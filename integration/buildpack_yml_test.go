@@ -138,7 +138,7 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 						nodeBuildpack,
 						buildPlanBuildpack,
 					).
-					WithEnv(map[string]string{"BP_NODE_VERSION": "~14.15"}).
+					WithEnv(map[string]string{"BP_NODE_VERSION": "~14"}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -146,14 +146,14 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      BP_NODE_VERSION -> \"~14.15\"",
+					"      BP_NODE_VERSION -> \"~14\"",
 					"      buildpack.yml   -> \"~12\"",
 					"      <unknown>       -> \"\"",
 					"",
-					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 14\.15\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 14\.\d+\.\d+`),
 					"",
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 14\.15\.\d+`),
+					MatchRegexp(`    Installing Node Engine 14\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
 					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v1.0.0.",

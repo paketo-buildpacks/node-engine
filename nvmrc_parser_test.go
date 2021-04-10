@@ -36,17 +36,19 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 
 	it("returns a version constraint", func() {
 		testCases := map[string]string{
-			"10":          "10.*.*",
-			"10.2":        "10.2.*",
-			"v10":         "10.*.*",
+			"10":          "10",
+			"10.2":        "10.2",
+			"v10":         "10",
 			"10.2.3":      "10.2.3",
 			"v10.2.3":     "10.2.3",
 			"10.1.1":      "10.1.1",
-			"lts/*":       "10.*.*",
-			"lts/argon":   "4.*.*",
-			"lts/boron":   "6.*.*",
-			"lts/carbon":  "8.*.*",
-			"lts/dubnium": "10.*.*",
+			"10.1.*":      "10.1.*",
+			"10.*":        "10.*",
+			"lts/*":       "10.*",
+			"lts/argon":   "4.*",
+			"lts/boron":   "6.*",
+			"lts/carbon":  "8.*",
+			"lts/dubnium": "10.*",
 			"node":        "*",
 		}
 
@@ -73,17 +75,6 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("failure cases", func() {
-		context("when the .nvmrc is empty", func() {
-			it.Before(func() {
-				Expect(os.Truncate(path, 0)).To(Succeed())
-			})
-
-			it("returns an error", func() {
-				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .nvmrc: \"\""))
-			})
-		})
-
 		context("when the .nvmrc contains a malformed semver number", func() {
 			it.Before(func() {
 				err := ioutil.WriteFile(path, []byte("1.2.this is not a number"), 0644)
@@ -92,7 +83,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 
 			it("returns an error", func() {
 				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .nvmrc: \"1.2.this is not a number\""))
+				Expect(err).To(MatchError("invalid version constraint specified in .nvmrc: \"1.2.this is not a number\""))
 			})
 		})
 	})

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"regexp"
 	"strings"
 
-	"github.com/Masterminds/semver"
+	"github.com/Masterminds/semver/v3"
 )
 
 var (
@@ -17,8 +16,6 @@ var (
 		"carbon":  8,
 		"dubnium": 10,
 	}
-
-	semverRegex = regexp.MustCompile(semver.SemVerRegex)
 )
 
 type NvmrcParser struct{}
@@ -68,8 +65,8 @@ func (p NvmrcParser) validateNvmrc(content string) (string, error) {
 
 	content = strings.TrimPrefix(content, "v")
 
-	if _, err := semver.NewVersion(content); err != nil {
-		return "", fmt.Errorf("invalid version specified in .nvmrc: %q", content)
+	if _, err := semver.NewConstraint(content); err != nil {
+		return "", fmt.Errorf("invalid version constraint specified in .nvmrc: %q", content)
 	}
 
 	return content, nil
@@ -90,18 +87,11 @@ func (p NvmrcParser) formatNvmrcContent(version string) string {
 				}
 			}
 
-			return fmt.Sprintf("%d.*.*", maxVersion)
+			return fmt.Sprintf("%d.*", maxVersion)
 		}
 
-		return fmt.Sprintf("%d.*.*", lts[ltsName])
+		return fmt.Sprintf("%d.*", lts[ltsName])
 	}
 
-	var groups []string
-	for _, part := range semverRegex.FindStringSubmatch(version) {
-		if part != "" {
-			groups = append(groups, part)
-		}
-	}
-
-	return version + strings.Repeat(".*", 4-len(groups))
+	return version
 }
