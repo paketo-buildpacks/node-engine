@@ -73,10 +73,10 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      .node-version -> \"10.23.*\"",
+				"      .node-version -> \"10.*\"",
 				"      <unknown>     -> \"\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 10\.23\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 10\.\d+\.\d+`),
 			))
 
 			container, err = docker.Container.Run.

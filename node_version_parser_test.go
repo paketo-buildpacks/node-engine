@@ -36,7 +36,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 	it("returns a version constraint", func() {
 		testCases := map[string]string{
-			"10.2":    "10.2.*",
+			"10.2":    "10.2",
 			"10.2.3":  "10.2.3",
 			"v10.2.3": "10.2.3",
 		}
@@ -64,17 +64,6 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("failure cases", func() {
-		context("when the .node-version is empty", func() {
-			it.Before(func() {
-				Expect(os.Truncate(path, 0)).To(Succeed())
-			})
-
-			it("returns an error", func() {
-				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .node-version: \"\""))
-			})
-		})
-
 		context("when the .node-version contains a malformed semver number", func() {
 			it.Before(func() {
 				err := ioutil.WriteFile(path, []byte("1.2.this is not a number"), 0644)
@@ -83,7 +72,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 			it("returns an error", func() {
 				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .node-version: \"1.2.this is not a number\""))
+				Expect(err).To(MatchError("invalid version constraint specified in .node-version: \"1.2.this is not a number\""))
 			})
 		})
 
@@ -95,7 +84,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 			it("returns an error", func() {
 				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .node-version: \"lts/*\""))
+				Expect(err).To(MatchError("invalid version constraint specified in .node-version: \"lts/*\""))
 			})
 		})
 
@@ -107,7 +96,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 			it("returns an error", func() {
 				_, err := parser.ParseVersion(path)
-				Expect(err).To(MatchError("invalid version specified in .node-version: \"node\""))
+				Expect(err).To(MatchError("invalid version constraint specified in .node-version: \"node\""))
 			})
 		})
 	})

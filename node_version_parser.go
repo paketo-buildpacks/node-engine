@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Masterminds/semver"
+	"github.com/Masterminds/semver/v3"
 )
 
 type NodeVersionParser struct{}
@@ -16,7 +16,7 @@ func NewNodeVersionParser() NodeVersionParser {
 }
 
 func (p NodeVersionParser) ParseVersion(path string) (string, error) {
-	nodeVersionContents, err := ioutil.ReadFile(path)
+	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", nil
@@ -24,12 +24,12 @@ func (p NodeVersionParser) ParseVersion(path string) (string, error) {
 		return "", err
 	}
 
-	nodeVersion, err := p.validateNodeVersion(string(nodeVersionContents))
+	version, err := p.validateNodeVersion(string(content))
 	if err != nil {
 		return "", err
 	}
 
-	return p.formatNodeVersionContent(nodeVersion), nil
+	return version, nil
 }
 
 func (p NodeVersionParser) validateNodeVersion(content string) (string, error) {
@@ -37,20 +37,9 @@ func (p NodeVersionParser) validateNodeVersion(content string) (string, error) {
 
 	content = strings.TrimPrefix(content, "v")
 
-	if _, err := semver.NewVersion(content); err != nil {
-		return "", fmt.Errorf("invalid version specified in .node-version: %q", content)
+	if _, err := semver.NewConstraint(content); err != nil {
+		return "", fmt.Errorf("invalid version constraint specified in .node-version: %q", content)
 	}
 
 	return content, nil
-}
-
-func (p NodeVersionParser) formatNodeVersionContent(version string) string {
-	var groups []string
-	for _, part := range semverRegex.FindStringSubmatch(version) {
-		if part != "" {
-			groups = append(groups, part)
-		}
-	}
-
-	return version + strings.Repeat(".*", 4-len(groups))
 }
