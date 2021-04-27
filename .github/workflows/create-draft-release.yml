@@ -16,7 +16,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.16
+        go-version: 1.16.x
     - name: Checkout
       uses: actions/checkout@v2
     - name: Run Unit Tests
@@ -30,7 +30,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.16
+        go-version: 1.16.x
     - name: Checkout
       uses: actions/checkout@v2
     - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
@@ -47,7 +47,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.16
+        go-version: 1.16.x
     - name: Checkout
       uses: actions/checkout@v2
     - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
