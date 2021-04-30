@@ -28,9 +28,9 @@ file that looks like the following:
   # is not specified, the buildpack will provide the default version, which can
   # be seen in the buildpack.toml file.
   # If you wish to request a specific version, the buildpack supports
-  # specifying a semver constraint in the form of "10.*", "10.15.*", or even
-  # "10.15.1".
-  version = "10.15.1"
+  # specifying a semver constraint in the form of "15.*", "15.14.*", or even
+  # "15.14.0".
+  version = "15.14.0"
 
   # The Node Engine buildpack supports some non-required metadata options.
   [requires.metadata]
@@ -62,9 +62,9 @@ Or they can require both `node` and `npm` using a Build Plan that looks like the
   # is not specified, the buildpack will provide the default version, which can
   # be seen in the buildpack.toml file.
   # If you wish to request a specific version, the buildpack supports
-  # specifying a semver constraint in the form of "10.*", "10.15.*", or even
-  # "10.15.1".
-  version = "10.15.1"
+  # specifying a semver constraint in the form of "15.*", "15.14.*", or even
+  # "15.14.0".
+  version = "15.14.0"
 
   # The Node Engine buildpack supports some non-required metadata options.
   [requires.metadata]
@@ -110,16 +110,16 @@ deprecated in Node Engine Buildpack v1.0.0.
 
 To migrate from using `buildpack.yml` please set the `$BP_NODE_VERSION`
 environment variable at build time either directly (ex. `pack build my-app
---env BP_NODE_VERSION=~10`) or through a [`project.toml`
+--env BP_NODE_VERSION=~15`) or through a [`project.toml`
 file](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md)
 
 ```shell
-$BP_NODE_VERSION="~10"
+$BP_NODE_VERSION="~15"
 ```
 This will replace the following structure in `buildpack.yml`:
 ```yaml
 nodejs:
-  version: ~10
+  version: ~15
 ```
 
 You can also specify a node version via an `.nvmrc` or `.node-version` file, also at the application directory root.
