@@ -99,6 +99,26 @@ api = "0.4"
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node_16.2.0_linux_x64_cflinuxfs3_ca6c2def.tgz"
     version = "16.2.0"
 
+  [[metadata.dependency-constraints]]
+    constraint = "12.*"
+    id = "node"
+    patches = 2
+
+  [[metadata.dependency-constraints]]
+    constraint = "14.*"
+    id = "node"
+    patches = 2
+
+  [[metadata.dependency-constraints]]
+    constraint = "15.*"
+    id = "node"
+    patches = 2
+
+  [[metadata.dependency-constraints]]
+    constraint = "16.*"
+    id = "node"
+    patches = 2
+
   [[metadata.dependency_deprecation_dates]]
     date = 2022-04-01T00:00:00Z
     link = "https://github.com/nodejs/Release"
