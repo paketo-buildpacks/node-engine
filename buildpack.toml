@@ -12,6 +12,7 @@ api = "0.4"
     node = "14.*.*"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:12.22.0:*:*:*:*:*:*:*"
     deprecation_date = "2022-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -23,6 +24,7 @@ api = "0.4"
     version = "12.22.0"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:12.22.1:*:*:*:*:*:*:*"
     deprecation_date = "2022-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -34,6 +36,7 @@ api = "0.4"
     version = "12.22.1"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:14.16.1:*:*:*:*:*:*:*"
     deprecation_date = "2023-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -45,6 +48,7 @@ api = "0.4"
     version = "14.16.1"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:14.17.0:*:*:*:*:*:*:*"
     deprecation_date = "2023-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -56,6 +60,7 @@ api = "0.4"
     version = "14.17.0"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:15.13.0:*:*:*:*:*:*:*"
     deprecation_date = "2021-06-01T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -67,6 +72,7 @@ api = "0.4"
     version = "15.13.0"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:15.14.0:*:*:*:*:*:*:*"
     deprecation_date = "2021-06-01T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -78,6 +84,7 @@ api = "0.4"
     version = "15.14.0"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:16.2.0:*:*:*:*:*:*:*"
     deprecation_date = "2024-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
@@ -89,6 +96,7 @@ api = "0.4"
     version = "16.2.0"
 
   [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:16.3.0:*:*:*:*:*:*:*"
     deprecation_date = "2024-04-30T00:00:00Z"
     id = "node"
     name = "Node Engine"
