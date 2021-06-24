@@ -141,6 +141,3 @@ api = "0.4"
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
-
-[[stacks]]
-  id = "org.cloudfoundry.stacks.cflinuxfs3"
