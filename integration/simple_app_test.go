@@ -375,8 +375,8 @@ api = "0.2"
     sha256 = "ad0376cbe4dfc3d6092d0ea9fdc4fd3fcb44c477bd4a2c800ccd48eee95e994d"
     source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1.tar.gz"
     source_sha256 = "80a61ffbe6d156458ed54120eb0e9fff7b626502e0986e861d91b365f7e876db"
-    stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-cflinuxfs3-ad0376cb.tgz"
+    stacks = ["some.stack"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-some-stack-ad0376cb.tgz"
     version = "10.18.1"
 
   [[metadata.dependencies]]
@@ -391,7 +391,7 @@ api = "0.2"
     version = "10.18.1"
 
 [[stacks]]
-  id = "org.cloudfoundry.stacks.cflinuxfs3"
+  id = "some.stack"
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
