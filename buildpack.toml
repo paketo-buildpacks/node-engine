@@ -36,18 +36,6 @@ api = "0.4"
     version = "12.22.3"
 
   [[metadata.dependencies]]
-    cpe = "cpe:2.3:a:nodejs:node.js:14.17.1:*:*:*:*:*:*:*"
-    deprecation_date = "2023-04-30T00:00:00Z"
-    id = "node"
-    name = "Node Engine"
-    sha256 = "38dd615ad9baa4d2433ae48911ce1306042337539d2d6916e31442a598e44424"
-    source = "https://nodejs.org/dist/v14.17.1/node-v14.17.1.tar.gz"
-    source_sha256 = "f85297faa15529cf134e9cfd395371fea62e092c3fe2127f2b0fdf8504905cee"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/node/node_v14.17.1_linux_x64_bionic_38dd615a.tgz"
-    version = "14.17.1"
-
-  [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:14.17.2:*:*:*:*:*:*:*"
     deprecation_date = "2023-04-30T00:00:00Z"
     id = "node"
@@ -58,6 +46,18 @@ api = "0.4"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/node/node_v14.17.2_linux_x64_bionic_83d999aa.tgz"
     version = "14.17.2"
+
+  [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:14.17.3:*:*:*:*:*:*:*"
+    deprecation_date = "2023-04-30T00:00:00Z"
+    id = "node"
+    name = "Node Engine"
+    sha256 = "05827c6e629880599edf70ef5e5889f4338bc72c74c22b1a442638cc70bf0d6b"
+    source = "https://nodejs.org/dist/v14.17.3/node-v14.17.3.tar.gz"
+    source_sha256 = "dcbd156506ee79ee48439257626ca0a6db3d7eab8cb0208db6979125ae7d3a95"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://deps.paketo.io/node/node_v14.17.3_linux_x64_bionic_05827c6e.tgz"
+    version = "14.17.3"
 
   [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:15.13.0:*:*:*:*:*:*:*"
