@@ -19,7 +19,6 @@ func main() {
 	entryResolver := draft.NewPlanner()
 	dependencyManager := postal.NewService(cargo.NewTransport())
 	environment := nodeengine.NewEnvironment(logEmitter)
-	planRefinery := nodeengine.NewPlanRefinery()
 
 	packit.Run(
 		nodeengine.Detect(
@@ -31,7 +30,6 @@ func main() {
 			entryResolver,
 			dependencyManager,
 			environment,
-			planRefinery,
 			logEmitter,
 			chronos.DefaultClock,
 		),
