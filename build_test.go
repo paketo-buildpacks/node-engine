@@ -30,7 +30,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		clock             chronos.Clock
 		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
-		planRefinery      *fakes.BuildPlanRefinery
 		buffer            *bytes.Buffer
 
 		build        packit.BuildFunc
@@ -80,33 +79,30 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
 
+		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
+			{
+				Name: "node",
+				Metadata: map[string]interface{}{
+					"name":    "node-dependency-name",
+					"sha256":  "node-dependency-sha",
+					"stacks":  []string{"some-stack"},
+					"uri":     "node-dependency-uri",
+					"version": "~10",
+				},
+			},
+		}
+
 		environment = &fakes.EnvironmentConfiguration{}
-		planRefinery = &fakes.BuildPlanRefinery{}
 
 		timeStamp = time.Now()
 		clock = chronos.NewClock(func() time.Time {
 			return timeStamp
 		})
 
-		planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
-			Entries: []packit.BuildpackPlanEntry{
-				{
-					Name: "node",
-					Metadata: map[string]interface{}{
-						"name":    "node-dependency-name",
-						"sha256":  "node-dependency-sha",
-						"stacks":  []string{"some-stack"},
-						"uri":     "node-dependency-uri",
-						"version": "~10",
-					},
-				},
-			},
-		}
-
 		buffer = bytes.NewBuffer(nil)
 		logEmitter := nodeengine.NewLogEmitter(buffer)
 
-		build = nodeengine.Build(entryResolver, dependencyManager, environment, planRefinery, logEmitter, clock)
+		build = nodeengine.Build(entryResolver, dependencyManager, environment, logEmitter, clock)
 
 		buildContext = packit.BuildContext{
 			CNBPath: cnbDir,
@@ -126,7 +122,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 			},
-			Layers: packit.Layers{Path: layersDir},
+			Platform: packit.Platform{Path: "platform"},
+			Layers:   packit.Layers{Path: layersDir},
 		}
 
 	})
@@ -140,20 +137,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		result, err := build(buildContext)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result).To(Equal(packit.BuildResult{
-			Plan: packit.BuildpackPlan{
-				Entries: []packit.BuildpackPlanEntry{
-					{
-						Name: "node",
-						Metadata: map[string]interface{}{
-							"name":    "node-dependency-name",
-							"sha256":  "node-dependency-sha",
-							"stacks":  []string{"some-stack"},
-							"uri":     "node-dependency-uri",
-							"version": "~10",
-						},
-					},
-				},
-			},
 			Layers: []packit.Layer{
 				{
 					Name:             "node",
@@ -200,12 +183,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal("~10"))
 		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
 
-		Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-		Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
+		Expect(dependencyManager.DeliverCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
+		Expect(dependencyManager.DeliverCall.Receives.CnbPath).To(Equal(cnbDir))
+		Expect(dependencyManager.DeliverCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(dependencyManager.DeliverCall.Receives.PlatformPath).To(Equal("platform"))
 
-		Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
-		Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
-		Expect(dependencyManager.InstallCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 
 		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
@@ -297,21 +280,6 @@ nodejs:
 
 			entryResolver.MergeLayerTypesCall.Returns.Launch = true
 			entryResolver.MergeLayerTypesCall.Returns.Build = true
-
-			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
-				Entries: []packit.BuildpackPlanEntry{
-					{
-						Name: "node",
-						Metadata: map[string]interface{}{
-							"name":    "node-dependency-name",
-							"sha256":  "node-dependency-sha",
-							"stacks":  []string{"some-stack"},
-							"uri":     "node-dependency-uri",
-							"version": "~10",
-						},
-					},
-				},
-			}
 		})
 
 		it.After(func() {
@@ -322,20 +290,6 @@ nodejs:
 			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(packit.BuildResult{
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"name":    "node-dependency-name",
-								"sha256":  "node-dependency-sha",
-								"stacks":  []string{"some-stack"},
-								"uri":     "node-dependency-uri",
-								"version": "~10",
-							},
-						},
-					},
-				},
 				Layers: []packit.Layer{
 					{
 						Name:             "node",
@@ -353,59 +307,37 @@ nodejs:
 						},
 					},
 				},
-			}))
-		})
-	})
-
-	context("when we refine the buildpack plan", func() {
-		it.Before(func() {
-			planRefinery.BillOfMaterialCall.Returns.BuildpackPlan = packit.BuildpackPlan{
-				Entries: []packit.BuildpackPlanEntry{
-					{
-						Name: "new-dep",
-						Metadata: map[string]interface{}{
-							"version":          "some-version",
-							"some-extra-field": "an-extra-value",
-						},
-					},
-				},
-			}
-		})
-		it("refines the BuildpackPlan", func() {
-			result, err := build(buildContext)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(result).To(Equal(packit.BuildResult{
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
+				Build: packit.BuildMetadata{
+					BOM: []packit.BOMEntry{
 						{
-							Name: "new-dep",
+							Name: "node",
 							Metadata: map[string]interface{}{
-								"version":          "some-version",
-								"some-extra-field": "an-extra-value",
+								"name":    "node-dependency-name",
+								"sha256":  "node-dependency-sha",
+								"stacks":  []string{"some-stack"},
+								"uri":     "node-dependency-uri",
+								"version": "~10",
 							},
 						},
 					},
 				},
-				Layers: []packit.Layer{
-					{
-						Name:             "node",
-						Path:             filepath.Join(layersDir, "node"),
-						SharedEnv:        packit.Environment{},
-						BuildEnv:         packit.Environment{},
-						LaunchEnv:        packit.Environment{},
-						ProcessLaunchEnv: map[string]packit.Environment{},
-						Build:            false,
-						Launch:           false,
-						Cache:            false,
-						Metadata: map[string]interface{}{
-							nodeengine.DepKey: "",
-							"built_at":        timeStamp.Format(time.RFC3339Nano),
+				Launch: packit.LaunchMetadata{
+					BOM: []packit.BOMEntry{
+						{
+							Name: "node",
+							Metadata: map[string]interface{}{
+								"name":    "node-dependency-name",
+								"sha256":  "node-dependency-sha",
+								"stacks":  []string{"some-stack"},
+								"uri":     "node-dependency-uri",
+								"version": "~10",
+							},
 						},
 					},
 				},
 			}))
 
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 		})
 	})
 
@@ -424,13 +356,15 @@ nodejs:
 			_, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{
-				Name:   "Node Engine",
-				SHA256: "some-sha",
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.CallCount).To(Equal(1))
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
+				{
+					Name:   "Node Engine",
+					SHA256: "some-sha",
+				},
 			}))
 
-			Expect(dependencyManager.InstallCall.CallCount).To(Equal(0))
+			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
 			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -454,70 +388,8 @@ nodejs:
 
 		it("returns result that installs version in buildpack.yml and provides deprecation warning", func() {
 			buildContext.Plan.Entries[0].Metadata["version-source"] = "buildpack.yml"
-			result, err := build(buildContext)
+			_, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(Equal(packit.BuildResult{
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "node",
-							Metadata: map[string]interface{}{
-								"name":    "node-dependency-name",
-								"sha256":  "node-dependency-sha",
-								"stacks":  []string{"some-stack"},
-								"uri":     "node-dependency-uri",
-								"version": "~10",
-							},
-						},
-					},
-				},
-				Layers: []packit.Layer{
-					{
-						Name:             "node",
-						Path:             filepath.Join(layersDir, "node"),
-						SharedEnv:        packit.Environment{},
-						BuildEnv:         packit.Environment{},
-						LaunchEnv:        packit.Environment{},
-						ProcessLaunchEnv: map[string]packit.Environment{},
-						Build:            false,
-						Launch:           false,
-						Cache:            false,
-						Metadata: map[string]interface{}{
-							nodeengine.DepKey: "",
-							"built_at":        timeStamp.Format(time.RFC3339Nano),
-						},
-					},
-				},
-			}))
-
-			Expect(filepath.Join(layersDir, "node")).To(BeADirectory())
-
-			Expect(entryResolver.ResolveCall.Receives.Entries).To(Equal([]packit.BuildpackPlanEntry{
-				{
-					Name: "node",
-					Metadata: map[string]interface{}{
-						"version":        "~10",
-						"version-source": "buildpack.yml",
-					},
-				},
-			}))
-
-			Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
-			Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal("node"))
-			Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal("~10"))
-			Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
-
-			Expect(planRefinery.BillOfMaterialCall.CallCount).To(Equal(1))
-			Expect(planRefinery.BillOfMaterialCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
-
-			Expect(dependencyManager.InstallCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
-			Expect(dependencyManager.InstallCall.Receives.CnbPath).To(Equal(cnbDir))
-			Expect(dependencyManager.InstallCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
-
-			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
-			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
@@ -542,7 +414,7 @@ nodejs:
 
 		context("when a dependency cannot be installed", func() {
 			it.Before(func() {
-				dependencyManager.InstallCall.Returns.Error = errors.New("failed to install dependency")
+				dependencyManager.DeliverCall.Returns.Error = errors.New("failed to install dependency")
 			})
 
 			it("returns an error", func() {

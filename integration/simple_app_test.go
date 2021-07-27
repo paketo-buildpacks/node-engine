@@ -356,7 +356,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(duplicator.Duplicate(root, tmpBuildpackDir)).To(Succeed())
 
 				bpToml := []byte(fmt.Sprintf(`
-api = "0.2"
+api = "0.5"
 
 [buildpack]
   id = %q

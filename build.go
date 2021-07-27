@@ -21,7 +21,8 @@ type EntryResolver interface {
 //go:generate faux --interface DependencyManager --output fakes/dependency_manager.go
 type DependencyManager interface {
 	Resolve(path, id, version, stack string) (postal.Dependency, error)
-	Install(dependency postal.Dependency, cnbPath, layerPath string) error
+	Deliver(dependency postal.Dependency, cnbPath, layerPath, platformPath string) error
+	GenerateBillOfMaterials(dependencies ...postal.Dependency) []packit.BOMEntry
 }
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
@@ -29,12 +30,7 @@ type EnvironmentConfiguration interface {
 	Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error
 }
 
-//go:generate faux --interface BuildPlanRefinery --output fakes/build_plan_refinery.go
-type BuildPlanRefinery interface {
-	BillOfMaterial(dependency postal.Dependency) packit.BuildpackPlan
-}
-
-func Build(entries EntryResolver, dependencies DependencyManager, environment EnvironmentConfiguration, planRefinery BuildPlanRefinery, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
+func Build(entryResolver EntryResolver, dependencyManager DependencyManager, environment EnvironmentConfiguration, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -47,18 +43,19 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			".node-version",
 		}
 
-		entry, allEntries := entries.Resolve("node", context.Plan.Entries, priorities)
+		entry, allEntries := entryResolver.Resolve("node", context.Plan.Entries, priorities)
 		logger.Candidates(allEntries)
 
 		version, _ := entry.Metadata["version"].(string)
 		var dependency postal.Dependency
 		var err error
-		dependency, err = dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
+		dependency, err = dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
+		bom := dependencyManager.GenerateBillOfMaterials(dependency)
 
 		versionSource, _ := entry.Metadata["version-source"].(string)
 		if versionSource == "buildpack.yml" {
@@ -73,23 +70,29 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		bom := planRefinery.BillOfMaterial(postal.Dependency{
-			ID:      dependency.ID,
-			Name:    dependency.Name,
-			SHA256:  dependency.SHA256,
-			Stacks:  dependency.Stacks,
-			URI:     dependency.URI,
-			Version: dependency.Version,
-		})
+		launch, build := entryResolver.MergeLayerTypes("node", context.Plan.Entries)
+
+		var buildMetadata = packit.BuildMetadata{}
+		var launchMetadata = packit.LaunchMetadata{}
+		if build {
+			buildMetadata = packit.BuildMetadata{BOM: bom}
+		}
+
+		if launch {
+			launchMetadata = packit.LaunchMetadata{BOM: bom}
+		}
 
 		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
 		if ok && cachedSHA == dependency.SHA256 {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
+			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
+
 			return packit.BuildResult{
-				Plan:   bom,
 				Layers: []packit.Layer{nodeLayer},
+				Build:  buildMetadata,
+				Launch: launchMetadata,
 			}, nil
 		}
 
@@ -100,8 +103,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 			return packit.BuildResult{}, err
 		}
 
-		nodeLayer.Launch, nodeLayer.Build = entries.MergeLayerTypes("node", context.Plan.Entries)
-		nodeLayer.Cache = nodeLayer.Build
+		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
 
 		nodeLayer.Metadata = map[string]interface{}{
 			DepKey:     dependency.SHA256,
@@ -110,7 +112,7 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)
 		duration, err := clock.Measure(func() error {
-			return dependencies.Install(dependency, context.CNBPath, nodeLayer.Path)
+			return dependencyManager.Deliver(dependency, context.CNBPath, nodeLayer.Path, context.Platform.Path)
 		})
 		if err != nil {
 			return packit.BuildResult{}, err
@@ -141,8 +143,9 @@ func Build(entries EntryResolver, dependencies DependencyManager, environment En
 		}
 
 		return packit.BuildResult{
-			Plan:   bom,
 			Layers: []packit.Layer{nodeLayer},
+			Build:  buildMetadata,
+			Launch: launchMetadata,
 		}, nil
 	}
 }
