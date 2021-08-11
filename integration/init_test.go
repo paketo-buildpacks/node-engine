@@ -56,7 +56,7 @@ func TestIntegration(t *testing.T) {
 
 	buildpackStore := occam.NewBuildpackStore()
 
-	version = "0.1.2"
+	version = "1.2.3"
 
 	nodeBuildpack, err = buildpackStore.Get.
 		WithVersion(version).
