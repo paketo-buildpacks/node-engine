@@ -1,17 +1,14 @@
 package integration
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/paketo-buildpacks/occam"
-	"github.com/paketo-buildpacks/packit/pexec"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
@@ -59,8 +56,7 @@ func TestIntegration(t *testing.T) {
 
 	buildpackStore := occam.NewBuildpackStore()
 
-	version, err = GetGitVersion()
-	Expect(err).NotTo(HaveOccurred())
+	version = "0.1.2"
 
 	nodeBuildpack, err = buildpackStore.Get.
 		WithVersion(version).
@@ -88,33 +84,4 @@ func TestIntegration(t *testing.T) {
 	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
 	suite.Run(t)
-}
-
-func GetGitVersion() (string, error) {
-	gitExec := pexec.NewExecutable("git")
-	revListOut := bytes.NewBuffer(nil)
-
-	err := gitExec.Execute(pexec.Execution{
-		Args:   []string{"rev-list", "--tags", "--max-count=1"},
-		Stdout: revListOut,
-	})
-
-	if revListOut.String() == "" {
-		return "0.0.0", nil
-	}
-
-	if err != nil {
-		return "", err
-	}
-
-	stdout := bytes.NewBuffer(nil)
-	err = gitExec.Execute(pexec.Execution{
-		Args:   []string{"describe", "--tags", strings.TrimSpace(revListOut.String())},
-		Stdout: stdout,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(strings.TrimPrefix(stdout.String(), "v")), nil
 }
