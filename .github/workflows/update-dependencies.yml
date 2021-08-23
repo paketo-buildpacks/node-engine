@@ -20,13 +20,14 @@ jobs:
         branch: automation/dependencies/update
 
     - name: Update dependencies
-      uses: paketo-buildpacks/github-config/actions/dependency/update@main
+      id: update
+      uses: paketo-buildpacks/github-config/actions/dependency/update@update-dependencies-versions
 
     - name: Commit
       id: commit
       uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
       with:
-        message: "Updating dependencies in buildpack.toml"
+        message: "Updating buildpack.toml dependency versions: ${{ steps.update.outputs.new-versions }}"
         pathspec: "."
         keyid: ${{ secrets.PAKETO_BOT_GPG_SIGNING_KEY_ID }}
         key: ${{ secrets.PAKETO_BOT_GPG_SIGNING_KEY }}
