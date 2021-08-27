@@ -82,12 +82,13 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
 			{
 				Name: "node",
-				Metadata: map[string]interface{}{
-					"name":    "node-dependency-name",
-					"sha256":  "node-dependency-sha",
-					"stacks":  []string{"some-stack"},
-					"uri":     "node-dependency-uri",
-					"version": "~10",
+				Metadata: packit.BOMMetadata{
+					URI:     "node-dependency-uri",
+					Version: "~10",
+					Checksum: packit.BOMChecksum{
+						Algorithm: packit.SHA256,
+						Hash:      "node-dependency-sha",
+					},
 				},
 			},
 		}
@@ -311,12 +312,13 @@ nodejs:
 					BOM: []packit.BOMEntry{
 						{
 							Name: "node",
-							Metadata: map[string]interface{}{
-								"name":    "node-dependency-name",
-								"sha256":  "node-dependency-sha",
-								"stacks":  []string{"some-stack"},
-								"uri":     "node-dependency-uri",
-								"version": "~10",
+							Metadata: packit.BOMMetadata{
+								URI:     "node-dependency-uri",
+								Version: "~10",
+								Checksum: packit.BOMChecksum{
+									Algorithm: packit.SHA256,
+									Hash:      "node-dependency-sha",
+								},
 							},
 						},
 					},
@@ -325,12 +327,13 @@ nodejs:
 					BOM: []packit.BOMEntry{
 						{
 							Name: "node",
-							Metadata: map[string]interface{}{
-								"name":    "node-dependency-name",
-								"sha256":  "node-dependency-sha",
-								"stacks":  []string{"some-stack"},
-								"uri":     "node-dependency-uri",
-								"version": "~10",
+							Metadata: packit.BOMMetadata{
+								URI:     "node-dependency-uri",
+								Version: "~10",
+								Checksum: packit.BOMChecksum{
+									Algorithm: packit.SHA256,
+									Hash:      "node-dependency-sha",
+								},
 							},
 						},
 					},
