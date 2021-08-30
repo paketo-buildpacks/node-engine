@@ -20,6 +20,7 @@ jobs:
         branch: automation/dependencies/update
 
     - name: Update dependencies
+      id: update
       uses: paketo-buildpacks/github-config/actions/dependency/update@main
 
     - name: Commit
@@ -42,5 +43,5 @@ jobs:
       uses: paketo-buildpacks/github-config/actions/pull-request/open@main
       with:
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
-        title: "Updates dependencies in buildpack.toml"
+        title: "Updates buildpack.toml with new dependency versions: ${{ steps.update.outputs.new-versions }}"
         branch: automation/dependencies/update
