@@ -60,11 +60,11 @@ api = "0.5"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
     name = "Node Engine"
     purl = "pkg:generic/node@v14.18.0?checksum=2272312d7eb48a28e982af395142d916385b0572380d07c89f9abd9c97810189&download_url=https://nodejs.org/dist/v14.18.0/node-v14.18.0.tar.gz"
-    sha256 = "0debc4da75eda988ce14b4d27fecf1e4a170607a46ef032bf55381b0a659171d"
+    sha256 = "644dfbf78db01bde4605db4409d680e58967462ce480fc25fbc266a8127178b6"
     source = "https://nodejs.org/dist/v14.18.0/node-v14.18.0.tar.gz"
     source_sha256 = "2272312d7eb48a28e982af395142d916385b0572380d07c89f9abd9c97810189"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/node/node_v14.18.0_linux_x64_bionic_0debc4da.tgz"
+    uri = "https://deps.paketo.io/node/node_v14.18.0_linux_x64_bionic_644dfbf7.tgz"
     version = "14.18.0"
 
   [[metadata.dependencies]]
