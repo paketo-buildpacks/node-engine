@@ -116,11 +116,11 @@ api = "0.5"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
     name = "Node Engine"
     purl = "pkg:generic/node@v16.10.0?checksum=69b09bb0c4cd9add7eb501b1625a405b15d6ce53596e98b863c8d066e0b6b202&download_url=https://nodejs.org/dist/v16.10.0/node-v16.10.0.tar.gz"
-    sha256 = "f75be1ae0edb8f6a5ed233b3dfe743fd8bff240269b5e58d96211b511dfc281f"
+    sha256 = "be3da93b8ad1cc099c58de7a4620f6ee3ae78d8913db91b8bdb2c8afed3af4dd"
     source = "https://nodejs.org/dist/v16.10.0/node-v16.10.0.tar.gz"
     source_sha256 = "69b09bb0c4cd9add7eb501b1625a405b15d6ce53596e98b863c8d066e0b6b202"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/node/node_v16.10.0_linux_x64_bionic_f75be1ae.tgz"
+    uri = "https://deps.paketo.io/node/node_v16.10.0_linux_x64_bionic_be3da93b.tgz"
     version = "16.10.0"
 
   [[metadata.dependency-constraints]]
