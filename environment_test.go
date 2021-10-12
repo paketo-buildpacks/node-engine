@@ -18,11 +18,10 @@ import (
 
 var (
 	MemoryAvailableScript = strings.TrimSpace(`if [ -z "$MEMORY_AVAILABLE" ]; then
-  if [ -f "/sys/fs/cgroup/memory/memory.limit_in_bytes" ]; then
-    memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
-  fi
-  if [ -f "/sys/fs/cgroup/memory.max" ]; then
+  if [ -f "/sys/fs/cgroup/cgroup.controllers" ]; then
     memory_in_bytes="$(cat /sys/fs/cgroup/memory.max)"
+  else
+    memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
   fi
   if [ "$memory_in_bytes" != "" ] && [ "$memory_in_bytes" != "max" ]; then
     MEMORY_AVAILABLE="$((memory_in_bytes / (1024 * 1024)))"
@@ -31,8 +30,10 @@ var (
 fi
 `)
 
-	OptimizeMemoryScript = `export NODE_OPTIONS="--max_old_space_size=$(( $MEMORY_AVAILABLE * 75 / 100 ))"`
-)
+	OptimizeMemoryScript = `if [ -n "$MEMORY_AVAILABLE" ]; then
+  export NODE_OPTIONS="--max_old_space_size=$(( MEMORY_AVAILABLE * 75 / 100 ))"
+fi
+`)
 
 func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (
