@@ -25,7 +25,7 @@ var (
     memory_in_bytes="$(cat /sys/fs/cgroup/memory.max)"
   fi
   if [ "$memory_in_bytes" != "" ] && [ "$memory_in_bytes" != "max" ]; then
-    MEMORY_AVAILABLE="$(($memory_in_bytes / (1024 * 1024)))"
+    MEMORY_AVAILABLE="$((memory_in_bytes / (1024 * 1024)))"
     export MEMORY_AVAILABLE
   fi
 fi
