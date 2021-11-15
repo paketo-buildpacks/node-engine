@@ -38,10 +38,16 @@ jobs:
       with:
         branch: automation/dependencies/update
 
+    - name: PR Title
+      id: title
+      if: ${{ steps.update.outputs.new-versions != '' }}
+      run: |
+        echo "::set-output name=include_versions:: with new dependency versions: ${{ steps.update.outputs.new-versions }}"
+
     - name: Open Pull Request
       if: ${{ steps.commit.outputs.commit_sha != '' }}
       uses: paketo-buildpacks/github-config/actions/pull-request/open@main
       with:
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
-        title: "Updates buildpack.toml with new dependency versions: ${{ steps.update.outputs.new-versions }}"
+        title: "Updates buildpack.toml${{ steps.title.outputs.include_versions }}"
         branch: automation/dependencies/update
