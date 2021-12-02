@@ -67,6 +67,9 @@ function tools::install() {
   util::tools::jam::install \
     --directory "${BUILDPACKDIR}/.bin"
 
+  util::tools::create-package::install \
+    --directory "${BUILDPACKDIR}/.bin"
+
   if [[ -f "${BUILDPACKDIR}/.libbuildpack" ]]; then
     util::tools::packager::install \
       --directory "${BUILDPACKDIR}/.bin"
