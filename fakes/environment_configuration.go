@@ -3,12 +3,12 @@ package fakes
 import (
 	"sync"
 
-	"github.com/paketo-buildpacks/packit"
+	packit "github.com/paketo-buildpacks/packit/v2"
 )
 
 type EnvironmentConfiguration struct {
 	ConfigureCall struct {
-		sync.Mutex
+		mutex     sync.Mutex
 		CallCount int
 		Receives  struct {
 			BuildEnv       packit.Environment
@@ -24,8 +24,8 @@ type EnvironmentConfiguration struct {
 }
 
 func (f *EnvironmentConfiguration) Configure(param1 packit.Environment, param2 packit.Environment, param3 string, param4 bool) error {
-	f.ConfigureCall.Lock()
-	defer f.ConfigureCall.Unlock()
+	f.ConfigureCall.mutex.Lock()
+	defer f.ConfigureCall.mutex.Unlock()
 	f.ConfigureCall.CallCount++
 	f.ConfigureCall.Receives.BuildEnv = param1
 	f.ConfigureCall.Receives.LaunchEnv = param2

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
-	"github.com/paketo-buildpacks/packit/cargo"
+	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -52,9 +52,16 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("simple app", func() {
+			var (
+				container1 occam.Container
+				container2 occam.Container
+				container3 occam.Container
+			)
 
 			it.After(func() {
-				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container1.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container3.ID)).To(Succeed())
 			})
 
 			it("builds, logs and runs correctly", func() {
@@ -85,6 +92,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
@@ -100,15 +110,16 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
 				))
 
-				container, err = docker.Container.Run.
+				// Ensure node is installed correctly
+				container1, err = docker.Container.Run.
 					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
 					WithPublish("8080").
 					Execute(image.ID)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(container).Should(BeAvailable())
+				Eventually(container1).Should(BeAvailable())
 
-				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container1.HostPort("8080")))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
@@ -117,12 +128,42 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
 				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container.ID)
+					cLogs, err := docker.Container.Logs.Execute(container1.ID)
 					Expect(err).NotTo(HaveOccurred())
 					return cLogs.String()
 				}).Should(
 					ContainSubstring("NODE_ENV=production"),
 				)
+
+				// check that all expected SBOM files are present
+				container2, err = docker.Container.Run.
+					WithCommand(fmt.Sprintf("ls -alR /layers/sbom/launch/%s/node/",
+						strings.ReplaceAll(config.Buildpack.ID, "/", "_"))).
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container2.ID)
+					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(And(
+					ContainSubstring("sbom.cdx.json"),
+					ContainSubstring("sbom.spdx.json"),
+					ContainSubstring("sbom.syft.json"),
+				))
+
+				// check an SBOM file to make sure it has an entry for node
+				container3, err = docker.Container.Run.
+					WithCommand(fmt.Sprintf("cat /layers/sbom/launch/%s/node/sbom.cdx.json",
+						strings.ReplaceAll(config.Buildpack.ID, "/", "_"))).
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container3.ID)
+					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(ContainSubstring(`"name": "Node Engine"`))
 			})
 		})
 
@@ -223,6 +264,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
@@ -298,6 +342,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
@@ -356,7 +403,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(duplicator.Duplicate(root, tmpBuildpackDir)).To(Succeed())
 
 				bpToml := []byte(fmt.Sprintf(`
-api = "0.5"
+api = "0.7"
 
 [buildpack]
   id = %q
@@ -378,6 +425,7 @@ api = "0.5"
     stacks = ["some.stack"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-some-stack-ad0376cb.tgz"
     version = "10.18.1"
+    cpe = "cpe:2.3:a:nodejs:node.js:10.18.1:*:*:*:*:*:*:*"
 
   [[metadata.dependencies]]
 		deprecation_date = 2000-04-01T00:00:00Z
@@ -389,6 +437,7 @@ api = "0.5"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-bionic-528414d1.tgz"
     version = "10.18.1"
+    cpe = "cpe:2.3:a:nodejs:node.js:10.18.1:*:*:*:*:*:*:*"
 
 [[stacks]]
   id = "some.stack"
