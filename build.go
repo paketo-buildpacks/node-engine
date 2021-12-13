@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"time"
 
-	// "io/ioutil"
-
 	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
@@ -151,15 +149,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
-
-		// // to see what's in the SBOM for debugging
-		// for _, f := range nodeLayer.SBOM.Formats() {
-		// 	b, err := ioutil.ReadAll(f.Content)
-		// 	if err != nil {
-		// 		panic(err)
-		// 	}
-		// 	fmt.Printf("bom content in %s format:\n%s\n", f.Extension, string(b))
-		// }
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{nodeLayer},
