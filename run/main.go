@@ -20,7 +20,6 @@ func (f Generator) GenerateFromDependency(dependency postal.Dependency, path str
 
 func main() {
 	nvmrcParser := nodeengine.NewNvmrcParser()
-	buildpackYMLParser := nodeengine.NewBuildpackYMLParser()
 	nodeVersionParser := nodeengine.NewNodeVersionParser()
 	logEmitter := nodeengine.NewLogEmitter(os.Stdout)
 	entryResolver := draft.NewPlanner()
@@ -31,7 +30,6 @@ func main() {
 	packit.Run(
 		nodeengine.Detect(
 			nvmrcParser,
-			buildpackYMLParser,
 			nodeVersionParser,
 		),
 		nodeengine.Build(

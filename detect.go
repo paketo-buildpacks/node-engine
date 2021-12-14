@@ -18,7 +18,7 @@ type BuildPlanMetadata struct {
 	VersionSource string `toml:"version-source"`
 }
 
-func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) packit.DetectFunc {
+func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
 		var requirements []packit.BuildPlanRequirement
 
@@ -61,21 +61,6 @@ func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) pa
 				Metadata: BuildPlanMetadata{
 					Version:       version,
 					VersionSource: "BP_NODE_VERSION",
-				},
-			})
-		}
-
-		version, err = buildpackYMLParser.ParseVersion(filepath.Join(context.WorkingDir, BuildpackYMLSource))
-		if err != nil {
-			return packit.DetectResult{}, err
-		}
-
-		if version != "" {
-			requirements = append(requirements, packit.BuildPlanRequirement{
-				Name: Node,
-				Metadata: BuildPlanMetadata{
-					Version:       version,
-					VersionSource: BuildpackYMLSource,
 				},
 			})
 		}

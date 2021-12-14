@@ -1,12 +1,10 @@
 package nodeengine
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/postal"
@@ -42,7 +40,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		priorities := []interface{}{
 			"BP_NODE_VERSION",
-			"buildpack.yml",
 			"package.json",
 			".nvmrc",
 			".node-version",
@@ -58,14 +55,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		}
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
-
-		versionSource, _ := entry.Metadata["version-source"].(string)
-		if versionSource == "buildpack.yml" {
-			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
-			logger.Subprocess("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
-			logger.Subprocess("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information.")
-			logger.Break()
-		}
 
 		nodeLayer, err := context.Layers.Get(Node)
 		if err != nil {
@@ -129,23 +118,12 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 			return packit.BuildResult{}, err
 		}
 
-		// Check if buildpack.yml specifies optimize_memory
-		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
-		if err != nil {
-			return packit.BuildResult{}, fmt.Errorf("unable to parse buildpack.yml file: %s", err)
-		}
-		if config.OptimizedMemory {
-			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
-			logger.Subprocess("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
-			logger.Subprocess("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.")
-			logger.Break()
-		}
-
+		optimizedMemory := false
 		if os.Getenv("BP_NODE_OPTIMIZE_MEMORY") == "true" {
-			config.OptimizedMemory = true
+			optimizedMemory = true
 		}
 
-		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, config.OptimizedMemory)
+		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, optimizedMemory)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
