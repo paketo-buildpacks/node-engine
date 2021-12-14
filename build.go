@@ -118,10 +118,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 			return packit.BuildResult{}, err
 		}
 
-		optimizedMemory := false
-		if os.Getenv("BP_NODE_OPTIMIZE_MEMORY") == "true" {
-			optimizedMemory = true
-		}
+		optimizedMemory := os.Getenv("BP_NODE_OPTIMIZE_MEMORY") == "true"
 
 		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, optimizedMemory)
 		if err != nil {
