@@ -281,6 +281,64 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("failure cases", func() {
+		context("when there is a buildpack.yml file", func() {
+			var workingDir string
+
+			it.Before(func() {
+				var err error
+				workingDir, err = ioutil.TempDir("", "working-dir")
+				Expect(err).NotTo(HaveOccurred())
+
+				buildpackYMLFilepath := filepath.Join(workingDir, "buildpack.yml")
+				err = os.WriteFile(buildpackYMLFilepath, nil, os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it.After(func() {
+				err := os.RemoveAll(workingDir)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("fails with helpful error", func() {
+				_, err := detect(packit.DetectContext{
+					WorkingDir: workingDir,
+				})
+				Expect(err).To(
+					MatchError(
+						ContainSubstring("providing configuration via buildpack.yml file is unsupported"),
+					),
+				)
+			})
+		})
+
+		context("when there is an error looking for buildpack.yml file", func() {
+			var workingDir string
+
+			it.Before(func() {
+				var err error
+				workingDir, err = ioutil.TempDir("", "working-dir")
+				Expect(err).NotTo(HaveOccurred())
+
+				buildpackYMLFilepath := filepath.Join(workingDir, "buildpack.yml")
+				Expect(os.WriteFile(buildpackYMLFilepath, nil, 0644)).To(Succeed())
+				Expect(os.Chmod(workingDir, 0000)).To(Succeed())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it.After(func() {
+				Expect(os.Chmod(workingDir, os.ModePerm)).To(Succeed())
+				err := os.RemoveAll(workingDir)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("returns an error", func() {
+				_, err := detect(packit.DetectContext{
+					WorkingDir: workingDir,
+				})
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
 		context("when the dir specified by BP_NODE_PROJECT_PATH does not exist", func() {
 			var workingDir string
 
@@ -293,6 +351,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 			it.After(func() {
 				Expect(os.Unsetenv("BP_NODE_PROJECT_PATH")).To(Succeed())
+
+				err := os.RemoveAll(workingDir)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			it("fails with helpful error", func() {

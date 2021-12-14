@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 )
 
 //go:generate faux --interface VersionParser --output fakes/version_parser.go
@@ -20,6 +21,16 @@ type BuildPlanMetadata struct {
 
 func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
+		bpYMLExists, err := fs.Exists(filepath.Join(context.WorkingDir, "buildpack.yml"))
+		if err != nil {
+			return packit.DetectResult{}, err
+		}
+
+		if bpYMLExists {
+			return packit.DetectResult{},
+				packit.Fail.WithMessage("providing configuration via buildpack.yml file is unsupported")
+		}
+
 		var requirements []packit.BuildPlanRequirement
 
 		projectPath := context.WorkingDir
