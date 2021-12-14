@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/postal"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/chronos"
+	"github.com/paketo-buildpacks/packit/v2/postal"
+	"github.com/paketo-buildpacks/packit/v2/sbom"
 )
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
@@ -22,7 +23,11 @@ type EntryResolver interface {
 type DependencyManager interface {
 	Resolve(path, id, version, stack string) (postal.Dependency, error)
 	Deliver(dependency postal.Dependency, cnbPath, layerPath, platformPath string) error
-	GenerateBillOfMaterials(dependencies ...postal.Dependency) []packit.BOMEntry
+}
+
+//go:generate faux --interface SBOMGenerator --output fakes/sbom_generator.go
+type SBOMGenerator interface {
+	GenerateFromDependency(dependency postal.Dependency, dir string) (sbom.SBOM, error)
 }
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
@@ -30,7 +35,7 @@ type EnvironmentConfiguration interface {
 	Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error
 }
 
-func Build(entryResolver EntryResolver, dependencyManager DependencyManager, environment EnvironmentConfiguration, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
+func Build(entryResolver EntryResolver, dependencyManager DependencyManager, environment EnvironmentConfiguration, sbomGenerator SBOMGenerator, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -47,15 +52,12 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		logger.Candidates(allEntries)
 
 		version, _ := entry.Metadata["version"].(string)
-		var dependency postal.Dependency
-		var err error
-		dependency, err = dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
+		dependency, err := dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
-		bom := dependencyManager.GenerateBillOfMaterials(dependency)
 
 		versionSource, _ := entry.Metadata["version-source"].(string)
 		if versionSource == "buildpack.yml" {
@@ -72,16 +74,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		launch, build := entryResolver.MergeLayerTypes("node", context.Plan.Entries)
 
-		var buildMetadata = packit.BuildMetadata{}
-		var launchMetadata = packit.LaunchMetadata{}
-		if build {
-			buildMetadata = packit.BuildMetadata{BOM: bom}
-		}
-
-		if launch {
-			launchMetadata = packit.LaunchMetadata{BOM: bom}
-		}
-
 		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
 		if ok && cachedSHA == dependency.SHA256 {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
@@ -91,8 +83,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 			return packit.BuildResult{
 				Layers: []packit.Layer{nodeLayer},
-				Build:  buildMetadata,
-				Launch: launchMetadata,
 			}, nil
 		}
 
@@ -121,6 +111,24 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		logger.Action("Completed in %s", duration.Round(time.Millisecond))
 		logger.Break()
 
+		logger.Process("Generating SBOM for directory %s", nodeLayer.Path)
+		var sbomContent sbom.SBOM
+		duration, err = clock.Measure(func() error {
+			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, context.WorkingDir)
+			return err
+		})
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
+		logger.Action("Completed in %s", duration.Round(time.Millisecond))
+		logger.Break()
+
+		nodeLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
 		// Check if buildpack.yml specifies optimize_memory
 		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
 		if err != nil {
@@ -144,8 +152,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{nodeLayer},
-			Build:  buildMetadata,
-			Launch: launchMetadata,
 		}, nil
 	}
 }

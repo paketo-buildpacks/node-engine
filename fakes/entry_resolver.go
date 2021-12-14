@@ -3,12 +3,12 @@ package fakes
 import (
 	"sync"
 
-	"github.com/paketo-buildpacks/packit"
+	packit "github.com/paketo-buildpacks/packit/v2"
 )
 
 type EntryResolver struct {
 	MergeLayerTypesCall struct {
-		sync.Mutex
+		mutex     sync.Mutex
 		CallCount int
 		Receives  struct {
 			Name    string
@@ -21,7 +21,7 @@ type EntryResolver struct {
 		Stub func(string, []packit.BuildpackPlanEntry) (bool, bool)
 	}
 	ResolveCall struct {
-		sync.Mutex
+		mutex     sync.Mutex
 		CallCount int
 		Receives  struct {
 			Name       string
@@ -39,8 +39,8 @@ type EntryResolver struct {
 }
 
 func (f *EntryResolver) MergeLayerTypes(param1 string, param2 []packit.BuildpackPlanEntry) (bool, bool) {
-	f.MergeLayerTypesCall.Lock()
-	defer f.MergeLayerTypesCall.Unlock()
+	f.MergeLayerTypesCall.mutex.Lock()
+	defer f.MergeLayerTypesCall.mutex.Unlock()
 	f.MergeLayerTypesCall.CallCount++
 	f.MergeLayerTypesCall.Receives.Name = param1
 	f.MergeLayerTypesCall.Receives.Entries = param2
@@ -51,8 +51,8 @@ func (f *EntryResolver) MergeLayerTypes(param1 string, param2 []packit.Buildpack
 }
 func (f *EntryResolver) Resolve(param1 string, param2 []packit.BuildpackPlanEntry, param3 []interface {
 }) (packit.BuildpackPlanEntry, []packit.BuildpackPlanEntry) {
-	f.ResolveCall.Lock()
-	defer f.ResolveCall.Unlock()
+	f.ResolveCall.mutex.Lock()
+	defer f.ResolveCall.mutex.Unlock()
 	f.ResolveCall.CallCount++
 	f.ResolveCall.Receives.Name = param1
 	f.ResolveCall.Receives.Entries = param2
