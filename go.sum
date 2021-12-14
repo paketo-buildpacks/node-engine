@@ -143,8 +143,8 @@ github.com/anchore/packageurl-go v0.0.0-20210922164639-b3fa992ebd29 h1:K9Lfnxwhq
 github.com/anchore/packageurl-go v0.0.0-20210922164639-b3fa992ebd29/go.mod h1:Oc1UkGaJwY6ND6vtAqPSlYrptKRJngHwkwB6W7l1uP0=
 github.com/anchore/stereoscope v0.0.0-20211203160213-5a5e323a5c89 h1:pcMFN7wjIQIxdZm8NA0R3JiRRFn5Eyx9mhagHOVS4Bw=
 github.com/anchore/stereoscope v0.0.0-20211203160213-5a5e323a5c89/go.mod h1:FNm1rtauEjkC3elA3jr3bJkU+/4QiovApwJdPnHQ9x0=
-github.com/anchore/syft v0.32.0 h1:YYAMlzZ+Avvg1NMLNQxk/912vEzaRrDTOeE1gwlny/4=
-github.com/anchore/syft v0.32.0/go.mod h1:6tuVZBaHohcTuX8S0G6S80o/6PmzoF7sHbjxDUJaLjU=
+github.com/anchore/syft v0.32.2 h1:3xeuAzR6m7iHzMvA9KvxzMTGVZAqScfhDyii//dsHSQ=
+github.com/anchore/syft v0.32.2/go.mod h1:6tuVZBaHohcTuX8S0G6S80o/6PmzoF7sHbjxDUJaLjU=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/andybalholm/brotli v1.0.1/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/andybalholm/brotli v1.0.4 h1:V7DdXeJtZscaqfNuAdSRuRFzuiKlHSC/Zh3zl9qY3JY=
@@ -776,8 +776,8 @@ github.com/paketo-buildpacks/occam v0.2.1/go.mod h1:d4K1+o/ZLOWYJUO6oMJT2hOgPFA0
 github.com/paketo-buildpacks/packit v0.5.0/go.mod h1:ATLZccUzqEAyPlirdka8hs+XNqS4pyJ/tjyU1NXJKm8=
 github.com/paketo-buildpacks/packit v1.3.1 h1:DJAfqsDadRllr/OPYDONxJEOHbYUMWE1NIPPArq4b7w=
 github.com/paketo-buildpacks/packit v1.3.1/go.mod h1:v0jVFr3GNcM9JDwwuIAzYNV4Le1L728uMSNhjUybXVA=
-github.com/paketo-buildpacks/packit/v2 v2.0.1-0.20211209184112-5bda788cab1c h1:EbcCmNm0gPIiuOEVU5GbTzzcNpKkuj8NxSm5VpghIWc=
-github.com/paketo-buildpacks/packit/v2 v2.0.1-0.20211209184112-5bda788cab1c/go.mod h1:E5i2KtrlWOxW+yKifU1YyruO801PLLGqIZ4ok06DmFs=
+github.com/paketo-buildpacks/packit/v2 v2.0.1 h1:1NY8511HOGCuXNH8VYgmgCu9fyiHlYZFYF0IN1P1z0I=
+github.com/paketo-buildpacks/packit/v2 v2.0.1/go.mod h1:7P/D0Hj6t/ZhckgfprtJ6dHv0CNWGRVP1JqOfabtQwI=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pelletier/go-toml v1.8.1/go.mod h1:T2/BmBdy8dvIRq1a/8aqjN41wvWlN4lrapLU/GW4pbc=
