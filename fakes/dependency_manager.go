@@ -3,12 +3,13 @@ package fakes
 import (
 	"sync"
 
-	"github.com/paketo-buildpacks/packit/v2/postal"
+	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/postal"
 )
 
 type DependencyManager struct {
 	DeliverCall struct {
-		mutex     sync.Mutex
+		sync.Mutex
 		CallCount int
 		Receives  struct {
 			Dependency   postal.Dependency
@@ -21,8 +22,19 @@ type DependencyManager struct {
 		}
 		Stub func(postal.Dependency, string, string, string) error
 	}
+	GenerateBillOfMaterialsCall struct {
+		sync.Mutex
+		CallCount int
+		Receives  struct {
+			Dependencies []postal.Dependency
+		}
+		Returns struct {
+			BOMEntrySlice []packit.BOMEntry
+		}
+		Stub func(...postal.Dependency) []packit.BOMEntry
+	}
 	ResolveCall struct {
-		mutex     sync.Mutex
+		sync.Mutex
 		CallCount int
 		Receives  struct {
 			Path    string
@@ -39,8 +51,8 @@ type DependencyManager struct {
 }
 
 func (f *DependencyManager) Deliver(param1 postal.Dependency, param2 string, param3 string, param4 string) error {
-	f.DeliverCall.mutex.Lock()
-	defer f.DeliverCall.mutex.Unlock()
+	f.DeliverCall.Lock()
+	defer f.DeliverCall.Unlock()
 	f.DeliverCall.CallCount++
 	f.DeliverCall.Receives.Dependency = param1
 	f.DeliverCall.Receives.CnbPath = param2
@@ -51,9 +63,19 @@ func (f *DependencyManager) Deliver(param1 postal.Dependency, param2 string, par
 	}
 	return f.DeliverCall.Returns.Error
 }
+func (f *DependencyManager) GenerateBillOfMaterials(param1 ...postal.Dependency) []packit.BOMEntry {
+	f.GenerateBillOfMaterialsCall.Lock()
+	defer f.GenerateBillOfMaterialsCall.Unlock()
+	f.GenerateBillOfMaterialsCall.CallCount++
+	f.GenerateBillOfMaterialsCall.Receives.Dependencies = param1
+	if f.GenerateBillOfMaterialsCall.Stub != nil {
+		return f.GenerateBillOfMaterialsCall.Stub(param1...)
+	}
+	return f.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice
+}
 func (f *DependencyManager) Resolve(param1 string, param2 string, param3 string, param4 string) (postal.Dependency, error) {
-	f.ResolveCall.mutex.Lock()
-	defer f.ResolveCall.mutex.Unlock()
+	f.ResolveCall.Lock()
+	defer f.ResolveCall.Unlock()
 	f.ResolveCall.CallCount++
 	f.ResolveCall.Receives.Path = param1
 	f.ResolveCall.Receives.Id = param2
