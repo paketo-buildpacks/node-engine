@@ -10,7 +10,7 @@ import (
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/node-engine/fakes"
-	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
