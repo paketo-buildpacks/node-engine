@@ -3,8 +3,8 @@ package nodeengine
 import (
 	"io"
 
-	"github.com/paketo-buildpacks/packit/v2"
-	"github.com/paketo-buildpacks/packit/v2/scribe"
+	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/scribe"
 )
 
 type LogEmitter struct {
