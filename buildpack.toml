@@ -7,7 +7,7 @@ api = "0.6"
 
   [[buildpack.licenses]]
     type = "Apache-2.0"
-    uri = "https://github.com/paketo-buildpacks/dotnet-core/blob/main/LICENSE"
+    uri = "https://github.com/paketo-buildpacks/node-engine/blob/main/LICENSE"
 
 [metadata]
   include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
