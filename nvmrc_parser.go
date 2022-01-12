@@ -15,6 +15,9 @@ var (
 		"boron":   6,
 		"carbon":  8,
 		"dubnium": 10,
+		"erbium":  12,
+		"fermium": 14,
+		"gallium": 16,
 	}
 )
 
