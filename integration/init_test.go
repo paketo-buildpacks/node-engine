@@ -45,7 +45,7 @@ func TestIntegration(t *testing.T) {
 	Expect(err).NotTo(HaveOccurred())
 	defer file.Close()
 
-	_, err = toml.DecodeReader(file, &config)
+	_, err = toml.NewDecoder(file).Decode(&config)
 	Expect(err).NotTo(HaveOccurred())
 
 	file, err = os.Open("../integration.json")
