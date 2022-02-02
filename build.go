@@ -23,6 +23,7 @@ type EntryResolver interface {
 type DependencyManager interface {
 	Resolve(path, id, version, stack string) (postal.Dependency, error)
 	Deliver(dependency postal.Dependency, cnbPath, layerPath, platformPath string) error
+	GenerateBillOfMaterials(dependencies ...postal.Dependency) []packit.BOMEntry
 }
 
 //go:generate faux --interface SBOMGenerator --output fakes/sbom_generator.go
@@ -59,6 +60,15 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
 
+		logger.Process("Generating legacy Paketo SBOM for %s", dependency.Name)
+		var legacySBOM []packit.BOMEntry
+		duration, err := clock.Measure(func() error {
+			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
+			return nil
+		})
+		logger.Action("Completed in %s", duration.Round(time.Millisecond))
+		logger.Break()
+
 		versionSource, _ := entry.Metadata["version-source"].(string)
 		if versionSource == "buildpack.yml" {
 			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
@@ -74,15 +84,26 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		launch, build := entryResolver.MergeLayerTypes("node", context.Plan.Entries)
 
+		var buildMetadata = packit.BuildMetadata{}
+		var launchMetadata = packit.LaunchMetadata{}
+		if build {
+			buildMetadata = packit.BuildMetadata{BOM: legacySBOM}
+		}
+
+		if launch {
+			launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
+		}
+
 		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
 		if ok && cachedSHA == dependency.SHA256 {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
 			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
-
 			return packit.BuildResult{
 				Layers: []packit.Layer{nodeLayer},
+				Build:  buildMetadata,
+				Launch: launchMetadata,
 			}, nil
 		}
 
@@ -101,7 +122,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)
-		duration, err := clock.Measure(func() error {
+		duration, err = clock.Measure(func() error {
 			return dependencyManager.Deliver(dependency, context.CNBPath, nodeLayer.Path, context.Platform.Path)
 		})
 		if err != nil {
@@ -111,7 +132,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		logger.Action("Completed in %s", duration.Round(time.Millisecond))
 		logger.Break()
 
-		logger.Process("Generating SBOM for directory %s", nodeLayer.Path)
+		logger.Process("Generating Syft SBOM for directory %s", nodeLayer.Path)
 		var sbomContent sbom.SBOM
 		duration, err = clock.Measure(func() error {
 			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, context.WorkingDir)
@@ -152,6 +173,8 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{nodeLayer},
+			Build:  buildMetadata,
+			Launch: launchMetadata,
 		}, nil
 	}
 }

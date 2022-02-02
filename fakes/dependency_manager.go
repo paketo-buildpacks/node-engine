@@ -3,6 +3,7 @@ package fakes
 import (
 	"sync"
 
+	packit "github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 )
 
@@ -20,6 +21,17 @@ type DependencyManager struct {
 			Error error
 		}
 		Stub func(postal.Dependency, string, string, string) error
+	}
+	GenerateBillOfMaterialsCall struct {
+		mutex     sync.Mutex
+		CallCount int
+		Receives  struct {
+			Dependencies []postal.Dependency
+		}
+		Returns struct {
+			BOMEntrySlice []packit.BOMEntry
+		}
+		Stub func(...postal.Dependency) []packit.BOMEntry
 	}
 	ResolveCall struct {
 		mutex     sync.Mutex
@@ -50,6 +62,16 @@ func (f *DependencyManager) Deliver(param1 postal.Dependency, param2 string, par
 		return f.DeliverCall.Stub(param1, param2, param3, param4)
 	}
 	return f.DeliverCall.Returns.Error
+}
+func (f *DependencyManager) GenerateBillOfMaterials(param1 ...postal.Dependency) []packit.BOMEntry {
+	f.GenerateBillOfMaterialsCall.mutex.Lock()
+	defer f.GenerateBillOfMaterialsCall.mutex.Unlock()
+	f.GenerateBillOfMaterialsCall.CallCount++
+	f.GenerateBillOfMaterialsCall.Receives.Dependencies = param1
+	if f.GenerateBillOfMaterialsCall.Stub != nil {
+		return f.GenerateBillOfMaterialsCall.Stub(param1...)
+	}
+	return f.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice
 }
 func (f *DependencyManager) Resolve(param1 string, param2 string, param3 string, param4 string) (postal.Dependency, error) {
 	f.ResolveCall.mutex.Lock()

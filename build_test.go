@@ -13,6 +13,9 @@ import (
 	"github.com/paketo-buildpacks/node-engine/fakes"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
+
+	//nolint Ignore SA1019, informed usage of deprecated package
+	"github.com/paketo-buildpacks/packit/v2/paketosbom"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/sclevine/spec"
@@ -85,7 +88,21 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
-
+		// Legacy SBOM
+		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
+			{
+				Name: "node",
+				Metadata: paketosbom.BOMMetadata{
+					URI:     "node-dependency-uri",
+					Version: "~10",
+					Checksum: paketosbom.BOMChecksum{
+						Algorithm: paketosbom.SHA256,
+						Hash:      "node-dependency-sha",
+					},
+				},
+			},
+		}
+		// Syft SBOM
 		sbomGenerator = &fakes.SBOMGenerator{}
 		sbomGenerator.GenerateFromDependencyCall.Returns.SBOM = sbom.SBOM{}
 
@@ -189,6 +206,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.DeliverCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.DeliverCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 		Expect(dependencyManager.DeliverCall.Receives.PlatformPath).To(Equal("platform"))
+		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(workingDir))
@@ -300,6 +318,37 @@ nodejs:
 			Expect(layer.Build).To(BeTrue())
 			Expect(layer.Launch).To(BeTrue())
 			Expect(layer.Cache).To(BeTrue())
+			Expect(result.Launch.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(result.Build.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 		})
 	})
 
@@ -312,12 +361,51 @@ nodejs:
 				Name:   "Node Engine",
 				SHA256: "some-sha",
 			}
+			entryResolver.MergeLayerTypesCall.Returns.Launch = true
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
 		})
 
 		it("exits build process early", func() {
-			_, err := build(buildContext)
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.CallCount).To(Equal(1))
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
+				{
+					Name:   "Node Engine",
+					SHA256: "some-sha",
+				},
+			}))
+			Expect(result.Launch.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(result.Build.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
 			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(0))
 			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
 			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
