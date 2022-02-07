@@ -70,6 +70,8 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 16\.\d+\.\d+`),
 				"",
 				"  Generating legacy Paketo SBOM for Node Engine",
+				"    WARNING: The legacy Paketo SBOM format and access via image labels will be deprecated soon in Node Engine Buildpack v2.0.0.",
+				"    Please switch to consuming the Syft-generated SBOM, available in a layer.",
 				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 				"",
 				"  Executing build process",

@@ -60,7 +60,10 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
 
+		nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
 		logger.Process("Generating legacy Paketo SBOM for %s", dependency.Name)
+		logger.Subprocess("WARNING: The legacy Paketo SBOM format and access via image labels will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
+		logger.Subprocess("Please switch to consuming the Syft-generated SBOM, available in a layer.")
 		var legacySBOM []packit.BOMEntry
 		duration, err := clock.Measure(func() error {
 			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
@@ -71,7 +74,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		versionSource, _ := entry.Metadata["version-source"].(string)
 		if versionSource == "buildpack.yml" {
-			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
 			logger.Subprocess("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
 			logger.Subprocess("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information.")
 			logger.Break()
