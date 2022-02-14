@@ -60,13 +60,9 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
 
-		nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
-		var legacySBOM []packit.BOMEntry
-		duration, err := clock.Measure(func() error {
-			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
-			return nil
-		})
+		legacySBOM := dependencyManager.GenerateBillOfMaterials(dependency)
 
+		nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
 		versionSource, _ := entry.Metadata["version-source"].(string)
 		if versionSource == "buildpack.yml" {
 			logger.Subprocess("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
@@ -119,7 +115,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)
-		duration, err = clock.Measure(func() error {
+		duration, err := clock.Measure(func() error {
 			return dependencyManager.Deliver(dependency, context.CNBPath, nodeLayer.Path, context.Platform.Path)
 		})
 		if err != nil {
