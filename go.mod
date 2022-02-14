@@ -11,5 +11,3 @@ require (
 	github.com/sclevine/spec v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )
-
-replace github.com/paketo-buildpacks/occam v0.3.0 => /Users/frankieg/workspace/paketo-buildpacks/occam
