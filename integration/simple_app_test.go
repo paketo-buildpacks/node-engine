@@ -37,33 +37,35 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 			container occam.Container
 			name      string
 			source    string
+			sbomDir   string
 		)
 
 		it.Before(func() {
 			var err error
 			name, err = occam.RandomName()
 			Expect(err).NotTo(HaveOccurred())
+
+			sbomDir, err = os.MkdirTemp("", "sbom")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(os.Chmod(sbomDir, os.ModePerm)).To(Succeed())
 		})
 
 		it.After(func() {
 			Expect(docker.Image.Remove.Execute(image.ID)).To(Succeed())
 			Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
 			Expect(os.RemoveAll(source)).To(Succeed())
+			Expect(os.RemoveAll(sbomDir)).To(Succeed())
 		})
 
 		context("simple app", func() {
 			var (
 				container1 occam.Container
 				container2 occam.Container
-				container3 occam.Container
-				container4 occam.Container
 			)
 
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container1.ID)).To(Succeed())
 				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
-				Expect(docker.Container.Remove.Execute(container3.ID)).To(Succeed())
-				Expect(docker.Container.Remove.Execute(container4.ID)).To(Succeed())
 			})
 
 			it("builds, logs and runs correctly", func() {
@@ -79,6 +81,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 						nodeBuildpack,
 						buildPlanBuildpack,
 					).
+					WithSBOMOutputDir(sbomDir).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -153,35 +156,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					ContainSubstring("[bom.metadata]"),
 				))
 
-				// check that all expected SBOM files are present
-				container3, err = docker.Container.Run.
-					WithCommand(fmt.Sprintf("ls -al /layers/sbom/launch/%s/node/",
-						strings.ReplaceAll(config.Buildpack.ID, "/", "_"))).
-					Execute(image.ID)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container3.ID)
-					Expect(err).NotTo(HaveOccurred())
-					return cLogs.String()
-				}).Should(And(
-					ContainSubstring("sbom.cdx.json"),
-					ContainSubstring("sbom.spdx.json"),
-					ContainSubstring("sbom.syft.json"),
-				))
+				// check that all required SBOM files are present
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
 
 				// check an SBOM file to make sure it has an entry for node
-				container4, err = docker.Container.Run.
-					WithCommand(fmt.Sprintf("cat /layers/sbom/launch/%s/node/sbom.cdx.json",
-						strings.ReplaceAll(config.Buildpack.ID, "/", "_"))).
-					Execute(image.ID)
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
 				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container4.ID)
-					Expect(err).NotTo(HaveOccurred())
-					return cLogs.String()
-				}).Should(ContainSubstring(`"name": "Node Engine"`))
+				Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
 			})
 		})
 
