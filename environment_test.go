@@ -17,7 +17,8 @@ import (
 )
 
 var (
-	MemoryAvailableScript = strings.TrimSpace(`if [ -z "$MEMORY_AVAILABLE" ]; then
+	MemoryAvailableScript = strings.TrimSpace(`set -e
+if [ -z "$MEMORY_AVAILABLE" ]; then
   if [ -f "/sys/fs/cgroup/cgroup.controllers" ]; then
     memory_in_bytes="$(cat /sys/fs/cgroup/memory.max)"
   else
@@ -30,10 +31,12 @@ var (
 fi
 `)
 
-	OptimizeMemoryScript = `if [ -n "$MEMORY_AVAILABLE" ]; then
+	OptimizeMemoryScript = `set -e
+if [ -n "$MEMORY_AVAILABLE" ]; then
   export NODE_OPTIONS="--max_old_space_size=$(( MEMORY_AVAILABLE * 75 / 100 ))"
 fi
-`)
+`
+)
 
 func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (
