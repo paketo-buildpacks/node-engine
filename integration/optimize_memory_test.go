@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
@@ -52,8 +53,8 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		image, logs, err = pack.WithNoColor().Build.
 			WithPullPolicy("never").
 			WithBuildpacks(
-				nodeBuildpack,
-				buildPlanBuildpack,
+				settings.Buildpacks.NodeEngine.Online,
+				settings.Buildpacks.Processes.Online,
 			).
 			WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
 			Execute(name, source)
@@ -62,7 +63,6 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 
 		container, err = docker.Container.Run.
 			WithMemory("128m").
-			WithCommand("node server.js").
 			WithPublish("8080").
 			Execute(image.ID)
 		Expect(err).NotTo(HaveOccurred())
@@ -71,7 +71,15 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
 
 		Expect(logs).To(ContainLines(
-			"    Writing profile.d/1_optimize_memory.sh",
+			"  Configuring launch environment",
+			`    NODE_ENV        -> "production"`,
+			fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+			`    NODE_VERBOSE    -> "false"`,
+			`    OPTIMIZE_MEMORY -> "true"`,
+			"",
+			"    Writing exec.d/0-optimize-memory",
+			"      Calculates available memory based on container limits at launch time.",
+			"      Made available in the MEMORY_AVAILABLE environment variable.",
 			"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
 			"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 		))

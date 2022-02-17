@@ -33,7 +33,7 @@ type SBOMGenerator interface {
 
 //go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
 type EnvironmentConfiguration interface {
-	Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error
+	Configure(buildEnv, launchEnv packit.Environment, layerPath, execdPath string, optimizeMemory bool) error
 }
 
 func Build(entryResolver EntryResolver, dependencyManager DependencyManager, environment EnvironmentConfiguration, sbomGenerator SBOMGenerator, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
@@ -160,7 +160,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 			config.OptimizedMemory = true
 		}
 
-		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, config.OptimizedMemory)
+		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, filepath.Join(context.CNBPath, "bin", "optimize-memory"), config.OptimizedMemory)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}

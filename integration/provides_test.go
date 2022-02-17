@@ -55,14 +55,14 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      <unknown> -> \"\"",
@@ -78,15 +78,15 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Configuring build environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"  Configuring launch environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
-				"    Writing profile.d/0_memory_available.sh",
+				"    Writing exec.d/0-optimize-memory",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))

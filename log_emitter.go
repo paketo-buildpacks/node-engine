@@ -27,12 +27,10 @@ func (e LogEmitter) Environment(buildEnv, launchEnv packit.Environment, optimize
 	e.Process("Configuring launch environment")
 	e.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(launchEnv))
 	e.Break()
-	e.Subprocess("Writing profile.d/0_memory_available.sh")
+	e.Subprocess("Writing exec.d/0-optimize-memory")
 	e.Action("Calculates available memory based on container limits at launch time.")
 	e.Action("Made available in the MEMORY_AVAILABLE environment variable.")
 	if optimizeMemory {
-		e.Break()
-		e.Subprocess("Writing profile.d/1_optimize_memory.sh")
 		e.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
 		e.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
 	}
