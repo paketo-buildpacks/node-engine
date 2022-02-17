@@ -81,6 +81,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 						nodeBuildpack,
 						buildPlanBuildpack,
 					).
+					WithEnv(map[string]string{
+						"BP_LOG_LEVEL": "DEBUG",
+					}).
 					WithSBOMOutputDir(sbomDir).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
@@ -97,8 +100,13 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating Syft SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
+					"  Writing SBOM in the following format(s):",
+					"    application/vnd.cyclonedx+json",
+					"    application/spdx+json",
+					"    application/vnd.syft+json",
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
@@ -265,7 +273,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating Syft SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",
@@ -343,7 +351,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating Syft SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",
