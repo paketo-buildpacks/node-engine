@@ -6,6 +6,10 @@ api = "0.7"
   name = "Paketo Node Engine Buildpack"
   sbom-formats = ["application/vnd.cyclonedx+json", "application/spdx+json", "application/vnd.syft+json"]
 
+ [[buildpack.licenses]]
+    type = "Apache-2.0"
+    uri = "https://github.com/paketo-buildpacks/node-engine/blob/main/LICENSE"
+
 [metadata]
   include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
   pre-package = "./scripts/build.sh"

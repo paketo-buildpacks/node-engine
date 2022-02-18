@@ -128,7 +128,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 		logger.GeneratingSBOM(nodeLayer.Path)
 		var sbomContent sbom.SBOM
 		duration, err = clock.Measure(func() error {
-			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, context.WorkingDir)
+			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, nodeLayer.Path)
 			return err
 		})
 		if err != nil {

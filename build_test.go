@@ -209,7 +209,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
-		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(workingDir))
+		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "node")))
 
 		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
