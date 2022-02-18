@@ -159,6 +159,22 @@ func testRun(t *testing.T, context spec.G, it spec.S) {
 				NODE_OPTIONS = "--max_old_space_size=3072"
 			`))
 		})
+
+		context("when $NODE_OPTIONS is already set", func() {
+			it.Before(func() {
+				environment["NODE_OPTIONS"] = "--no-warnings"
+			})
+
+			it("merges this option onto the end", func() {
+				buffer := bytes.NewBuffer(nil)
+				err := internal.Run(environment, buffer, root)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(buffer.String()).To(MatchTOML(`
+				MEMORY_AVAILABLE = "4096"
+				NODE_OPTIONS = "--no-warnings --max_old_space_size=3072"
+			`))
+			})
+		})
 	})
 
 	context("failure cases", func() {

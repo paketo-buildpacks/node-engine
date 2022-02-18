@@ -53,7 +53,12 @@ func Run(environment map[string]string, output io.Writer, root string) error {
 				return err
 			}
 
-			variables["NODE_OPTIONS"] = fmt.Sprintf("--max_old_space_size=%d", memoryMax*75/100)
+			options := fmt.Sprintf("--max_old_space_size=%d", memoryMax*75/100)
+			if _, ok := environment["NODE_OPTIONS"]; ok {
+				options = strings.Join([]string{environment["NODE_OPTIONS"], options}, " ")
+			}
+
+			variables["NODE_OPTIONS"] = options
 		}
 	}
 

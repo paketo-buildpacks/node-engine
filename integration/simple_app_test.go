@@ -99,7 +99,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Writing SBOM in the following format(s):",
@@ -164,12 +164,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				))
 
 				// check that all required SBOM files are present
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
 
 				// check an SBOM file to make sure it has an entry for node
-				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
 			})
@@ -272,7 +272,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",
@@ -350,7 +350,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",

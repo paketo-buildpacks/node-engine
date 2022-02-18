@@ -64,11 +64,12 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		container, err = docker.Container.Run.
 			WithMemory("128m").
 			WithPublish("8080").
+			WithEnv(map[string]string{"NODE_OPTIONS": "--no-warnings"}).
 			Execute(image.ID)
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(container).Should(BeAvailable())
-		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
+		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --no-warnings --max_old_space_size=96")).OnPort(8080))
 
 		Expect(logs).To(ContainLines(
 			"  Configuring launch environment",
