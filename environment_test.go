@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
@@ -16,33 +15,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	MemoryAvailableScript = strings.TrimSpace(`if [ -z "$MEMORY_AVAILABLE" ]; then
-  if [ -f "/sys/fs/cgroup/cgroup.controllers" ]; then
-    memory_in_bytes="$(cat /sys/fs/cgroup/memory.max)"
-  else
-    memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
-  fi
-  if [ "$memory_in_bytes" != "" ] && [ "$memory_in_bytes" != "max" ]; then
-    MEMORY_AVAILABLE="$((memory_in_bytes / (1024 * 1024)))"
-    export MEMORY_AVAILABLE
-  fi
-fi
-`)
-
-	OptimizeMemoryScript = `if [ -n "$MEMORY_AVAILABLE" ]; then
-  export NODE_OPTIONS="--max_old_space_size=$(( MEMORY_AVAILABLE * 75 / 100 ))"
-fi
-`
-)
-
 func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
 		buildEnv  packit.Environment
 		launchEnv packit.Environment
-		path      string
+		layerPath string
+		execdPath string
 
 		buffer      *bytes.Buffer
 		environment nodeengine.Environment
@@ -50,8 +30,17 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		path, err = ioutil.TempDir("", "layer-dir")
+		layerPath, err = ioutil.TempDir("", "layer-dir")
 		Expect(err).NotTo(HaveOccurred())
+
+		file, err := os.CreateTemp("", "optimize-memory")
+		Expect(err).NotTo(HaveOccurred())
+
+		_, err = file.WriteString("optimize-memory-script")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(file.Close())
+
+		execdPath = file.Name()
 
 		buildEnv = packit.Environment{}
 		launchEnv = packit.Environment{}
@@ -60,22 +49,23 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	it.After(func() {
-		Expect(os.RemoveAll(path)).To(Succeed())
+		Expect(os.RemoveAll(layerPath)).To(Succeed())
+		Expect(os.Remove(execdPath)).To(Succeed())
 	})
 
 	context("Configure", func() {
 		it("configures the environment variables", func() {
-			err := environment.Configure(buildEnv, launchEnv, path, false)
+			err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, false)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(buildEnv).To(Equal(packit.Environment{
-				"NODE_HOME.default":    path,
+				"NODE_HOME.default":    layerPath,
 				"NODE_ENV.default":     "production",
 				"NODE_VERBOSE.default": "false",
 			}))
 
 			Expect(launchEnv).To(Equal(packit.Environment{
-				"NODE_HOME.default":    path,
+				"NODE_HOME.default":    layerPath,
 				"NODE_ENV.default":     "production",
 				"NODE_VERBOSE.default": "false",
 			}))
@@ -93,7 +83,7 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 			})
 
 			it("configures build envs using given value", func() {
-				err := environment.Configure(buildEnv, launchEnv, path, false)
+				err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, false)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(buildEnv["NODE_ENV.default"]).To(Equal("some-node-env-val"))
@@ -104,103 +94,71 @@ func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 			})
 		})
 
-		it("writes a profile.d script for available memory", func() {
-			err := environment.Configure(buildEnv, launchEnv, path, false)
+		it("writes an exec.d script for available memory and optimization", func() {
+			err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, false)
 			Expect(err).NotTo(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(filepath.Join(path, "profile.d", "0_memory_available.sh"))
+			contents, err := ioutil.ReadFile(filepath.Join(layerPath, "exec.d", "0-optimize-memory"))
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(contents)).To(Equal(MemoryAvailableScript))
+			Expect(string(contents)).To(Equal("optimize-memory-script"))
 
 			Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"production\""))
-			Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME    -> %q", path)))
+			Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME    -> %q", layerPath)))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"false\""))
-			Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
+			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
 			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
 		})
 
-		it("does not write a profile.d script for optimizing memory", func() {
-			err := environment.Configure(buildEnv, launchEnv, path, false)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(filepath.Join(path, "profile.d", "1_optimize_memory.sh")).NotTo(BeARegularFile())
-			Expect(buffer.String()).NotTo(ContainSubstring("Writing profile.d/1_optimize_memory.sh"))
-		})
-
 		context("when memory should be optimized", func() {
-			it("writes a profile.d script for optimizing memory", func() {
-				err := environment.Configure(buildEnv, launchEnv, path, true)
+			it("sets the $OPTIMIZE_MEMORY environment variable", func() {
+				err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, true)
 				Expect(err).NotTo(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(filepath.Join(path, "profile.d", "1_optimize_memory.sh"))
-				Expect(err).NotTo(HaveOccurred())
-				Expect(string(contents)).To(Equal(OptimizeMemoryScript))
+				Expect(launchEnv["OPTIMIZE_MEMORY.default"]).To(Equal("true"))
 
-				Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/1_optimize_memory.sh"))
+				Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
+				Expect(buffer.String()).To(ContainSubstring("    NODE_ENV        -> \"production\""))
+				Expect(buffer.String()).To(ContainSubstring(fmt.Sprintf("    NODE_HOME       -> %q", layerPath)))
+				Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE    -> \"false\""))
+				Expect(buffer.String()).To(ContainSubstring("    OPTIMIZE_MEMORY -> \"true\""))
+				Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
+				Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
+				Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
 				Expect(buffer.String()).To(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 				Expect(buffer.String()).To(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 			})
 		})
 
 		context("failure cases", func() {
-			context("when the profile.d directory cannot be created", func() {
+			context("when the exec.d directory cannot be created", func() {
 				it.Before(func() {
-					Expect(os.Chmod(path, 0000)).To(Succeed())
+					Expect(os.Chmod(layerPath, 0000)).To(Succeed())
 				})
 
 				it.After(func() {
-					Expect(os.Chmod(path, os.ModePerm)).To(Succeed())
+					Expect(os.Chmod(layerPath, os.ModePerm)).To(Succeed())
 				})
 
 				it("returns an error", func() {
-					err := environment.Configure(buildEnv, launchEnv, path, false)
-					Expect(err).To(MatchError(ContainSubstring("permission denied")))
+					err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, false)
+					Expect(err).To(MatchError(ContainSubstring("exec.d: permission denied")))
 				})
 			})
 
-			context("when the 0_memory_available.sh script cannot be created", func() {
+			context("when the exec.d script cannot be copied into the exec.d directory", func() {
 				it.Before(func() {
-					scriptPath := filepath.Join(path, "profile.d", "0_memory_available.sh")
-
-					Expect(os.MkdirAll(filepath.Dir(scriptPath), os.ModePerm)).To(Succeed())
-
-					_, err := os.Create(scriptPath)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(os.Chmod(scriptPath, 0000)).To(Succeed())
+					Expect(os.Chmod(execdPath, 0000)).To(Succeed())
 				})
 
 				it.After(func() {
-					Expect(os.Chmod(path, os.ModePerm)).To(Succeed())
+					Expect(os.Chmod(execdPath, os.ModePerm)).To(Succeed())
 				})
 
 				it("returns an error", func() {
-					err := environment.Configure(buildEnv, launchEnv, path, false)
-					Expect(err).To(MatchError(ContainSubstring("permission denied")))
-				})
-			})
-
-			context("when the 1_optimize_memory.sh script cannot be created", func() {
-				it.Before(func() {
-					scriptPath := filepath.Join(path, "profile.d", "1_optimize_memory.sh")
-
-					Expect(os.MkdirAll(filepath.Dir(scriptPath), os.ModePerm)).To(Succeed())
-
-					_, err := os.Create(scriptPath)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(os.Chmod(scriptPath, 0000)).To(Succeed())
-				})
-
-				it.After(func() {
-					Expect(os.Chmod(path, os.ModePerm)).To(Succeed())
-				})
-
-				it("returns an error", func() {
-					err := environment.Configure(buildEnv, launchEnv, path, true)
-					Expect(err).To(MatchError(ContainSubstring("permission denied")))
+					err := environment.Configure(buildEnv, launchEnv, layerPath, execdPath, false)
+					Expect(err).To(MatchError(ContainSubstring(fmt.Sprintf("%s: permission denied", execdPath))))
 				})
 			})
 		})

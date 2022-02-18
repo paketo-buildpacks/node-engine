@@ -11,7 +11,7 @@ api = "0.7"
     uri = "https://github.com/paketo-buildpacks/node-engine/blob/main/LICENSE"
 
 [metadata]
-  include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
+  include-files = ["bin/build", "bin/detect", "bin/run", "bin/optimize-memory", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
   [metadata.default-versions]
     node = "16.*.*"

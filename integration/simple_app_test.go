@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
-	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -78,8 +77,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithEnv(map[string]string{
 						"BP_LOG_LEVEL": "DEBUG",
@@ -89,7 +88,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
-					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      <unknown> -> \"\"",
@@ -100,7 +99,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Writing SBOM in the following format(s):",
@@ -110,15 +109,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
-					"    Writing profile.d/0_memory_available.sh",
+					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
 				))
@@ -165,12 +164,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				))
 
 				// check that all required SBOM files are present
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
-				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
 
 				// check an SBOM file to make sure it has an entry for node
-				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(config.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
 			})
@@ -192,8 +191,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					WithPullPolicy("never").
 					WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
@@ -201,12 +200,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(logs).To(ContainLines(
 					"  Configuring build environment",
 					`    NODE_ENV     -> "development"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "true"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 				))
 
@@ -254,14 +253,14 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
-					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .node-version -> \"12.*\"",
@@ -273,20 +272,20 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
-					"    Writing profile.d/0_memory_available.sh",
+					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
 				))
@@ -332,14 +331,14 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
-					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .nvmrc    -> \"12.*\"",
@@ -351,20 +350,20 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
-					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
-					"    Writing profile.d/0_memory_available.sh",
+					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
 				))
@@ -396,92 +395,25 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("when the node version specfied in the app is EOL'd", func() {
-			var (
-				logs                       fmt.Stringer
-				duplicator                 cargo.DirectoryDuplicator
-				deprecatedDepNodeBuildpack string
-				tmpBuildpackDir            string
-			)
-
-			it.Before(func() {
-				var err error
-				duplicator = cargo.NewDirectoryDuplicator()
-				tmpBuildpackDir, err = ioutil.TempDir("", "node-engine-cnb-outdated-deps")
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(duplicator.Duplicate(root, tmpBuildpackDir)).To(Succeed())
-
-				bpToml := []byte(fmt.Sprintf(`
-api = "0.7"
-
-[buildpack]
-  id = %q
-  name = %q
-
-[metadata]
-  include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
-  pre-package = "./scripts/build.sh"
-  [metadata.default-versions]
-    node = "10.x"
-
-  [[metadata.dependencies]]
-		deprecation_date = 2000-04-01T00:00:00Z
-    id = "node"
-    name = "Node Engine"
-    sha256 = "ad0376cbe4dfc3d6092d0ea9fdc4fd3fcb44c477bd4a2c800ccd48eee95e994d"
-    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1.tar.gz"
-    source_sha256 = "80a61ffbe6d156458ed54120eb0e9fff7b626502e0986e861d91b365f7e876db"
-    stacks = ["some.stack"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-linux-x64-some-stack-ad0376cb.tgz"
-    version = "10.18.1"
-    cpe = "cpe:2.3:a:nodejs:node.js:10.18.1:*:*:*:*:*:*:*"
-
-  [[metadata.dependencies]]
-		deprecation_date = 2000-04-01T00:00:00Z
-    id = "node"
-    name = "Node Engine"
-    sha256 = "528414d1987c8ff9d74f6b5baef604632a2d1d1fbce4a33c7302debcbfa53e1b"
-    source = "https://nodejs.org/dist/v10.18.1/node-v10.18.1-linux-x64.tar.gz"
-    source_sha256 = "812fe7d421894b792027d19c78c919faad3bf32d8bc16bde67f5c7eea2469eac"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/node/node-10.18.1-bionic-528414d1.tgz"
-    version = "10.18.1"
-    cpe = "cpe:2.3:a:nodejs:node.js:10.18.1:*:*:*:*:*:*:*"
-
-[[stacks]]
-  id = "some.stack"
-
-[[stacks]]
-  id = "io.buildpacks.stacks.bionic"
-`, config.Buildpack.ID, config.Buildpack.Name))
-
-				err = ioutil.WriteFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), bpToml, os.ModePerm)
-				Expect(err).NotTo(HaveOccurred())
-
-				deprecatedDepNodeBuildpack, err = occam.NewBuildpackStore().Get.WithVersion(version).Execute(tmpBuildpackDir)
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			it.After(func() {
-				os.RemoveAll(tmpBuildpackDir)
-			})
-
 			it("logs thats the dependency is deprecated", func() {
 				var err error
 				source, err = occam.Source(filepath.Join("testdata", "simple_app"))
 				Expect(err).NotTo(HaveOccurred())
 
+				var logs fmt.Stringer
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						deprecatedDepNodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Deprecated,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
-				Expect(logs.String()).To(ContainSubstring("Version 10.18.1 of Node Engine is deprecated."))
-				Expect(logs.String()).To(ContainSubstring("Migrate your application to a supported version of Node Engine."))
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`      Version \d+\.\d+\.\d+ of Node Engine is deprecated.`),
+					"      Migrate your application to a supported version of Node Engine.",
+				))
 			})
 		})
 	})

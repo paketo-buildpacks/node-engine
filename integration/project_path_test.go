@@ -60,8 +60,8 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{
 					"BP_NODE_PROJECT_PATH": "hello_world_server",
@@ -70,7 +70,7 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      .node-version -> \"16.*\"",

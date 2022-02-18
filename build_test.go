@@ -72,7 +72,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
     stacks = ["some-stack"]
     uri = "some-uri"
     version = "some-dep-version"
-`), 0644)
+`), 0600)
 		Expect(err).NotTo(HaveOccurred())
 
 		entryResolver = &fakes.EntryResolver{}
@@ -213,7 +213,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-		Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 		Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -249,7 +250,8 @@ nodejs:
 
 			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -276,7 +278,8 @@ nodejs:
 
 			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 			Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
 			Expect(buffer.String()).ToNot(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))

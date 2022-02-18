@@ -56,8 +56,8 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					offlineNodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Offline,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
 				WithNetwork("none").

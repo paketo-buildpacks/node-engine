@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+set -u
+set -o pipefail
+
+function main() {
+  local plan
+  plan="${2}"
+
+  cat <<-TOML > "${plan}"
+[[requires]]
+  name = "node"
+
+  [requires.metadata]
+    launch = true
+TOML
+
+  exit 0
+}
+
+main "${@:-}"
