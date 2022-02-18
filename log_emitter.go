@@ -2,9 +2,10 @@ package nodeengine
 
 import (
 	"io"
+	"os"
 
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/scribe"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
 type LogEmitter struct {
@@ -15,7 +16,7 @@ type LogEmitter struct {
 
 func NewLogEmitter(output io.Writer) LogEmitter {
 	return LogEmitter{
-		Emitter: scribe.NewEmitter(output),
+		Emitter: scribe.NewEmitter(output).WithLevel(os.Getenv("BP_LOG_LEVEL")),
 	}
 }
 

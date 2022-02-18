@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -33,7 +33,8 @@ fi
 	OptimizeMemoryScript = `if [ -n "$MEMORY_AVAILABLE" ]; then
   export NODE_OPTIONS="--max_old_space_size=$(( MEMORY_AVAILABLE * 75 / 100 ))"
 fi
-`)
+`
+)
 
 func testEnvironment(t *testing.T, context spec.G, it spec.S) {
 	var (

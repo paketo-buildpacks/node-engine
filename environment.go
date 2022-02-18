@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
 )
 
 var (
@@ -26,7 +26,8 @@ fi
 	OptimizeMemoryScript = `if [ -n "$MEMORY_AVAILABLE" ]; then
   export NODE_OPTIONS="--max_old_space_size=$(( MEMORY_AVAILABLE * 75 / 100 ))"
 fi
-`)
+`
+)
 
 type Environment struct {
 	logger LogEmitter
