@@ -10,7 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/paketo-buildpacks/occam"
-	"github.com/paketo-buildpacks/packit/cargo"
+	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
