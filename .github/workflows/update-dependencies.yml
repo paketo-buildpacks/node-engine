@@ -5,6 +5,8 @@ on:
   - cron: '15 */1 * * *'
   workflow_dispatch: {}
 
+concurrency: dependency_update
+
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
