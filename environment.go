@@ -1,12 +1,11 @@
 package nodeengine
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 )
 
 var (
@@ -41,12 +40,12 @@ func NewEnvironment(logger LogEmitter) Environment {
 	}
 }
 
-func (e Environment) Configure(buildEnv, launchEnv packit.Environment, path string, optimizeMemory bool) error {
-	launchEnv.Default("NODE_HOME", path)
+func (e Environment) Configure(buildEnv, launchEnv packit.Environment, layerPath, execdPath string, optimizeMemory bool) error {
+	launchEnv.Default("NODE_HOME", layerPath)
 	launchEnv.Default("NODE_ENV", "production")
 	launchEnv.Default("NODE_VERBOSE", "false")
 
-	buildEnv.Default("NODE_HOME", path)
+	buildEnv.Default("NODE_HOME", layerPath)
 	if val, ok := os.LookupEnv("NODE_ENV"); ok {
 		buildEnv.Default("NODE_ENV", val)
 	} else {
@@ -59,22 +58,19 @@ func (e Environment) Configure(buildEnv, launchEnv packit.Environment, path stri
 		buildEnv.Default("NODE_VERBOSE", "false")
 	}
 
-	profileDPath := filepath.Join(path, "profile.d")
-	err := os.MkdirAll(profileDPath, os.ModePerm)
+	execdDir := filepath.Join(layerPath, "exec.d")
+	err := os.MkdirAll(execdDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(profileDPath, "0_memory_available.sh"), []byte(MemoryAvailableScript), 0644)
+	err = fs.Copy(execdPath, filepath.Join(execdDir, "0-optimize-memory"))
 	if err != nil {
 		return err
 	}
 
 	if optimizeMemory {
-		err = ioutil.WriteFile(filepath.Join(profileDPath, "1_optimize_memory.sh"), []byte(OptimizeMemoryScript), 0644)
-		if err != nil {
-			return err
-		}
+		launchEnv.Default("OPTIMIZE_MEMORY", "true")
 	}
 
 	e.logger.Environment(buildEnv, launchEnv, optimizeMemory)

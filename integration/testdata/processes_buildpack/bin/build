@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+set -u
+set -o pipefail
+
+function main() {
+  echo "Paketo Processes Buildpack"
+  cat << EOF > /layers/paketo-buildpacks_node-engine_processes/launch.toml
+[[processes]]
+  type = "web"
+  command = "node"
+  args = ["server.js"]
+  default = true
+  direct = true
+EOF
+}
+
+main "${@:-}"

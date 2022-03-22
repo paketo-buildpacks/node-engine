@@ -2,6 +2,7 @@ package integration
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,69 +10,130 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/paketo-buildpacks/occam"
+	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 
 	. "github.com/onsi/gomega"
 )
 
-var (
-	nodeBuildpack        string
-	offlineNodeBuildpack string
-	buildPlanBuildpack   string
-	root                 string
-	version              string
-
-	config struct {
-		Buildpack struct {
-			ID   string
-			Name string
+var settings struct {
+	Buildpacks struct {
+		NodeEngine struct {
+			Online     string
+			Offline    string
+			Deprecated string
+		}
+		BuildPlan struct {
+			Online string
+		}
+		Processes struct {
+			Online string
 		}
 	}
 
-	integrationjson struct {
+	Buildpack struct {
+		ID   string
+		Name string
+	}
+
+	Config struct {
 		BuildPlan string `json:"build-plan"`
 	}
-)
+}
 
 func TestIntegration(t *testing.T) {
 	Expect := NewWithT(t).Expect
 
-	var err error
-	root, err = filepath.Abs("./..")
+	root, err := filepath.Abs("./..")
 	Expect(err).ToNot(HaveOccurred())
 
 	file, err := os.Open("../buildpack.toml")
 	Expect(err).NotTo(HaveOccurred())
-	defer file.Close()
 
-	_, err = toml.NewDecoder(file).Decode(&config)
+	_, err = toml.NewDecoder(file).Decode(&settings)
 	Expect(err).NotTo(HaveOccurred())
+	Expect(file.Close()).To(Succeed())
 
 	file, err = os.Open("../integration.json")
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(json.NewDecoder(file).Decode(&integrationjson)).To(Succeed())
+	Expect(json.NewDecoder(file).Decode(&settings.Config)).To(Succeed())
 	Expect(file.Close()).To(Succeed())
 
 	buildpackStore := occam.NewBuildpackStore()
 
-	version = "1.2.3"
-
-	nodeBuildpack, err = buildpackStore.Get.
-		WithVersion(version).
+	settings.Buildpacks.NodeEngine.Online, err = buildpackStore.Get.
+		WithVersion("1.2.3").
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
-	offlineNodeBuildpack, err = buildpackStore.Get.
+	settings.Buildpacks.NodeEngine.Offline, err = buildpackStore.Get.
 		WithOfflineDependencies().
-		WithVersion(version).
+		WithVersion("1.2.3").
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
-	buildPlanBuildpack, err = buildpackStore.Get.
-		Execute(integrationjson.BuildPlan)
+	tmpBuildpackDir, err := ioutil.TempDir("", "node-engine-outdated-deps")
 	Expect(err).NotTo(HaveOccurred())
+
+	Expect(cargo.NewDirectoryDuplicator().Duplicate(root, tmpBuildpackDir)).To(Succeed())
+
+	file, err = os.OpenFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), os.O_RDWR, 0600)
+	Expect(err).NotTo(HaveOccurred())
+
+	var buildpackConfig struct {
+		API       interface{}
+		Buildpack interface{}
+		Metadata  struct {
+			IncludeFiles    interface{} `toml:"include-files"`
+			PrePackage      interface{} `toml:"pre-package"`
+			DefaultVersions interface{} `toml:"default-versions"`
+			Dependencies    []struct {
+				CPE             interface{}
+				DeprecationDate string `toml:"deprecation_date"`
+				ID              interface{}
+				Licenses        interface{}
+				Name            interface{}
+				PURL            interface{}
+				SHA256          interface{}
+				Source          interface{}
+				SourceSHA256    interface{}
+				Stacks          interface{}
+				URI             interface{}
+				Version         interface{}
+			}
+		}
+		Stacks interface{}
+	}
+	_, err = toml.NewDecoder(file).Decode(&buildpackConfig)
+	Expect(err).NotTo(HaveOccurred())
+
+	for i := range buildpackConfig.Metadata.Dependencies {
+		buildpackConfig.Metadata.Dependencies[i].DeprecationDate = "2000-04-01T00:00:00Z"
+	}
+
+	_, err = file.Seek(0, 0)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = file.Truncate(0)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = toml.NewEncoder(file).Encode(buildpackConfig)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(file.Close()).To(Succeed())
+
+	settings.Buildpacks.NodeEngine.Deprecated, err = occam.NewBuildpackStore().Get.
+		WithVersion("1.2.3").
+		Execute(tmpBuildpackDir)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(os.RemoveAll(tmpBuildpackDir)).To(Succeed())
+
+	settings.Buildpacks.BuildPlan.Online, err = buildpackStore.Get.
+		Execute(settings.Config.BuildPlan)
+	Expect(err).NotTo(HaveOccurred())
+
+	settings.Buildpacks.Processes.Online = filepath.Join("testdata", "processes_buildpack")
 
 	SetDefaultEventuallyTimeout(5 * time.Second)
 

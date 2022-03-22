@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -44,10 +44,9 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 			Expect(buffer.String()).To(ContainSubstring("    NODE_ENV     -> \"another-env\""))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_HOME    -> \"/some/path\""))
 			Expect(buffer.String()).To(ContainSubstring("    NODE_VERBOSE -> \"another-bool\""))
-			Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
+			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
 			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
-			Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/1_optimize_memory.sh"))
 			Expect(buffer.String()).To(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 			Expect(buffer.String()).To(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 		})
@@ -66,10 +65,9 @@ func testLogEmitter(t *testing.T, context spec.G, it spec.S) {
 
 				Expect(buffer.String()).To(ContainSubstring("  Configuring build environment"))
 				Expect(buffer.String()).To(ContainSubstring("  Configuring launch environment"))
-				Expect(buffer.String()).To(ContainSubstring("    Writing profile.d/0_memory_available.sh"))
+				Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
 				Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
 				Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
-				Expect(buffer.String()).NotTo(ContainSubstring("    Writing profile.d/1_optimize_memory.sh"))
 				Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 				Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 			})

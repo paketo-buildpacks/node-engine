@@ -72,8 +72,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
@@ -81,11 +81,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(2))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      <unknown> -> \"\"",
@@ -96,17 +96,20 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
+				fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+				"",
 				"  Configuring build environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"  Configuring launch environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
-				"    Writing profile.d/0_memory_available.sh",
+				"    Writing exec.d/0-optimize-memory",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
@@ -126,8 +129,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
@@ -135,18 +138,18 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(2))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      <unknown> -> \"\"",
 				"",
 				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
 				"",
-				fmt.Sprintf("  Reusing cached layer /layers/%s/node", strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf("  Reusing cached layer /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 			))
 
 			secondContainer, err = docker.Container.Run.
@@ -190,8 +193,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
 				Execute(name, source)
@@ -200,11 +203,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[firstImage.ID] = struct{}{}
 
 			Expect(firstImage.Buildpacks).To(HaveLen(2))
-			Expect(firstImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
 			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      BP_NODE_VERSION -> \"~12\"",
@@ -216,17 +219,20 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
+				fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+				"",
 				"  Configuring build environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"  Configuring launch environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
-				"    Writing profile.d/0_memory_available.sh",
+				"    Writing exec.d/0-optimize-memory",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
@@ -246,8 +252,8 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					nodeBuildpack,
-					buildPlanBuildpack,
+					settings.Buildpacks.NodeEngine.Online,
+					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{"BP_NODE_VERSION": "~14"}).
 				Execute(name, source)
@@ -256,11 +262,11 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			imageIDs[secondImage.ID] = struct{}{}
 
 			Expect(secondImage.Buildpacks).To(HaveLen(2))
-			Expect(secondImage.Buildpacks[0].Key).To(Equal(config.Buildpack.ID))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
 				"      BP_NODE_VERSION -> \"~14\"",
@@ -272,17 +278,20 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(`    Installing Node Engine 14\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
+				fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+				"",
 				"  Configuring build environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
 				"  Configuring launch environment",
 				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				`    NODE_VERBOSE -> "false"`,
 				"",
-				"    Writing profile.d/0_memory_available.sh",
+				"    Writing exec.d/0-optimize-memory",
 				"      Calculates available memory based on container limits at launch time.",
 				"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))

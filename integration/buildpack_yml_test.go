@@ -55,7 +55,6 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 
 			it("builds, logs and runs correctly but gives a deprecation warning", func() {
 				var err error
-
 				source, err = occam.Source(filepath.Join("testdata", "buildpack_yml_app"))
 				Expect(err).ToNot(HaveOccurred())
 
@@ -63,14 +62,14 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
-					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      buildpack.yml -> \"~12\"",
@@ -85,24 +84,26 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
 					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0.",
 					"    Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.",
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
-					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
-					`    NODE_VERBOSE -> "false"`,
+					`    NODE_ENV        -> "production"`,
+					fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE    -> "false"`,
+					`    OPTIMIZE_MEMORY -> "true"`,
 					"",
-					"    Writing profile.d/0_memory_available.sh",
+					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
-					"",
-					"    Writing profile.d/1_optimize_memory.sh",
 					"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
 					"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 				))
@@ -116,7 +117,6 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 
 				Eventually(container).Should(BeAvailable())
 				Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
-
 			})
 		})
 
@@ -135,15 +135,15 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						nodeBuildpack,
-						buildPlanBuildpack,
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithEnv(map[string]string{"BP_NODE_VERSION": "~14"}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
-					fmt.Sprintf("%s %s", config.Buildpack.Name, version),
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      BP_NODE_VERSION -> \"~14\"",
@@ -156,22 +156,28 @@ func testBuildpackYML(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`    Installing Node Engine 14\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+\.\d+`),
 					"",
+					fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+					"",
 					"    WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0.",
 					"    Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.",
 					"",
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
-					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(config.Buildpack.ID, "/", "_")),
-					`    NODE_VERBOSE -> "false"`,
+					`    NODE_ENV        -> "production"`,
+					fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					`    NODE_VERBOSE    -> "false"`,
+					`    OPTIMIZE_MEMORY -> "true"`,
 					"",
-					"    Writing profile.d/0_memory_available.sh",
+					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
+					"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
+					"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 				))
 
 				container, err = docker.Container.Run.

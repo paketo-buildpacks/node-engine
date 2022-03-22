@@ -11,9 +11,13 @@ import (
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/node-engine/fakes"
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/postal"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/chronos"
+
+	//nolint Ignore SA1019, informed usage of deprecated package
+	"github.com/paketo-buildpacks/packit/v2/paketosbom"
+	"github.com/paketo-buildpacks/packit/v2/postal"
+	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
@@ -23,10 +27,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
+		workingDir        string
 		layersDir         string
 		cnbDir            string
 		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
+		sbomGenerator     *fakes.SBOMGenerator
 		clock             chronos.Clock
 		timeStamp         time.Time
 		environment       *fakes.EnvironmentConfiguration
@@ -44,11 +50,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		cnbDir, err = ioutil.TempDir("", "cnb")
 		Expect(err).NotTo(HaveOccurred())
 
+		workingDir, err = ioutil.TempDir("", "working-dir")
+		Expect(err).NotTo(HaveOccurred())
+
 		err = ioutil.WriteFile(filepath.Join(cnbDir, "buildpack.toml"), []byte(`api = "0.2"
 [buildpack]
   id = "org.some-org.some-buildpack"
   name = "Some Buildpack"
   version = "some-version"
+  sbom-formats = ["cdx","spdx"]
 
 [metadata]
   [metadata.default-versions]
@@ -62,7 +72,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
     stacks = ["some-stack"]
     uri = "some-uri"
     version = "some-dep-version"
-`), 0644)
+`), 0600)
 		Expect(err).NotTo(HaveOccurred())
 
 		entryResolver = &fakes.EntryResolver{}
@@ -78,20 +88,23 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
-
+		// Legacy SBOM
 		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
 			{
 				Name: "node",
-				Metadata: packit.BOMMetadata{
+				Metadata: paketosbom.BOMMetadata{
 					URI:     "node-dependency-uri",
 					Version: "~10",
-					Checksum: packit.BOMChecksum{
-						Algorithm: packit.SHA256,
+					Checksum: paketosbom.BOMChecksum{
+						Algorithm: paketosbom.SHA256,
 						Hash:      "node-dependency-sha",
 					},
 				},
 			},
 		}
+		// Syft SBOM
+		sbomGenerator = &fakes.SBOMGenerator{}
+		sbomGenerator.GenerateFromDependencyCall.Returns.SBOM = sbom.SBOM{}
 
 		environment = &fakes.EnvironmentConfiguration{}
 
@@ -103,14 +116,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		buffer = bytes.NewBuffer(nil)
 		logEmitter := nodeengine.NewLogEmitter(buffer)
 
-		build = nodeengine.Build(entryResolver, dependencyManager, environment, logEmitter, clock)
+		build = nodeengine.Build(entryResolver, dependencyManager, environment, sbomGenerator, logEmitter, clock)
 
 		buildContext = packit.BuildContext{
 			CNBPath: cnbDir,
 			Stack:   "some-stack",
 			BuildpackInfo: packit.BuildpackInfo{
-				Name:    "Some Buildpack",
-				Version: "1.2.3",
+				Name:        "Some Buildpack",
+				Version:     "1.2.3",
+				SBOMFormats: []string{sbom.CycloneDXFormat, sbom.SPDXFormat},
 			},
 			Plan: packit.BuildpackPlan{
 				Entries: []packit.BuildpackPlanEntry{
@@ -123,8 +137,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 			},
-			Platform: packit.Platform{Path: "platform"},
-			Layers:   packit.Layers{Path: layersDir},
+			Platform:   packit.Platform{Path: "platform"},
+			Layers:     packit.Layers{Path: layersDir},
+			WorkingDir: workingDir,
 		}
 
 	})
@@ -132,28 +147,31 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	it.After(func() {
 		Expect(os.RemoveAll(layersDir)).To(Succeed())
 		Expect(os.RemoveAll(cnbDir)).To(Succeed())
+		Expect(os.RemoveAll(workingDir)).To(Succeed())
 	})
 
 	it("returns a result that installs node", func() {
 		result, err := build(buildContext)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(result).To(Equal(packit.BuildResult{
-			Layers: []packit.Layer{
-				{
-					Name:             "node",
-					Path:             filepath.Join(layersDir, "node"),
-					SharedEnv:        packit.Environment{},
-					BuildEnv:         packit.Environment{},
-					LaunchEnv:        packit.Environment{},
-					ProcessLaunchEnv: map[string]packit.Environment{},
-					Build:            false,
-					Launch:           false,
-					Cache:            false,
-					Metadata: map[string]interface{}{
-						nodeengine.DepKey: "",
-						"built_at":        timeStamp.Format(time.RFC3339Nano),
-					},
-				},
+
+		Expect(result.Layers).To(HaveLen(1))
+		layer := result.Layers[0]
+
+		Expect(layer.Name).To(Equal("node"))
+		Expect(layer.Path).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(layer.Metadata).To(Equal(map[string]interface{}{
+			nodeengine.DepKey: "",
+			"built_at":        timeStamp.Format(time.RFC3339Nano),
+		}))
+
+		Expect(layer.SBOM.Formats()).To(Equal([]packit.SBOMFormat{
+			{
+				Extension: sbom.Format(sbom.CycloneDXFormat).Extension(),
+				Content:   sbom.NewFormattedReader(sbom.SBOM{}, sbom.CycloneDXFormat),
+			},
+			{
+				Extension: sbom.Format(sbom.SPDXFormat).Extension(),
+				Content:   sbom.NewFormattedReader(sbom.SBOM{}, sbom.SPDXFormat),
 			},
 		}))
 
@@ -188,12 +206,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.DeliverCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.DeliverCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 		Expect(dependencyManager.DeliverCall.Receives.PlatformPath).To(Equal("platform"))
-
 		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
+
+		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
+		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "node")))
 
 		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-		Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 		Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
 
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -229,7 +250,8 @@ nodejs:
 
 			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -256,7 +278,8 @@ nodejs:
 
 			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
 			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
 			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 			Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
 			Expect(buffer.String()).ToNot(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
@@ -290,56 +313,44 @@ nodejs:
 		it("marks the node layer as build, cached and launch", func() {
 			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(Equal(packit.BuildResult{
-				Layers: []packit.Layer{
-					{
-						Name:             "node",
-						Path:             filepath.Join(layersDir, "node"),
-						SharedEnv:        packit.Environment{},
-						BuildEnv:         packit.Environment{},
-						LaunchEnv:        packit.Environment{},
-						ProcessLaunchEnv: map[string]packit.Environment{},
-						Build:            true,
-						Launch:           true,
-						Cache:            true,
-						Metadata: map[string]interface{}{
-							nodeengine.DepKey: "",
-							"built_at":        timeStamp.Format(time.RFC3339Nano),
-						},
-					},
-				},
-				Build: packit.BuildMetadata{
-					BOM: []packit.BOMEntry{
-						{
-							Name: "node",
-							Metadata: packit.BOMMetadata{
-								URI:     "node-dependency-uri",
-								Version: "~10",
-								Checksum: packit.BOMChecksum{
-									Algorithm: packit.SHA256,
-									Hash:      "node-dependency-sha",
-								},
-							},
-						},
-					},
-				},
-				Launch: packit.LaunchMetadata{
-					BOM: []packit.BOMEntry{
-						{
-							Name: "node",
-							Metadata: packit.BOMMetadata{
-								URI:     "node-dependency-uri",
-								Version: "~10",
-								Checksum: packit.BOMChecksum{
-									Algorithm: packit.SHA256,
-									Hash:      "node-dependency-sha",
-								},
-							},
-						},
-					},
-				},
-			}))
 
+			Expect(result.Layers).To(HaveLen(1))
+			layer := result.Layers[0]
+
+			Expect(layer.Name).To(Equal("node"))
+			Expect(layer.Build).To(BeTrue())
+			Expect(layer.Launch).To(BeTrue())
+			Expect(layer.Cache).To(BeTrue())
+			Expect(result.Launch.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(result.Build.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
 			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
 		})
 	})
@@ -353,10 +364,12 @@ nodejs:
 				Name:   "Node Engine",
 				SHA256: "some-sha",
 			}
+			entryResolver.MergeLayerTypesCall.Returns.Launch = true
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
 		})
 
 		it("exits build process early", func() {
-			_, err := build(buildContext)
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(dependencyManager.GenerateBillOfMaterialsCall.CallCount).To(Equal(1))
@@ -366,7 +379,37 @@ nodejs:
 					SHA256: "some-sha",
 				},
 			}))
-
+			Expect(result.Launch.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(result.Build.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(0))
 			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
 			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
 
@@ -423,6 +466,28 @@ nodejs:
 			it("returns an error", func() {
 				_, err := build(buildContext)
 				Expect(err).To(MatchError("failed to install dependency"))
+			})
+		})
+
+		context("when generating the SBOM returns an error", func() {
+			it.Before(func() {
+				buildContext.BuildpackInfo.SBOMFormats = []string{"random-format"}
+			})
+
+			it("returns an error", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError("\"random-format\" is not a supported SBOM format"))
+			})
+		})
+
+		context("when formatting the SBOM returns an error", func() {
+			it.Before(func() {
+				sbomGenerator.GenerateFromDependencyCall.Returns.Error = errors.New("failed to generate SBOM")
+			})
+
+			it("returns an error", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError(ContainSubstring("failed to generate SBOM")))
 			})
 		})
 
