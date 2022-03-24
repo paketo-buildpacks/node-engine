@@ -2,7 +2,6 @@ package integration
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -74,7 +73,7 @@ func TestIntegration(t *testing.T) {
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
-	tmpBuildpackDir, err := ioutil.TempDir("", "node-engine-outdated-deps")
+	tmpBuildpackDir, err := os.MkdirTemp("", "node-engine-outdated-deps")
 	Expect(err).NotTo(HaveOccurred())
 
 	Expect(cargo.NewDirectoryDuplicator().Duplicate(root, tmpBuildpackDir)).To(Succeed())

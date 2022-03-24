@@ -2,7 +2,6 @@ package nodeengine
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -28,7 +27,7 @@ func NewNvmrcParser() NvmrcParser {
 }
 
 func (p NvmrcParser) ParseVersion(path string) (string, error) {
-	nvmrcContents, err := ioutil.ReadFile(path)
+	nvmrcContents, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", nil

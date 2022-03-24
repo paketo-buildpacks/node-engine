@@ -3,7 +3,6 @@ package nodeengine_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -384,7 +383,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		var workingDir string
 		it.Before(func() {
 			var err error
-			workingDir, err = ioutil.TempDir("", "working-dir")
+			workingDir, err = os.MkdirTemp("", "working-dir")
 			Expect(err).NotTo(HaveOccurred())
 			err = os.MkdirAll(filepath.Join(workingDir, "custom", "path"), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
@@ -415,7 +414,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 			it.Before(func() {
 				var err error
-				workingDir, err = ioutil.TempDir("", "working-dir")
+				workingDir, err = os.MkdirTemp("", "working-dir")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(os.Setenv("BP_NODE_PROJECT_PATH", "src/does/not/exist")).To(Succeed())
 			})

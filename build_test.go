@@ -3,7 +3,6 @@ package nodeengine_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	"github.com/paketo-buildpacks/node-engine/fakes"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 
 	//nolint Ignore SA1019, informed usage of deprecated package
 	"github.com/paketo-buildpacks/packit/v2/paketosbom"
@@ -35,7 +35,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		sbomGenerator     *fakes.SBOMGenerator
 		clock             chronos.Clock
 		timeStamp         time.Time
-		environment       *fakes.EnvironmentConfiguration
 		buffer            *bytes.Buffer
 
 		build        packit.BuildFunc
@@ -44,36 +43,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		layersDir, err = ioutil.TempDir("", "layers")
+		layersDir, err = os.MkdirTemp("", "layers")
 		Expect(err).NotTo(HaveOccurred())
 
-		cnbDir, err = ioutil.TempDir("", "cnb")
+		cnbDir, err = os.MkdirTemp("", "cnb")
 		Expect(err).NotTo(HaveOccurred())
 
-		workingDir, err = ioutil.TempDir("", "working-dir")
+		workingDir, err = os.MkdirTemp("", "working-dir")
 		Expect(err).NotTo(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(cnbDir, "buildpack.toml"), []byte(`api = "0.2"
-[buildpack]
-  id = "org.some-org.some-buildpack"
-  name = "Some Buildpack"
-  version = "some-version"
-  sbom-formats = ["cdx","spdx"]
-
-[metadata]
-  [metadata.default-versions]
-    node = "10.x"
-
-  [[metadata.dependencies]]
-    deprecation_date = 2021-04-01T00:00:00Z
-    id = "some-dep"
-    name = "Some Dep"
-    sha256 = "some-sha"
-    stacks = ["some-stack"]
-    uri = "some-uri"
-    version = "some-dep-version"
-`), 0600)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(os.MkdirAll(filepath.Join(cnbDir, "bin"), os.ModePerm)).To(Succeed())
+		Expect(os.WriteFile(filepath.Join(cnbDir, "bin", "optimize-memory"), nil, os.ModePerm)).To(Succeed())
 
 		entryResolver = &fakes.EntryResolver{}
 		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
@@ -106,17 +86,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		sbomGenerator = &fakes.SBOMGenerator{}
 		sbomGenerator.GenerateFromDependencyCall.Returns.SBOM = sbom.SBOM{}
 
-		environment = &fakes.EnvironmentConfiguration{}
-
 		timeStamp = time.Now()
 		clock = chronos.NewClock(func() time.Time {
 			return timeStamp
 		})
 
 		buffer = bytes.NewBuffer(nil)
-		logEmitter := nodeengine.NewLogEmitter(buffer)
 
-		build = nodeengine.Build(entryResolver, dependencyManager, environment, sbomGenerator, logEmitter, clock)
+		build = nodeengine.Build(entryResolver, dependencyManager, sbomGenerator, scribe.NewEmitter(buffer), clock)
 
 		buildContext = packit.BuildContext{
 			CNBPath: cnbDir,
@@ -159,6 +136,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(layer.Name).To(Equal("node"))
 		Expect(layer.Path).To(Equal(filepath.Join(layersDir, "node")))
+		Expect(layer.SharedEnv).To(Equal(packit.Environment{
+			"NODE_HOME.default":    filepath.Join(layersDir, "node"),
+			"NODE_ENV.default":     "production",
+			"NODE_VERBOSE.default": "false",
+		}))
+
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
 			nodeengine.DepKey: "",
 			"built_at":        timeStamp.Format(time.RFC3339Nano),
@@ -211,18 +194,18 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "node")))
 
-		Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
-		Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-		Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
-		Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
-		Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeFalse())
-
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 		Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 		Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
 		Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
 		Expect(buffer.String()).ToNot(ContainSubstring("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information."))
 		Expect(buffer.String()).To(ContainSubstring("Executing build process"))
+
+		Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
+		Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
+		Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
+		Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
+		Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 	})
 
 	context("when the buildpack.yml contains a directive to optimize memory", func() {
@@ -230,10 +213,10 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		it.Before(func() {
 			var err error
-			workingDir, err = ioutil.TempDir("", "working-dir")
+			workingDir, err = os.MkdirTemp("", "working-dir")
 			Expect(err).NotTo(HaveOccurred())
 
-			err = ioutil.WriteFile(filepath.Join(workingDir, "buildpack.yml"), []byte(`---
+			err = os.WriteFile(filepath.Join(workingDir, "buildpack.yml"), []byte(`---
 nodejs:
   optimize-memory: true`), 0644)
 			Expect(err).NotTo(HaveOccurred())
@@ -247,12 +230,6 @@ nodejs:
 			buildContext.WorkingDir = workingDir
 			_, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
-
-			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
-			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
-			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
@@ -273,16 +250,26 @@ nodejs:
 		})
 
 		it("tells the environment to optimize memory", func() {
-			_, err := build(buildContext)
+			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(environment.ConfigureCall.Receives.BuildEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LaunchEnv).To(Equal(packit.Environment{}))
-			Expect(environment.ConfigureCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
-			Expect(environment.ConfigureCall.Receives.ExecdPath).To(Equal(filepath.Join(cnbDir, "bin", "optimize-memory")))
-			Expect(environment.ConfigureCall.Receives.OptimizeMemory).To(BeTrue())
+			Expect(result.Layers).To(HaveLen(1))
+			layer := result.Layers[0]
+
+			Expect(layer.Name).To(Equal("node"))
+			Expect(layer.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(layer.LaunchEnv).To(Equal(packit.Environment{
+				"OPTIMIZE_MEMORY.default": "true",
+			}))
+
 			Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
 			Expect(buffer.String()).ToNot(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
+
+			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
+			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
+			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
+			Expect(buffer.String()).To(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
+			Expect(buffer.String()).To(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 		})
 	})
 
@@ -291,7 +278,7 @@ nodejs:
 
 		it.Before(func() {
 			var err error
-			workingDir, err = ioutil.TempDir("", "working-dir")
+			workingDir, err = os.MkdirTemp("", "working-dir")
 			Expect(err).NotTo(HaveOccurred())
 
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
@@ -357,7 +344,7 @@ nodejs:
 
 	context("when there is a dependency cache match", func() {
 		it.Before(func() {
-			err := ioutil.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0644)
+			err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0644)
 			Expect(err).NotTo(HaveOccurred())
 
 			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
@@ -411,7 +398,7 @@ nodejs:
 			))
 			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(0))
 			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
-			Expect(environment.ConfigureCall.CallCount).To(Equal(0))
+			// Expect(environment.ConfigureCall.CallCount).To(Equal(0))
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
@@ -525,14 +512,14 @@ nodejs:
 			})
 		})
 
-		context("when the environment cannot be configured", func() {
+		context("when copying the file fails", func() {
 			it.Before(func() {
-				environment.ConfigureCall.Returns.Error = errors.New("failed to configure environment")
+				Expect(os.RemoveAll(filepath.Join(cnbDir, "bin"))).To(Succeed())
 			})
 
 			it("returns an error", func() {
 				_, err := build(buildContext)
-				Expect(err).To(MatchError("failed to configure environment"))
+				Expect(err).To(MatchError(ContainSubstring("no such file or directory")))
 			})
 		})
 	})

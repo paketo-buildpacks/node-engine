@@ -2,7 +2,7 @@ package integration
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -135,7 +135,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-				content, err := ioutil.ReadAll(response.Body)
+				content, err := io.ReadAll(response.Body)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
@@ -199,9 +199,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 
 				Expect(logs).To(ContainLines(
 					"  Configuring build environment",
-					`    NODE_ENV     -> "development"`,
+					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-					`    NODE_VERBOSE -> "true"`,
+					`    NODE_VERBOSE -> "false"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
@@ -221,7 +221,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-				content, err := ioutil.ReadAll(response.Body)
+				content, err := io.ReadAll(response.Body)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
@@ -302,7 +302,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-				content, err := ioutil.ReadAll(response.Body)
+				content, err := io.ReadAll(response.Body)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
@@ -380,7 +380,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-				content, err := ioutil.ReadAll(response.Body)
+				content, err := io.ReadAll(response.Body)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(ContainSubstring("hello world"))
 

@@ -2,7 +2,6 @@ package nodeengine_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -21,7 +20,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		file, err := ioutil.TempFile("", ".nvmrc")
+		file, err := os.CreateTemp("", ".nvmrc")
 		Expect(err).NotTo(HaveOccurred())
 		defer file.Close()
 
@@ -56,7 +55,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		for input, output := range testCases {
-			err := ioutil.WriteFile(path, []byte(input), 0644)
+			err := os.WriteFile(path, []byte(input), 0644)
 			Expect(err).NotTo(HaveOccurred())
 
 			version, err := parser.ParseVersion(path)
@@ -80,7 +79,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 	context("failure cases", func() {
 		context("when the .nvmrc contains a malformed semver number", func() {
 			it.Before(func() {
-				err := ioutil.WriteFile(path, []byte("1.2.this is not a number"), 0644)
+				err := os.WriteFile(path, []byte("1.2.this is not a number"), 0644)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
