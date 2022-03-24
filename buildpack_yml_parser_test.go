@@ -1,7 +1,6 @@
 package nodeengine_test
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -20,7 +19,7 @@ func testBuildpackYMLParser(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		file, err := ioutil.TempFile("", "buildpack.yml")
+		file, err := os.CreateTemp("", "buildpack.yml")
 		Expect(err).NotTo(HaveOccurred())
 		defer file.Close()
 
@@ -42,7 +41,7 @@ nodejs:
 	context("Parse", func() {
 		context("buildpack.yml sets optimize-memory", func() {
 			it.Before(func() {
-				err := ioutil.WriteFile(path, []byte(`---
+				err := os.WriteFile(path, []byte(`---
 nodejs:
   optimize-memory: true
   version: "1.2.3"
@@ -104,7 +103,7 @@ nodejs:
 
 			context("when the contents of the buildpack.yml file are malformed", func() {
 				it.Before(func() {
-					err := ioutil.WriteFile(path, []byte("%%%"), 0644)
+					err := os.WriteFile(path, []byte("%%%"), 0644)
 					Expect(err).NotTo(HaveOccurred())
 				})
 

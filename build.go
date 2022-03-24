@@ -9,8 +9,10 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
@@ -31,12 +33,7 @@ type SBOMGenerator interface {
 	GenerateFromDependency(dependency postal.Dependency, dir string) (sbom.SBOM, error)
 }
 
-//go:generate faux --interface EnvironmentConfiguration --output fakes/environment_configuration.go
-type EnvironmentConfiguration interface {
-	Configure(buildEnv, launchEnv packit.Environment, layerPath, execdPath string, optimizeMemory bool) error
-}
-
-func Build(entryResolver EntryResolver, dependencyManager DependencyManager, environment EnvironmentConfiguration, sbomGenerator SBOMGenerator, logger LogEmitter, clock chronos.Clock) packit.BuildFunc {
+func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbomGenerator SBOMGenerator, logger scribe.Emitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 		logger.Process("Resolving Node Engine version")
@@ -160,10 +157,34 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, env
 			config.OptimizedMemory = true
 		}
 
-		err = environment.Configure(nodeLayer.BuildEnv, nodeLayer.SharedEnv, nodeLayer.Path, filepath.Join(context.CNBPath, "bin", "optimize-memory"), config.OptimizedMemory)
+		nodeLayer.SharedEnv.Default("NODE_HOME", nodeLayer.Path)
+		nodeLayer.SharedEnv.Default("NODE_ENV", "production")
+		nodeLayer.SharedEnv.Default("NODE_VERBOSE", "false")
+		if config.OptimizedMemory {
+			nodeLayer.LaunchEnv.Default("OPTIMIZE_MEMORY", "true")
+		}
+
+		logger.EnvironmentVariables(nodeLayer)
+
+		execdDir := filepath.Join(nodeLayer.Path, "exec.d")
+		err = os.MkdirAll(execdDir, os.ModePerm)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
+
+		err = fs.Copy(filepath.Join(context.CNBPath, "bin", "optimize-memory"), filepath.Join(execdDir, "0-optimize-memory"))
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
+		logger.Subprocess("Writing exec.d/0-optimize-memory")
+		logger.Action("Calculates available memory based on container limits at launch time.")
+		logger.Action("Made available in the MEMORY_AVAILABLE environment variable.")
+		if config.OptimizedMemory {
+			logger.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
+			logger.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
+		}
+		logger.Break()
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{nodeLayer},

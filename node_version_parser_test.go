@@ -2,7 +2,6 @@ package nodeengine_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -21,7 +20,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		file, err := ioutil.TempFile("", ".node-version")
+		file, err := os.CreateTemp("", ".node-version")
 		Expect(err).NotTo(HaveOccurred())
 		defer file.Close()
 
@@ -42,7 +41,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		for input, output := range testCases {
-			err := ioutil.WriteFile(path, []byte(input), 0644)
+			err := os.WriteFile(path, []byte(input), 0644)
 			Expect(err).NotTo(HaveOccurred())
 
 			version, err := parser.ParseVersion(path)
@@ -66,7 +65,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 	context("failure cases", func() {
 		context("when the .node-version contains a malformed semver number", func() {
 			it.Before(func() {
-				err := ioutil.WriteFile(path, []byte("1.2.this is not a number"), 0644)
+				err := os.WriteFile(path, []byte("1.2.this is not a number"), 0644)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -78,7 +77,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 		context("when the .node-version contains a value prefixed with `lts/`", func() {
 			it.Before(func() {
-				err := ioutil.WriteFile(path, []byte("lts/*"), 0644)
+				err := os.WriteFile(path, []byte("lts/*"), 0644)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -90,7 +89,7 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 
 		context("when the .node-version contains the value `node`", func() {
 			it.Before(func() {
-				err := ioutil.WriteFile(path, []byte("node"), 0644)
+				err := os.WriteFile(path, []byte("node"), 0644)
 				Expect(err).NotTo(HaveOccurred())
 			})
 

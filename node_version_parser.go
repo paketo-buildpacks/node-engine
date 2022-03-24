@@ -2,7 +2,6 @@ package nodeengine
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -16,7 +15,7 @@ func NewNodeVersionParser() NodeVersionParser {
 }
 
 func (p NodeVersionParser) ParseVersion(path string) (string, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", nil

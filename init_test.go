@@ -12,8 +12,6 @@ func TestUnitNode(t *testing.T) {
 	suite("Build", testBuild)
 	suite("BuildpackYMLParser", testBuildpackYMLParser)
 	suite("Detect", testDetect)
-	suite("Environment", testEnvironment)
-	suite("LogEmitter", testLogEmitter)
 	suite("NvmrcParser", testNvmrcParser)
 	suite("NodeVersionParser", testNodeVersionParser)
 	suite.Run(t)

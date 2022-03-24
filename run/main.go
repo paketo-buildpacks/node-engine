@@ -10,6 +10,7 @@ import (
 	"github.com/paketo-buildpacks/packit/v2/draft"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
 type Generator struct{}
@@ -22,10 +23,9 @@ func main() {
 	nvmrcParser := nodeengine.NewNvmrcParser()
 	buildpackYMLParser := nodeengine.NewBuildpackYMLParser()
 	nodeVersionParser := nodeengine.NewNodeVersionParser()
-	logEmitter := nodeengine.NewLogEmitter(os.Stdout)
+	logEmitter := scribe.NewEmitter(os.Stdout).WithLevel(os.Getenv("BP_LOG_LEVEL"))
 	entryResolver := draft.NewPlanner()
 	dependencyManager := postal.NewService(cargo.NewTransport())
-	environment := nodeengine.NewEnvironment(logEmitter)
 	sbomGenerator := Generator{}
 
 	packit.Run(
@@ -37,7 +37,6 @@ func main() {
 		nodeengine.Build(
 			entryResolver,
 			dependencyManager,
-			environment,
 			sbomGenerator,
 			logEmitter,
 			chronos.DefaultClock,
