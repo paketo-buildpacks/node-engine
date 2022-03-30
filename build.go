@@ -107,8 +107,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
 
 		nodeLayer.Metadata = map[string]interface{}{
-			DepKey:     dependency.SHA256,
-			"built_at": clock.Now().Format(time.RFC3339Nano),
+			DepKey: dependency.SHA256,
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)

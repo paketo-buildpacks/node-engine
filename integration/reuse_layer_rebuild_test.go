@@ -171,7 +171,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(content).To(ContainSubstring("hello world"))
 
-			Expect(secondImage.Buildpacks[0].Layers["node"].Metadata["built_at"]).To(Equal(firstImage.Buildpacks[0].Layers["node"].Metadata["built_at"]))
+			Expect(secondImage.Buildpacks[0].Layers["node"].SHA).To(Equal(firstImage.Buildpacks[0].Layers["node"].SHA))
 		})
 	})
 
@@ -315,7 +315,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(content).To(ContainSubstring("hello world"))
 
-			Expect(secondImage.Buildpacks[0].Layers["node"].Metadata["built_at"]).NotTo(Equal(firstImage.Buildpacks[0].Layers["node"].Metadata["built_at"]))
+			Expect(secondImage.Buildpacks[0].Layers["node"].SHA).NotTo(Equal(firstImage.Buildpacks[0].Layers["node"].SHA))
 		})
 	})
 }

@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	nodeengine "github.com/paketo-buildpacks/node-engine"
 	"github.com/paketo-buildpacks/node-engine/fakes"
@@ -33,8 +32,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
 		sbomGenerator     *fakes.SBOMGenerator
-		clock             chronos.Clock
-		timeStamp         time.Time
 		buffer            *bytes.Buffer
 
 		build        packit.BuildFunc
@@ -86,14 +83,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		sbomGenerator = &fakes.SBOMGenerator{}
 		sbomGenerator.GenerateFromDependencyCall.Returns.SBOM = sbom.SBOM{}
 
-		timeStamp = time.Now()
-		clock = chronos.NewClock(func() time.Time {
-			return timeStamp
-		})
-
 		buffer = bytes.NewBuffer(nil)
 
-		build = nodeengine.Build(entryResolver, dependencyManager, sbomGenerator, scribe.NewEmitter(buffer), clock)
+		build = nodeengine.Build(entryResolver, dependencyManager, sbomGenerator, scribe.NewEmitter(buffer), chronos.DefaultClock)
 
 		buildContext = packit.BuildContext{
 			CNBPath: cnbDir,
@@ -144,7 +136,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
 			nodeengine.DepKey: "",
-			"built_at":        timeStamp.Format(time.RFC3339Nano),
 		}))
 
 		Expect(layer.SBOM.Formats()).To(Equal([]packit.SBOMFormat{
