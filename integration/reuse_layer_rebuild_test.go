@@ -196,7 +196,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~12"}).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~16"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -210,13 +210,13 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      BP_NODE_VERSION -> \"~12\"",
+				"      BP_NODE_VERSION -> \"~16\"",
 				"      <unknown>       -> \"\"",
 				"",
-				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 12\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 16\.\d+\.\d+`),
 				"",
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 12\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine 16\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+\.\d+`),
 				"",
 				fmt.Sprintf("  Generating SBOM for directory /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
