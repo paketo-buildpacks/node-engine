@@ -454,7 +454,7 @@ nodejs:
 
 			it("returns an error", func() {
 				_, err := build(buildContext)
-				Expect(err).To(MatchError("\"random-format\" is not a supported SBOM format"))
+				Expect(err).To(MatchError("unsupported SBOM format: 'random-format'"))
 			})
 		})
 
