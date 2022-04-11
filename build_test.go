@@ -133,6 +133,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			"NODE_ENV.default":     "production",
 			"NODE_VERBOSE.default": "false",
 		}))
+		Expect(layer.ExecD).To(Equal([]string{
+			filepath.Join(cnbDir, "bin", "optimize-memory"),
+		}))
 
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
 			nodeengine.DepKey: "",
@@ -500,17 +503,6 @@ nodejs:
 			it("returns an error", func() {
 				_, err := build(buildContext)
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
-			})
-		})
-
-		context("when copying the file fails", func() {
-			it.Before(func() {
-				Expect(os.RemoveAll(filepath.Join(cnbDir, "bin"))).To(Succeed())
-			})
-
-			it("returns an error", func() {
-				_, err := build(buildContext)
-				Expect(err).To(MatchError(ContainSubstring("no such file or directory")))
 			})
 		})
 	})
