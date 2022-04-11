@@ -49,9 +49,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		workingDir, err = os.MkdirTemp("", "working-dir")
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(os.MkdirAll(filepath.Join(cnbDir, "bin"), os.ModePerm)).To(Succeed())
-		Expect(os.WriteFile(filepath.Join(cnbDir, "bin", "optimize-memory"), nil, os.ModePerm)).To(Succeed())
-
 		entryResolver = &fakes.EntryResolver{}
 		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 			Name: "node",
