@@ -49,9 +49,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		workingDir, err = os.MkdirTemp("", "working-dir")
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(os.MkdirAll(filepath.Join(cnbDir, "bin"), os.ModePerm)).To(Succeed())
-		Expect(os.WriteFile(filepath.Join(cnbDir, "bin", "optimize-memory"), nil, os.ModePerm)).To(Succeed())
-
 		entryResolver = &fakes.EntryResolver{}
 		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 			Name: "node",
@@ -132,6 +129,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			"NODE_HOME.default":    filepath.Join(layersDir, "node"),
 			"NODE_ENV.default":     "production",
 			"NODE_VERBOSE.default": "false",
+		}))
+		Expect(layer.ExecD).To(Equal([]string{
+			filepath.Join(cnbDir, "bin", "optimize-memory"),
 		}))
 
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
@@ -454,7 +454,7 @@ nodejs:
 
 			it("returns an error", func() {
 				_, err := build(buildContext)
-				Expect(err).To(MatchError("\"random-format\" is not a supported SBOM format"))
+				Expect(err).To(MatchError("unsupported SBOM format: 'random-format'"))
 			})
 		})
 
@@ -500,17 +500,6 @@ nodejs:
 			it("returns an error", func() {
 				_, err := build(buildContext)
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
-			})
-		})
-
-		context("when copying the file fails", func() {
-			it.Before(func() {
-				Expect(os.RemoveAll(filepath.Join(cnbDir, "bin"))).To(Succeed())
-			})
-
-			it("returns an error", func() {
-				_, err := build(buildContext)
-				Expect(err).To(MatchError(ContainSubstring("no such file or directory")))
 			})
 		})
 	})

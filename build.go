@@ -9,7 +9,6 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
-	"github.com/paketo-buildpacks/packit/v2/fs"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
@@ -165,16 +164,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 
 		logger.EnvironmentVariables(nodeLayer)
 
-		execdDir := filepath.Join(nodeLayer.Path, "exec.d")
-		err = os.MkdirAll(execdDir, os.ModePerm)
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		err = fs.Copy(filepath.Join(context.CNBPath, "bin", "optimize-memory"), filepath.Join(execdDir, "0-optimize-memory"))
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+		nodeLayer.ExecD = []string{filepath.Join(context.CNBPath, "bin", "optimize-memory")}
 
 		logger.Subprocess("Writing exec.d/0-optimize-memory")
 		logger.Action("Calculates available memory based on container limits at launch time.")
