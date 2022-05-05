@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/Masterminds/semver/v3"
@@ -56,7 +57,15 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 
 		logger.SelectedDependency(entry, dependency, clock.Now())
 
-		legacySBOM := dependencyManager.GenerateBillOfMaterials(dependency)
+		sbomDisabled, err := checkSbomDisabled()
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
+		var legacySBOM []packit.BOMEntry
+		if !sbomDisabled {
+			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
+		}
 
 		nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
 		versionSource, _ := entry.Metadata["version-source"].(string)
@@ -120,23 +129,28 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		logger.Action("Completed in %s", duration.Round(time.Millisecond))
 		logger.Break()
 
-		logger.GeneratingSBOM(nodeLayer.Path)
-		var sbomContent sbom.SBOM
-		duration, err = clock.Measure(func() error {
-			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, nodeLayer.Path)
-			return err
-		})
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+		if sbomDisabled {
+			logger.Subprocess("Skipping SBOM generation for Node Engine")
+			logger.Break()
+		} else {
+			logger.GeneratingSBOM(nodeLayer.Path)
+			var sbomContent sbom.SBOM
+			duration, err = clock.Measure(func() error {
+				sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, nodeLayer.Path)
+				return err
+			})
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 
-		logger.Action("Completed in %s", duration.Round(time.Millisecond))
-		logger.Break()
+			logger.Action("Completed in %s", duration.Round(time.Millisecond))
+			logger.Break()
 
-		logger.FormattingSBOM(context.BuildpackInfo.SBOMFormats...)
-		nodeLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
-		if err != nil {
-			return packit.BuildResult{}, err
+			logger.FormattingSBOM(context.BuildpackInfo.SBOMFormats...)
+			nodeLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 		}
 
 		// Check if buildpack.yml specifies optimize_memory
@@ -181,4 +195,15 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			Launch: launchMetadata,
 		}, nil
 	}
+}
+
+func checkSbomDisabled() (bool, error) {
+	if disableStr, ok := os.LookupEnv("BP_DISABLE_SBOM"); ok {
+		disable, err := strconv.ParseBool(disableStr)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse BP_DISABLE_SBOM value %s: %w", disableStr, err)
+		}
+		return disable, nil
+	}
+	return false, nil
 }

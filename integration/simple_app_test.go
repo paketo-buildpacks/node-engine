@@ -147,9 +147,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					ContainSubstring("NODE_ENV=production"),
 				)
 
-				// check that legacy SBOM is included via metadata
+				// check that legacy SBOM is included via sbom.legacy.json
 				container2, err = docker.Container.Run.
-					WithCommand("cat /layers/config/metadata.toml").
+					WithCommand("cat /layers/sbom/launch/sbom.legacy.json").
 					Execute(image.ID)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -157,11 +157,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					cLogs, err := docker.Container.Logs.Execute(container2.ID)
 					Expect(err).NotTo(HaveOccurred())
 					return cLogs.String()
-				}).Should(And(
-					ContainSubstring("[[bom]]"),
-					ContainSubstring(`name = "Node Engine`),
-					ContainSubstring("[bom.metadata]"),
-				))
+				}).Should(And(ContainSubstring(`"name":"Node Engine"`)))
 
 				// check that all required SBOM files are present
 				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
@@ -414,6 +410,84 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`      Version \d+\.\d+\.\d+ of Node Engine is deprecated.`),
 					"      Migrate your application to a supported version of Node Engine.",
 				))
+			})
+		})
+
+		context("BP_DISABLE_SBOM is set to true", func() {
+			var (
+				container1 occam.Container
+				container2 occam.Container
+			)
+
+			it.After(func() {
+				Expect(docker.Container.Remove.Execute(container1.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
+			})
+
+			it("skips SBOM generation", func() {
+				var err error
+
+				source, err = occam.Source(filepath.Join("testdata", "simple_app"))
+				Expect(err).ToNot(HaveOccurred())
+
+				var logs fmt.Stringer
+				image, logs, err = pack.WithNoColor().Build.
+					WithPullPolicy("never").
+					WithBuildpacks(
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
+					).
+					WithSBOMOutputDir(sbomDir).
+					WithEnv(map[string]string{
+						"BP_LOG_LEVEL":    "DEBUG",
+						"BP_DISABLE_SBOM": "true",
+					}).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs).To(ContainLines("    Skipping SBOM generation for Node Engine"))
+
+				// Ensure node is installed correctly
+				container1, err = docker.Container.Run.
+					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
+					WithPublish("8080").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container1).Should(BeAvailable())
+
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container1.HostPort("8080")))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+				content, err := io.ReadAll(response.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("hello world"))
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container1.ID)
+					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(
+					ContainSubstring("NODE_ENV=production"),
+				)
+
+				// check that legacy SBOM is NOT included via sbom.legacy.json
+				container2, err = docker.Container.Run.
+					WithCommand("cat /layers/sbom/launch/sbom.legacy.json").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(func() string {
+					cLogs, err := docker.Container.Logs.Execute(container2.ID)
+					Expect(err).NotTo(HaveOccurred())
+					return cLogs.String()
+				}).Should(Not(ContainSubstring(`"name": "Node Engine"`)))
+
+				// check that SBOM files are not generated
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).ToNot(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).ToNot(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).ToNot(BeARegularFile())
 			})
 		})
 	})
