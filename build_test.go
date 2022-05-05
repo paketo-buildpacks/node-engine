@@ -469,6 +469,21 @@ nodejs:
 			})
 		})
 
+		context("when BP_DISABLE_SBOM is set incorrectly", func() {
+			it.Before(func() {
+				os.Setenv("BP_DISABLE_SBOM", "not-a-bool")
+			})
+
+			it.After(func() {
+				os.Unsetenv("BP_DISABLE_SBOM")
+			})
+
+			it("returns an error", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError(ContainSubstring("failed to parse BP_DISABLE_SBOM")))
+			})
+		})
+
 		context("when the layers directory cannot be written to", func() {
 			it.Before(func() {
 				Expect(os.Chmod(layersDir, 0000)).To(Succeed())
