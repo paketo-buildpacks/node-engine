@@ -101,20 +101,6 @@ api = "0.7"
     version = "16.15.0"
 
   [[metadata.dependencies]]
-    cpe = "cpe:2.3:a:nodejs:node.js:18.0.0:*:*:*:*:*:*:*"
-    deprecation_date = "2025-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v18.0.0?checksum=7280a4318574131e9172c7b64e3dd1f2ee0a7bd132a53a6e98865f7b08db062c&download_url=https://nodejs.org/dist/v18.0.0/node-v18.0.0.tar.gz"
-    sha256 = "5cdbd738e3696f96a88019fcba04f88550b5f07bebe032caeeb2d771397c4b68"
-    source = "https://nodejs.org/dist/v18.0.0/node-v18.0.0.tar.gz"
-    source_sha256 = "7280a4318574131e9172c7b64e3dd1f2ee0a7bd132a53a6e98865f7b08db062c"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/node/node_v18.0.0_linux_x64_bionic_5cdbd738.tgz"
-    version = "18.0.0"
-
-  [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:18.1.0:*:*:*:*:*:*:*"
     deprecation_date = "2025-04-30T00:00:00Z"
     id = "node"
@@ -127,6 +113,20 @@ api = "0.7"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/node/node_v18.1.0_linux_x64_bionic_aa71f1fb.tgz"
     version = "18.1.0"
+
+  [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:18.2.0:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v18.2.0?checksum=bb9c117814341676edbfd7c79cfaaac2d809e760a65fe9afe050245d55bb7ca7&download_url=https://nodejs.org/dist/v18.2.0/node-v18.2.0.tar.gz"
+    sha256 = "76d5fcd9b18f1146a0bba2761b9fead9507df2ff1eed32ee97be0b883cedbad5"
+    source = "https://nodejs.org/dist/v18.2.0/node-v18.2.0.tar.gz"
+    source_sha256 = "bb9c117814341676edbfd7c79cfaaac2d809e760a65fe9afe050245d55bb7ca7"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://deps.paketo.io/node/node_v18.2.0_linux_x64_bionic_76d5fcd9.tgz"
+    version = "18.2.0"
 
   [[metadata.dependency-constraints]]
     constraint = "12.*"
