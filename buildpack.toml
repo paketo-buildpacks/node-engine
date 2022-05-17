@@ -45,20 +45,6 @@ api = "0.7"
     version = "12.22.12"
 
   [[metadata.dependencies]]
-    cpe = "cpe:2.3:a:nodejs:node.js:14.19.1:*:*:*:*:*:*:*"
-    deprecation_date = "2023-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v14.19.1?checksum=cb5b094df5a59374014b131994314ccc5e390013f4e813a75491325f6eb7e1a2&download_url=https://nodejs.org/dist/v14.19.1/node-v14.19.1.tar.gz"
-    sha256 = "0783733b8a88129d998858045478ecba35c2ff12cfa7da0140cfb4c5e2b60765"
-    source = "https://nodejs.org/dist/v14.19.1/node-v14.19.1.tar.gz"
-    source_sha256 = "cb5b094df5a59374014b131994314ccc5e390013f4e813a75491325f6eb7e1a2"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/node/node_v14.19.1_linux_x64_bionic_0783733b.tgz"
-    version = "14.19.1"
-
-  [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:14.19.2:*:*:*:*:*:*:*"
     deprecation_date = "2023-04-30T00:00:00Z"
     id = "node"
@@ -71,6 +57,20 @@ api = "0.7"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/node/node_v14.19.2_linux_x64_bionic_3f263e3e.tgz"
     version = "14.19.2"
+
+  [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:14.19.3:*:*:*:*:*:*:*"
+    deprecation_date = "2023-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v14.19.3?checksum=1df831a7b9d9ca76fb9af45244a309b7430bf54ba2be9d2d7b77d868ddaf0d3d&download_url=https://nodejs.org/dist/v14.19.3/node-v14.19.3.tar.gz"
+    sha256 = "4a812083444dab7b6742b36eaa070ecd727c146d62a6f805452bda5b6bfb8d72"
+    source = "https://nodejs.org/dist/v14.19.3/node-v14.19.3.tar.gz"
+    source_sha256 = "1df831a7b9d9ca76fb9af45244a309b7430bf54ba2be9d2d7b77d868ddaf0d3d"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://deps.paketo.io/node/node_v14.19.3_linux_x64_bionic_4a812083.tgz"
+    version = "14.19.3"
 
   [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:16.14.2:*:*:*:*:*:*:*"
