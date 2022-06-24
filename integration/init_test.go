@@ -137,12 +137,13 @@ func TestIntegration(t *testing.T) {
 	SetDefaultEventuallyTimeout(5 * time.Second)
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
-	suite("Simple", testSimple)
 	suite("Buildpack.yml", testBuildpackYML)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
 	suite("ProjectPath", testProjectPath)
 	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
+	suite("Simple", testSimple)
+	suite("OpenSSL", testOpenSSL)
 	suite.Run(t)
 }

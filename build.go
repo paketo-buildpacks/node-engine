@@ -176,6 +176,17 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			nodeLayer.LaunchEnv.Default("OPTIMIZE_MEMORY", "true")
 		}
 
+		// NOTE: ensures OpenSSL CA store works with Node v18 and higher. Waiting
+		// for resolution on https://github.com/nodejs/node/issues/43560 to decide
+		// how to properly fix this.
+		nodeVersion, err := semver.NewVersion(dependency.Version)
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+		if !nodeVersion.LessThan(semver.MustParse("18.0.0")) {
+			nodeLayer.SharedEnv.Append("SSL_CERT_DIR", "/etc/ssl/certs", ":")
+		}
+
 		logger.EnvironmentVariables(nodeLayer)
 
 		nodeLayer.ExecD = []string{filepath.Join(context.CNBPath, "bin", "optimize-memory")}
