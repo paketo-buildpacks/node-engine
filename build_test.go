@@ -61,7 +61,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		entryResolver.MergeLayerTypesCall.Returns.Build = false
 
 		dependencyManager = &fakes.DependencyManager{}
-		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine"}
+		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine", Version: "10.11.12"}
 		// Legacy SBOM
 		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
 			{
@@ -176,13 +176,13 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal("~10"))
 		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
 
-		Expect(dependencyManager.DeliverCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
+		Expect(dependencyManager.DeliverCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine", Version: "10.11.12"}))
 		Expect(dependencyManager.DeliverCall.Receives.CnbPath).To(Equal(cnbDir))
 		Expect(dependencyManager.DeliverCall.Receives.LayerPath).To(Equal(filepath.Join(layersDir, "node")))
 		Expect(dependencyManager.DeliverCall.Receives.PlatformPath).To(Equal("platform"))
-		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
+		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine", Version: "10.11.12"}}))
 
-		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine"}))
+		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dependency).To(Equal(postal.Dependency{Name: "Node Engine", Version: "10.11.12"}))
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "node")))
 
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
@@ -329,7 +329,7 @@ nodejs:
 					},
 				},
 			))
-			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine"}}))
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{{Name: "Node Engine", Version: "10.11.12"}}))
 		})
 	})
 
@@ -424,6 +424,28 @@ nodejs:
 		})
 	})
 
+	context("when the dependency version is 18 or higher", func() {
+		it.Before(func() {
+			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine", Version: "18.0.1"}
+		})
+
+		it("sets the SSL_CERT_DIR environment variable", func() {
+			result, err := build(buildContext)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(result.Layers).To(HaveLen(1))
+			layer := result.Layers[0]
+
+			Expect(layer.SharedEnv).To(Equal(packit.Environment{
+				"NODE_HOME.default":    filepath.Join(layersDir, "node"),
+				"NODE_ENV.default":     "production",
+				"NODE_VERBOSE.default": "false",
+				"SSL_CERT_DIR.append":  "/etc/ssl/certs",
+				"SSL_CERT_DIR.delim":   ":",
+			}))
+		})
+	})
+
 	context("failure cases", func() {
 		context("when a dependency cannot be resolved", func() {
 			it.Before(func() {
@@ -515,6 +537,17 @@ nodejs:
 			it("returns an error", func() {
 				_, err := build(buildContext)
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
+			})
+		})
+
+		context("when the dependency version cannot be parsed", func() {
+			it.Before(func() {
+				dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine", Version: "not a semver number"}
+			})
+
+			it("returns an error", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError(ContainSubstring("Invalid Semantic Version")))
 			})
 		})
 	})
