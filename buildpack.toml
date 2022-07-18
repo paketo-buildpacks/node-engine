@@ -26,7 +26,7 @@ api = "0.7"
     sha256 = "d7d7ee01d6e77fbba4dea79af30b85817ae6909eb1f02002a8bcffaa04979bb8"
     source = "https://nodejs.org/dist/v12.22.11/node-v12.22.11.tar.gz"
     source_sha256 = "784785071df0c2f756a5dc5206a37f585ee1017898131a707183b8764269fefa"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v12.22.11_linux_x64_bionic_d7d7ee01.tgz"
     version = "12.22.11"
 
@@ -40,7 +40,7 @@ api = "0.7"
     sha256 = "9f9f969a029fa08205cc79196bee6a265cb48f5ce0e7dd04312157c4ef89bbc5"
     source = "https://nodejs.org/dist/v12.22.12/node-v12.22.12.tar.gz"
     source_sha256 = "1a5c52c50185f7c23318e7e8001cc58054736acb98cb8c523d33b136da9e54be"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v12.22.12_linux_x64_bionic_9f9f969a.tgz"
     version = "12.22.12"
 
@@ -54,7 +54,7 @@ api = "0.7"
     sha256 = "4a812083444dab7b6742b36eaa070ecd727c146d62a6f805452bda5b6bfb8d72"
     source = "https://nodejs.org/dist/v14.19.3/node-v14.19.3.tar.gz"
     source_sha256 = "1df831a7b9d9ca76fb9af45244a309b7430bf54ba2be9d2d7b77d868ddaf0d3d"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v14.19.3_linux_x64_bionic_4a812083.tgz"
     version = "14.19.3"
 
@@ -68,7 +68,7 @@ api = "0.7"
     sha256 = "ccc85a8a7f1f59298de7ec25e72fdf1152ea4b71cef2b876391ce6bc17a363ea"
     source = "https://nodejs.org/dist/v14.20.0/node-v14.20.0.tar.gz"
     source_sha256 = "53098eafccdd69120b9d9187eb3bbb872c91ee17bfa0ee33aaeb300803c113f5"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v14.20.0_linux_x64_bionic_ccc85a8a.tgz"
     version = "14.20.0"
 
@@ -82,7 +82,7 @@ api = "0.7"
     sha256 = "76df2d3176c44a1f83705415bc81d48ab9519893967816029c84381b7a1d8a5c"
     source = "https://nodejs.org/dist/v16.15.1/node-v16.15.1.tar.gz"
     source_sha256 = "308aee7149c4092a53c87c28ef49e23a8d1606119e79ae68333062e2a1f94208"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v16.15.1_linux_x64_bionic_76df2d31.tgz"
     version = "16.15.1"
 
@@ -96,7 +96,7 @@ api = "0.7"
     sha256 = "1ddc8446ba20bafd52ffe2fc5dac1661f256596a0d1c8425a16c3c5f289bfd09"
     source = "https://nodejs.org/dist/v16.16.0/node-v16.16.0.tar.gz"
     source_sha256 = "e07c30b0498f143c08793e34bda1adeaad32f485a4f79f4d67a82879f4c0bbe3"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v16.16.0_linux_x64_bionic_1ddc8446.tgz"
     version = "16.16.0"
 
@@ -110,7 +110,7 @@ api = "0.7"
     sha256 = "3d269a9ada94c5d4fb88988204b7124311253330b310e449ef5a783a7c9e6a12"
     source = "https://nodejs.org/dist/v18.5.0/node-v18.5.0.tar.gz"
     source_sha256 = "47843654ffa6a59557254fdfe6d74c1fa21e314bcc4bc203727acc058b7780dd"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v18.5.0_linux_x64_bionic_3d269a9a.tgz"
     version = "18.5.0"
 
@@ -124,7 +124,7 @@ api = "0.7"
     sha256 = "e4e5b2d40a5b3e4436f53851c040c56ce61209a26010fef814be481cbbdedc18"
     source = "https://nodejs.org/dist/v18.6.0/node-v18.6.0.tar.gz"
     source_sha256 = "11a2f77f69987068fe9d3f5fd8f6b4e79570656f97f6b576716b8250544d47cd"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy" ]
     uri = "https://deps.paketo.io/node/node_v18.6.0_linux_x64_bionic_e4e5b2d4.tgz"
     version = "18.6.0"
 
@@ -150,3 +150,6 @@ api = "0.7"
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
+
+[[stacks]]
+  id = "io.buildpacks.stacks.jammy"
