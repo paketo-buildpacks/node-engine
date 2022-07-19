@@ -54,7 +54,7 @@ api = "0.7"
     sha256 = "4a812083444dab7b6742b36eaa070ecd727c146d62a6f805452bda5b6bfb8d72"
     source = "https://nodejs.org/dist/v14.19.3/node-v14.19.3.tar.gz"
     source_sha256 = "1df831a7b9d9ca76fb9af45244a309b7430bf54ba2be9d2d7b77d868ddaf0d3d"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
     uri = "https://deps.paketo.io/node/node_v14.19.3_linux_x64_bionic_4a812083.tgz"
     version = "14.19.3"
 
