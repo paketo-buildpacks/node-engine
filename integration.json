@@ -1,4 +1,3 @@
 {
-  "builders": ["paketobuildpacks/builder:buildpackless-base", "paketobuildpacks/builder-jammy-buildpackless-base"],
   "build-plan": "github.com/paketo-community/build-plan"
 }
