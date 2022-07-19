@@ -57,14 +57,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("simple app", func() {
-			var (
-				container1 occam.Container
-				container2 occam.Container
-			)
-
 			it.After(func() {
-				Expect(docker.Container.Remove.Execute(container1.ID)).To(Succeed())
-				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
 
 			it("builds, logs and runs correctly", func() {
@@ -123,15 +117,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				))
 
 				// Ensure node is installed correctly
-				container1, err = docker.Container.Run.
+				container, err = docker.Container.Run.
 					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
 					WithPublish("8080").
 					Execute(image.ID)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(container1).Should(BeAvailable())
+				Eventually(container).Should(BeAvailable())
 
-				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container1.HostPort("8080")))
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
@@ -140,7 +134,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
 				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container1.ID)
+					cLogs, err := docker.Container.Logs.Execute(container.ID)
 					Expect(err).NotTo(HaveOccurred())
 					return cLogs.String()
 				}).Should(
@@ -148,16 +142,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				)
 
 				// check that legacy SBOM is included via sbom.legacy.json
-				container2, err = docker.Container.Run.
-					WithCommand("cat /layers/sbom/launch/sbom.legacy.json").
-					Execute(image.ID)
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", "sbom.legacy.json"))
 				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container2.ID)
-					Expect(err).NotTo(HaveOccurred())
-					return cLogs.String()
-				}).Should(And(ContainSubstring(`"name":"Node Engine"`)))
+				Expect(string(contents)).To(ContainSubstring(`"name":"Node Engine"`))
 
 				// check that all required SBOM files are present
 				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
@@ -165,7 +152,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
 
 				// check an SBOM file to make sure it has an entry for node
-				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
+				contents, err = os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
 			})
@@ -414,14 +401,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		context("BP_DISABLE_SBOM is set to true", func() {
-			var (
-				container1 occam.Container
-				container2 occam.Container
-			)
-
 			it.After(func() {
-				Expect(docker.Container.Remove.Execute(container1.ID)).To(Succeed())
-				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
+				Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
 			})
 
 			it("skips SBOM generation", func() {
@@ -448,15 +429,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(logs).To(ContainLines("    Skipping SBOM generation for Node Engine"))
 
 				// Ensure node is installed correctly
-				container1, err = docker.Container.Run.
+				container, err = docker.Container.Run.
 					WithCommand("echo NODE_ENV=$NODE_ENV && node server.js").
 					WithPublish("8080").
 					Execute(image.ID)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(container1).Should(BeAvailable())
+				Eventually(container).Should(BeAvailable())
 
-				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container1.HostPort("8080")))
+				response, err := http.Get(fmt.Sprintf("http://localhost:%s", container.HostPort("8080")))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(response.StatusCode).To(Equal(http.StatusOK))
 
@@ -465,7 +446,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(string(content)).To(ContainSubstring("hello world"))
 
 				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container1.ID)
+					cLogs, err := docker.Container.Logs.Execute(container.ID)
 					Expect(err).NotTo(HaveOccurred())
 					return cLogs.String()
 				}).Should(
@@ -473,16 +454,9 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				)
 
 				// check that legacy SBOM is NOT included via sbom.legacy.json
-				container2, err = docker.Container.Run.
-					WithCommand("cat /layers/sbom/launch/sbom.legacy.json").
-					Execute(image.ID)
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", "sbom.legacy.json"))
 				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(func() string {
-					cLogs, err := docker.Container.Logs.Execute(container2.ID)
-					Expect(err).NotTo(HaveOccurred())
-					return cLogs.String()
-				}).Should(Not(ContainSubstring(`"name": "Node Engine"`)))
+				Expect(string(contents)).To(ContainSubstring("null"))
 
 				// check that SBOM files are not generated
 				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).ToNot(BeARegularFile())
