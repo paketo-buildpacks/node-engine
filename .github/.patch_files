@@ -21,5 +21,6 @@ README.md
 scripts/.util/print.sh
 scripts/.util/tools.json
 scripts/.util/tools.sh
+scripts/.util/builders.sh
 scripts/integration.sh
 scripts/unit.sh
