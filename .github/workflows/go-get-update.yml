@@ -18,6 +18,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Checkout Branch
+        uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
+        with:
+          branch: automation/tools/go-get-update
+
       - shell: bash
         run: |
           go get -u all
