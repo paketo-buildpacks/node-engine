@@ -2,7 +2,7 @@ name: Go Get Update
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Once a day at midnight
+    - cron: '0 0 * * 1'  # Once per week, Mondays at midnight
   workflow_dispatch: {}
 
 jobs:

@@ -25,3 +25,5 @@ scripts/.util/tools.sh
 scripts/.util/builders.sh
 scripts/integration.sh
 scripts/unit.sh
+go.mod
+go.sum
