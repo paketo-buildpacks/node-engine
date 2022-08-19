@@ -71,7 +71,7 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				"",
 				"  Executing build process",
 				MatchRegexp(`    Installing Node Engine 16\.\d+\.\d+`),
-				MatchRegexp(`      Completed in \d+\.\d+`),
+				MatchRegexp(`      Completed in \d+(\.\d+)?`),
 				"",
 				fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
