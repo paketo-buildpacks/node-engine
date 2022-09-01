@@ -1,4 +1,4 @@
-# Node Engine Cloud Native Buildpack
+# Paketo Buildpack for Node Engine
 
 The Node Engine CNB provides the Node binary distribution.  The buildpack
 installs the Node binary distribution onto the `$PATH` which makes it available
