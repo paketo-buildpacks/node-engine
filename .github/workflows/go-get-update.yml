@@ -8,7 +8,7 @@ on:
 jobs:
   update:
     name: Go Get Update
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Setup Go
         uses: actions/setup-go@v3

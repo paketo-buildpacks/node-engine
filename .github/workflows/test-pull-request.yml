@@ -13,7 +13,7 @@ concurrency:
 jobs:
   unit:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       builders: ${{ steps.builders.outputs.builders }}
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   integration:
     name: Integration Tests with Builders
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: unit
     strategy:
       matrix:
@@ -63,7 +63,7 @@ jobs:
 
   roundup:
     name: Integration Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: integration
     steps:
     - run: |
@@ -72,7 +72,7 @@ jobs:
 
   upload:
     name: Upload Workflow Event Payload
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
