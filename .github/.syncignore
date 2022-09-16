@@ -1,1 +1,2 @@
 CODEOWNERS
+workflows/update-dependencies-from-metadata.yml
