@@ -93,7 +93,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		}
 
 		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
-		if ok && cachedSHA == dependency.SHA256 {
+		if ok && cachedSHA == dependency.SHA256 { //nolint:staticcheck
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
@@ -115,7 +115,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
 
 		nodeLayer.Metadata = map[string]interface{}{
-			DepKey: dependency.SHA256,
+			DepKey: dependency.SHA256, //nolint:staticcheck
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)

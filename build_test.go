@@ -340,7 +340,7 @@ nodejs:
 
 			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
 				Name:   "Node Engine",
-				SHA256: "some-sha",
+				SHA256: "some-sha", //nolint:staticcheck
 			}
 			entryResolver.MergeLayerTypesCall.Returns.Launch = true
 			entryResolver.MergeLayerTypesCall.Returns.Build = true
@@ -354,7 +354,7 @@ nodejs:
 			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
 				{
 					Name:   "Node Engine",
-					SHA256: "some-sha",
+					SHA256: "some-sha", //nolint:staticcheck
 				},
 			}))
 			Expect(result.Launch.BOM).To(Equal(
