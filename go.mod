@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/Masterminds/semver/v3 v3.1.1
-	github.com/onsi/gomega v1.20.2
-	github.com/paketo-buildpacks/occam v0.13.2
+	github.com/onsi/gomega v1.21.1
+	github.com/paketo-buildpacks/occam v0.13.3
 	github.com/paketo-buildpacks/packit/v2 v2.6.1
 	github.com/sclevine/spec v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -16,7 +16,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.6.0 // indirect
 	github.com/DataDog/zstd v1.5.2 // indirect
-	github.com/ForestEckhardt/freezer v0.0.11 // indirect
+	github.com/ForestEckhardt/freezer v0.0.12 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
