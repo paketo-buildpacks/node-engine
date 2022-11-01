@@ -17,20 +17,6 @@ api = "0.7"
     node = "16.*.*"
 
   [[metadata.dependencies]]
-    cpe = "cpe:2.3:a:nodejs:node.js:14.20.0:*:*:*:*:*:*:*"
-    deprecation_date = "2023-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v14.20.0?checksum=53098eafccdd69120b9d9187eb3bbb872c91ee17bfa0ee33aaeb300803c113f5&download_url=https://nodejs.org/dist/v14.20.0/node-v14.20.0.tar.gz"
-    sha256 = "ccc85a8a7f1f59298de7ec25e72fdf1152ea4b71cef2b876391ce6bc17a363ea"
-    source = "https://nodejs.org/dist/v14.20.0/node-v14.20.0.tar.gz"
-    source_sha256 = "53098eafccdd69120b9d9187eb3bbb872c91ee17bfa0ee33aaeb300803c113f5"
-    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
-    uri = "https://deps.paketo.io/node/node_v14.20.0_linux_x64_bionic_ccc85a8a.tgz"
-    version = "14.20.0"
-
-  [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:14.20.1:*:*:*:*:*:*:*"
     deprecation_date = "2023-04-30T00:00:00Z"
     id = "node"
@@ -43,6 +29,20 @@ api = "0.7"
     stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
     uri = "https://deps.paketo.io/node/node_v14.20.1_linux_x64_bionic_44e6c2f4.tgz"
     version = "14.20.1"
+
+  [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:nodejs:node.js:14.21.0:*:*:*:*:*:*:*"
+    deprecation_date = "2023-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "CC0-1.0", "MIT", "MIT-0", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v14.21.0?checksum=228f02347f7e4ae7ee844b911147fdf7e1d738dcf000abf0fc067b9161510785&download_url=https://nodejs.org/dist/v14.21.0/node-v14.21.0.tar.gz"
+    sha256 = "6e7f00b9a65d677f09ed29abc94e3996219994e7d8d69411d7c796e4cd061cf4"
+    source = "https://nodejs.org/dist/v14.21.0/node-v14.21.0.tar.gz"
+    source_sha256 = "228f02347f7e4ae7ee844b911147fdf7e1d738dcf000abf0fc067b9161510785"
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
+    uri = "https://deps.paketo.io/node/node_v14.21.0_linux_x64_bionic_6e7f00b9.tgz"
+    version = "14.21.0"
 
   [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:16.17.1:*:*:*:*:*:*:*"
