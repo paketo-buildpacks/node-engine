@@ -14,7 +14,7 @@ api = "0.7"
   include-files = ["bin/build", "bin/detect", "bin/run", "bin/optimize-memory", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
   [metadata.default-versions]
-    node = "16.*.*"
+    node = "18.*.*"
 
   [[metadata.dependencies]]
     cpe = "cpe:2.3:a:nodejs:node.js:14.20.1:*:*:*:*:*:*:*"
