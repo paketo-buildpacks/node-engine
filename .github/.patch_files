@@ -12,6 +12,7 @@
 .github/workflows/synchronize-labels.yml
 .github/workflows/test-pull-request.yml
 .github/workflows/update-dependencies.yml
+.github/workflows/update-dependencies-from-metadata.yml
 .github/workflows/update-github-config.yml
 .gitignore
 LICENSE
