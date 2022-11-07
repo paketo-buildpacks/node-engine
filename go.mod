@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/onsi/gomega v1.24.0
 	github.com/paketo-buildpacks/occam v0.13.3
-	github.com/paketo-buildpacks/packit/v2 v2.6.1
+	github.com/paketo-buildpacks/packit/v2 v2.7.0
 	github.com/sclevine/spec v1.4.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -22,11 +22,12 @@ require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/Microsoft/hcsshim v0.9.4 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
+	github.com/anchore/go-logger v0.0.0-20220728155337-03b66a5207d8 // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20220428202044-a072fa3cb6d7 // indirect
 	github.com/anchore/stereoscope v0.0.0-20221006201143-d24c9d626b33 // indirect
-	github.com/anchore/syft v0.58.0 // indirect
+	github.com/anchore/syft v0.60.3 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.2.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
@@ -59,7 +60,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
-	github.com/knqyf263/go-rpmdb v0.0.0-20220830120628-c11b1c45080a // indirect
+	github.com/knqyf263/go-rpmdb v0.0.0-20221030135625-4082a22221ce // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
@@ -104,13 +105,13 @@ require (
 	github.com/wagoodman/go-progress v0.0.0-20220614130704-4b1c25a33c7c // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/tools v0.2.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/genproto v0.0.0-20221014213838-99cd37c6964a // indirect
 	google.golang.org/grpc v1.50.1 // indirect
