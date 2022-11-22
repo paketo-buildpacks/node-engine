@@ -384,6 +384,20 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
+	context("when nodejs has already been provided", func() {
+		it.Before(func() {
+			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
+				Name: "",
+			}
+		})
+
+		it("no attempt to install node", func() {
+			result, err := build(buildContext)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Layers).To(HaveLen(0))
+		})
+	})
+
 	context("failure cases", func() {
 		context("when a dependency cannot be resolved", func() {
 			it.Before(func() {
