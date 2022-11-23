@@ -50,10 +50,9 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		if entry.Name == "" && len(allEntries) == 0 {
 			logger.Process("Node no longer requested by plan")
 			return packit.BuildResult{}, nil
-		} else {
-			logger.Process("Resolving Node Engine version")
-			logger.Candidates(allEntries)
 		}
+		logger.Process("Resolving Node Engine version")
+		logger.Candidates(allEntries)
 
 		version, _ := entry.Metadata["version"].(string)
 		dependency, err := dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
