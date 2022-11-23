@@ -51,7 +51,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			logger.Process("Node no longer requested by plan")
 			return packit.BuildResult{}, nil
 		}
-		logger.Process("Resolving Node Engine version")
 		logger.Candidates(allEntries)
 
 		version, _ := entry.Metadata["version"].(string)
