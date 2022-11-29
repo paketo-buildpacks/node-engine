@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/BurntSushi/toml v1.2.1
-	github.com/Masterminds/semver/v3 v3.1.1
+	github.com/Masterminds/semver/v3 v3.2.0
 	github.com/onsi/gomega v1.24.1
 	github.com/paketo-buildpacks/occam v0.13.3
 	github.com/paketo-buildpacks/packit/v2 v2.7.0
