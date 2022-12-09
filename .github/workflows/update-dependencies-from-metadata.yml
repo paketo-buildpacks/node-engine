@@ -7,20 +7,8 @@ on:
     - cron: '0 */12 * * *'
 
 jobs:
-  select-go-version:
-    name: Select Go Version
-    runs-on: ubuntu-latest
-    outputs:
-      go-version: ${{ steps.select-go-version.outputs.go-version }}
-    steps:
-      - name: Select Go Version
-        id: select-go-version
-        run: echo "go-version=>=1.18.0" >> "$GITHUB_OUTPUT"
-
   retrieve:
     name: Retrieve New Versions and Generate Metadata
-    needs:
-      - select-go-version
     runs-on: ubuntu-latest
     outputs:
       metadata-filepath: ${{ steps.retrieve.outputs.metadata-filepath }}
@@ -35,10 +23,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Setup Go '${{ needs.select-go-version.outputs.go-version }}'
+      - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ needs.select-go-version.outputs.go-version }}
+          go-version: 1.18.x
 
       - name: Run Retrieve
         id: retrieve
