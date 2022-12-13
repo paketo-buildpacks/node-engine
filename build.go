@@ -40,7 +40,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 
 		priorities := []interface{}{
 			"BP_NODE_VERSION",
-			"buildpack.yml",
 			"package.json",
 			".nvmrc",
 			".node-version",
@@ -65,14 +64,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		var legacySBOM []packit.BOMEntry
 		if !sbomDisabled {
 			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
-		}
-
-		nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
-		versionSource, _ := entry.Metadata["version-source"].(string)
-		if versionSource == "buildpack.yml" {
-			logger.Subprocess("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
-			logger.Subprocess("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information.")
-			logger.Break()
 		}
 
 		nodeLayer, err := context.Layers.Get(Node)
@@ -153,26 +144,15 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			}
 		}
 
-		// Check if buildpack.yml specifies optimize_memory
-		config, err := BuildpackYMLParser{}.Parse(filepath.Join(context.WorkingDir, "buildpack.yml"))
-		if err != nil {
-			return packit.BuildResult{}, fmt.Errorf("unable to parse buildpack.yml file: %s", err)
-		}
-		if config.OptimizedMemory {
-			nextMajorVersion := semver.MustParse(context.BuildpackInfo.Version).IncMajor()
-			logger.Subprocess("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v%s.", nextMajorVersion.String())
-			logger.Subprocess("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information.")
-			logger.Break()
-		}
-
+		var optimizedMemory bool
 		if os.Getenv("BP_NODE_OPTIMIZE_MEMORY") == "true" {
-			config.OptimizedMemory = true
+			optimizedMemory = true
 		}
 
 		nodeLayer.SharedEnv.Default("NODE_HOME", nodeLayer.Path)
 		nodeLayer.SharedEnv.Default("NODE_ENV", "production")
 		nodeLayer.SharedEnv.Default("NODE_VERBOSE", "false")
-		if config.OptimizedMemory {
+		if optimizedMemory {
 			nodeLayer.LaunchEnv.Default("OPTIMIZE_MEMORY", "true")
 		}
 
@@ -194,7 +174,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		logger.Subprocess("Writing exec.d/0-optimize-memory")
 		logger.Action("Calculates available memory based on container limits at launch time.")
 		logger.Action("Made available in the MEMORY_AVAILABLE environment variable.")
-		if config.OptimizedMemory {
+		if optimizedMemory {
 			logger.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
 			logger.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
 		}

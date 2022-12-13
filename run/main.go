@@ -21,7 +21,6 @@ func (f Generator) GenerateFromDependency(dependency postal.Dependency, path str
 
 func main() {
 	nvmrcParser := nodeengine.NewNvmrcParser()
-	buildpackYMLParser := nodeengine.NewBuildpackYMLParser()
 	nodeVersionParser := nodeengine.NewNodeVersionParser()
 	logEmitter := scribe.NewEmitter(os.Stdout).WithLevel(os.Getenv("BP_LOG_LEVEL"))
 	entryResolver := draft.NewPlanner()
@@ -31,7 +30,6 @@ func main() {
 	packit.Run(
 		nodeengine.Detect(
 			nvmrcParser,
-			buildpackYMLParser,
 			nodeVersionParser,
 		),
 		nodeengine.Build(
