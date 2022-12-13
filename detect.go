@@ -1,11 +1,11 @@
 package nodeengine
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 )
 
 //go:generate faux --interface VersionParser --output fakes/version_parser.go
@@ -18,7 +18,7 @@ type BuildPlanMetadata struct {
 	VersionSource string `toml:"version-source"`
 }
 
-func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) packit.DetectFunc {
+func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
 		var requirements []packit.BuildPlanRequirement
 
@@ -28,14 +28,14 @@ func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) pa
 		if customProjPath != "" {
 			customProjPath = filepath.Clean(customProjPath)
 			projectPath = filepath.Join(projectPath, customProjPath)
-			_, err := os.Stat(projectPath)
+			exists, err := fs.Exists(projectPath)
 			if err != nil {
-				if errors.Is(err, os.ErrNotExist) {
-					return packit.DetectResult{},
-						packit.Fail.WithMessage("expected value derived from BP_NODE_PROJECT_PATH [%s] to be an existing directory", projectPath)
-				} else {
-					return packit.DetectResult{}, err
-				}
+				return packit.DetectResult{}, err
+			}
+
+			if !exists {
+				return packit.DetectResult{},
+					packit.Fail.WithMessage("expected value derived from BP_NODE_PROJECT_PATH [%s] to be an existing directory", projectPath)
 			}
 		}
 
@@ -61,21 +61,6 @@ func Detect(nvmrcParser, buildpackYMLParser, nodeVersionParser VersionParser) pa
 				Metadata: BuildPlanMetadata{
 					Version:       version,
 					VersionSource: "BP_NODE_VERSION",
-				},
-			})
-		}
-
-		version, err = buildpackYMLParser.ParseVersion(filepath.Join(context.WorkingDir, BuildpackYMLSource))
-		if err != nil {
-			return packit.DetectResult{}, err
-		}
-
-		if version != "" {
-			requirements = append(requirements, packit.BuildPlanRequirement{
-				Name: Node,
-				Metadata: BuildPlanMetadata{
-					Version:       version,
-					VersionSource: BuildpackYMLSource,
 				},
 			})
 		}

@@ -188,8 +188,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 		Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 		Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
-		Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
-		Expect(buffer.String()).ToNot(ContainSubstring("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information."))
 		Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 
 		Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
@@ -197,38 +195,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
 		Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 		Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
-	})
-
-	context("when the buildpack.yml contains a directive to optimize memory", func() {
-		var workingDir string
-
-		it.Before(func() {
-			var err error
-			workingDir, err = os.MkdirTemp("", "working-dir")
-			Expect(err).NotTo(HaveOccurred())
-
-			err = os.WriteFile(filepath.Join(workingDir, "buildpack.yml"), []byte(`---
-nodejs:
-  optimize-memory: true`), 0644)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		it.After(func() {
-			Expect(os.RemoveAll(workingDir)).To(Succeed())
-		})
-
-		it("tells the environment to optimize memory", func() {
-			buildContext.WorkingDir = workingDir
-			_, err := build(buildContext)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
-			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
-			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
-			Expect(buffer.String()).To(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
-			Expect(buffer.String()).To(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
-			Expect(buffer.String()).To(ContainSubstring("Executing build process"))
-		})
 	})
 
 	context("when the os environment contains a directive to optimize memory", func() {
@@ -252,9 +218,6 @@ nodejs:
 			Expect(layer.LaunchEnv).To(Equal(packit.Environment{
 				"OPTIMIZE_MEMORY.default": "true",
 			}))
-
-			Expect(buffer.String()).ToNot(ContainSubstring("WARNING: Enabling memory optimization through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
-			Expect(buffer.String()).ToNot(ContainSubstring("Please enable through the $BP_NODE_OPTIMIZE_MEMORY environment variable instead. See README.md for more information."))
 
 			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
 			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
@@ -396,31 +359,6 @@ nodejs:
 			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
 			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
 			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
-		})
-	})
-
-	context("when the entry version source is buildpack.yml", func() {
-		it.Before(func() {
-			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
-				Name: "node",
-				Metadata: map[string]interface{}{
-					"version":        "~10",
-					"version-source": "buildpack.yml",
-				},
-			}
-		})
-
-		it("returns result that installs version in buildpack.yml and provides deprecation warning", func() {
-			buildContext.Plan.Entries[0].Metadata["version-source"] = "buildpack.yml"
-			_, err := build(buildContext)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
-			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
-			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using buildpack.yml): "))
-			Expect(buffer.String()).To(ContainSubstring("WARNING: Setting the Node version through buildpack.yml will be deprecated soon in Node Engine Buildpack v2.0.0."))
-			Expect(buffer.String()).To(ContainSubstring("Please specify the version through the $BP_NODE_VERSION environment variable instead. See README.md for more information."))
-			Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 		})
 	})
 
