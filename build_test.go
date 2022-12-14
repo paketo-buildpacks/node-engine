@@ -298,12 +298,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	context("when there is a dependency cache match", func() {
 		it.Before(func() {
-			err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0644)
+			err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0600)
 			Expect(err).NotTo(HaveOccurred())
 
 			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
-				Name:   "Node Engine",
-				SHA256: "some-sha", //nolint:staticcheck
+				Name:     "Node Engine",
+				Checksum: "some-sha",
 			}
 			entryResolver.MergeLayerTypesCall.Returns.Launch = true
 			entryResolver.MergeLayerTypesCall.Returns.Build = true
@@ -316,8 +316,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(dependencyManager.GenerateBillOfMaterialsCall.CallCount).To(Equal(1))
 			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
 				{
-					Name:   "Node Engine",
-					SHA256: "some-sha", //nolint:staticcheck
+					Name:     "Node Engine",
+					Checksum: "some-sha",
 				},
 			}))
 			Expect(result.Launch.BOM).To(Equal(

@@ -9,6 +9,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
@@ -83,8 +84,8 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
 		}
 
-		cachedSHA, ok := nodeLayer.Metadata[DepKey].(string)
-		if ok && cachedSHA == dependency.SHA256 { //nolint:staticcheck
+		cachedChecksum, ok := nodeLayer.Metadata[DepKey].(string)
+		if ok && cargo.Checksum(dependency.Checksum).MatchString(cachedChecksum) {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
@@ -106,7 +107,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
 
 		nodeLayer.Metadata = map[string]interface{}{
-			DepKey: dependency.SHA256, //nolint:staticcheck
+			DepKey: dependency.Checksum,
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)
