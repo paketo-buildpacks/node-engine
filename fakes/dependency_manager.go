@@ -3,7 +3,7 @@ package fakes
 import (
 	"sync"
 
-	packit "github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 )
 

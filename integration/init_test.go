@@ -81,35 +81,13 @@ func TestIntegration(t *testing.T) {
 	file, err = os.OpenFile(filepath.Join(tmpBuildpackDir, "buildpack.toml"), os.O_RDWR, 0600)
 	Expect(err).NotTo(HaveOccurred())
 
-	var buildpackConfig struct {
-		API       interface{}
-		Buildpack interface{}
-		Metadata  struct {
-			IncludeFiles    interface{} `toml:"include-files"`
-			PrePackage      interface{} `toml:"pre-package"`
-			DefaultVersions interface{} `toml:"default-versions"`
-			Dependencies    []struct {
-				CPE             interface{}
-				DeprecationDate string `toml:"deprecation_date"`
-				ID              interface{}
-				Licenses        interface{}
-				Name            interface{}
-				PURL            interface{}
-				SHA256          interface{}
-				Source          interface{}
-				SourceSHA256    interface{}
-				Stacks          interface{}
-				URI             interface{}
-				Version         interface{}
-			}
-		}
-		Stacks interface{}
-	}
+	var buildpackConfig cargo.Config
 	_, err = toml.NewDecoder(file).Decode(&buildpackConfig)
 	Expect(err).NotTo(HaveOccurred())
 
+	date := time.Date(2000, time.April, 1, 0, 0, 0, 0, time.UTC) // "2000-04-01T00:00:00Z"
 	for i := range buildpackConfig.Metadata.Dependencies {
-		buildpackConfig.Metadata.Dependencies[i].DeprecationDate = "2000-04-01T00:00:00Z"
+		buildpackConfig.Metadata.Dependencies[i].DeprecationDate = &date
 	}
 
 	_, err = file.Seek(0, 0)
@@ -137,7 +115,6 @@ func TestIntegration(t *testing.T) {
 	SetDefaultEventuallyTimeout(5 * time.Second)
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
-	suite("Buildpack.yml", testBuildpackYML)
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
 	suite("ProjectPath", testProjectPath)

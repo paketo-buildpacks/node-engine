@@ -25,14 +25,14 @@ jobs:
 
       - shell: bash
         run: |
-          go get -u all
+          go get -u -t ./...
           go mod tidy
 
       - name: Commit
         id: commit
         uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
         with:
-          message: "Running 'go get -u all'"
+          message: "Running 'go get -u -t ./...'"
           pathspec: "."
           keyid: ${{ secrets.PAKETO_BOT_GPG_SIGNING_KEY_ID }}
           key: ${{ secrets.PAKETO_BOT_GPG_SIGNING_KEY }}
@@ -48,5 +48,5 @@ jobs:
         uses: paketo-buildpacks/github-config/actions/pull-request/open@main
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
-          title: "Running 'go get -u all'"
+          title: "Running 'go get -u -t ./...'"
           branch: automation/tools/go-get-update
