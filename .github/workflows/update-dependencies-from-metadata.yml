@@ -120,7 +120,12 @@ jobs:
       - name: Download upstream tarball (if not compiled)
         if: ${{ matrix.includes.uri != ''  && needs.get-compile-and-test.outputs.should-test == 'true' }}
         run: |
-          curl ${{ matrix.includes.uri }} --silent --location --output ${{ steps.make-outputdir.outputs.outputdir }}/dependency.tgz
+          curl ${{ matrix.includes.uri }} \
+            --fail-with-body \
+            --show-error \
+            --silent \
+            --location \
+            --output ${{ steps.make-outputdir.outputs.outputdir }}/dependency.tgz
 
       # Test the dependency tarball if:
       #   (1) dependency testing code is present in the buildpack directory
