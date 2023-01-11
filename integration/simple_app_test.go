@@ -105,13 +105,11 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 					"",
 					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
@@ -187,13 +185,11 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 					"",
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 				))
 
 				container, err = docker.Container.Run.

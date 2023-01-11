@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
@@ -159,17 +158,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.SharedEnv.Default("NODE_VERBOSE", "false")
 		if optimizedMemory {
 			nodeLayer.LaunchEnv.Default("OPTIMIZE_MEMORY", "true")
-		}
-
-		// NOTE: ensures OpenSSL CA store works with Node v18 and higher. Waiting
-		// for resolution on https://github.com/nodejs/node/issues/43560 to decide
-		// how to properly fix this.
-		nodeVersion, err := semver.NewVersion(dependency.Version)
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-		if !nodeVersion.LessThan(semver.MustParse("18.0.0")) {
-			nodeLayer.SharedEnv.Append("SSL_CERT_DIR", "/etc/ssl/certs", ":")
 		}
 
 		logger.EnvironmentVariables(nodeLayer)
