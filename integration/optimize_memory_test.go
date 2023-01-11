@@ -77,7 +77,6 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 			fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 			`    NODE_VERBOSE    -> "false"`,
 			`    OPTIMIZE_MEMORY -> "true"`,
-			`    SSL_CERT_DIR    -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 			"",
 			"    Writing exec.d/0-optimize-memory",
 			"      Calculates available memory based on container limits at launch time.",

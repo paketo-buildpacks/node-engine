@@ -362,28 +362,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
-	context("when the dependency version is 18 or higher", func() {
-		it.Before(func() {
-			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine", Version: "18.0.1"}
-		})
-
-		it("sets the SSL_CERT_DIR environment variable", func() {
-			result, err := build(buildContext)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(result.Layers).To(HaveLen(1))
-			layer := result.Layers[0]
-
-			Expect(layer.SharedEnv).To(Equal(packit.Environment{
-				"NODE_HOME.default":    filepath.Join(layersDir, "node"),
-				"NODE_ENV.default":     "production",
-				"NODE_VERBOSE.default": "false",
-				"SSL_CERT_DIR.append":  "/etc/ssl/certs",
-				"SSL_CERT_DIR.delim":   ":",
-			}))
-		})
-	})
-
 	context("when nodejs has already been provided", func() {
 		it.Before(func() {
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
@@ -492,15 +470,5 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			})
 		})
 
-		context("when the dependency version cannot be parsed", func() {
-			it.Before(func() {
-				dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{Name: "Node Engine", Version: "not a semver number"}
-			})
-
-			it("returns an error", func() {
-				_, err := build(buildContext)
-				Expect(err).To(MatchError(ContainSubstring("Invalid Semantic Version")))
-			})
-		})
 	})
 }

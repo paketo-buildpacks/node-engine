@@ -94,9 +94,6 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 					`    NODE_VERBOSE -> "false"`,
 				))
 
-				Expect(logs).NotTo(ContainLines(
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
-				))
 			})
 		})
 
@@ -134,7 +131,6 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_VERBOSE -> "false"`,
-					`    SSL_CERT_DIR -> "$SSL_CERT_DIR:/etc/ssl/certs"`,
 				))
 			})
 		})
