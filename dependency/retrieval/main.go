@@ -110,7 +110,7 @@ func getReleaseSchedule() (ReleaseSchedule, error) {
 
 func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedule) ([]versionology.Dependency, error) {
 	version := release.Version
-	url := fmt.Sprintf("https://nodejs.org/dist/%s/node-%s.tar.gz", version, version)
+	url := fmt.Sprintf("https://nodejs.org/dist/%[1]s/node-%[1]s-linux-x64.tar.xz", version)
 
 	checksum, err := getChecksum(version)
 	if err != nil {
@@ -140,6 +140,7 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 	dep.Stacks = []string{"io.buildpacks.stacks.jammy"}
 	dep.URI = url
 	dep.Checksum = fmt.Sprintf("sha256:%s", checksum)
+	dep.StripComponents = 1
 
 	jammyDependency, err := versionology.NewDependency(dep, "jammy")
 	if err != nil {
@@ -175,12 +176,12 @@ func getChecksum(version string) (string, error) {
 
 	var dependencySHA string
 	for _, line := range strings.Split(string(body), "\n") {
-		if strings.HasSuffix(line, fmt.Sprintf("node-%s.tar.gz", version)) {
+		if strings.HasSuffix(line, fmt.Sprintf("node-%s-linux-x64.tar.xz", version)) {
 			dependencySHA = strings.Fields(line)[0]
 		}
 	}
 	if dependencySHA == "" {
-		return "", fmt.Errorf("could not find SHA256 for node-%s.tar.gz", version)
+		return "", fmt.Errorf("could not find SHA256 for node-%s-linux-x64.tar.xz", version)
 	}
 	return dependencySHA, nil
 }
