@@ -73,7 +73,7 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(container).Should(BeAvailable())
-			Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --max_old_space_size=96")).OnPort(8080))
+			Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --use-openssl-ca --max_old_space_size=96")).OnPort(8080))
 		})
 	})
 }

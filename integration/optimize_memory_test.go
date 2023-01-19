@@ -75,6 +75,7 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 			"  Configuring launch environment",
 			`    NODE_ENV        -> "production"`,
 			fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+			`    NODE_OPTIONS    -> "--use-openssl-ca"`,
 			`    NODE_VERBOSE    -> "false"`,
 			`    OPTIMIZE_MEMORY -> "true"`,
 			"",
