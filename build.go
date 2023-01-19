@@ -156,6 +156,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.SharedEnv.Default("NODE_HOME", nodeLayer.Path)
 		nodeLayer.SharedEnv.Default("NODE_ENV", "production")
 		nodeLayer.SharedEnv.Default("NODE_VERBOSE", "false")
+		nodeLayer.SharedEnv.Default("NODE_OPTIONS", "--use-openssl-ca")
 		if optimizedMemory {
 			nodeLayer.LaunchEnv.Default("OPTIMIZE_MEMORY", "true")
 		}

@@ -129,6 +129,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			"NODE_HOME.default":    filepath.Join(layersDir, "node"),
 			"NODE_ENV.default":     "production",
 			"NODE_VERBOSE.default": "false",
+			"NODE_OPTIONS.default": "--use-openssl-ca",
 		}))
 		Expect(layer.ExecD).To(Equal([]string{
 			filepath.Join(cnbDir, "bin", "optimize-memory"),
