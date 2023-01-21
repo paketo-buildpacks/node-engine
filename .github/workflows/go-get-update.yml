@@ -50,3 +50,23 @@ jobs:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
           title: "Running 'go get -u -t ./...'"
           branch: automation/tools/go-get-update
+
+  failure:
+    name: Alert on Failure
+    runs-on: ubuntu-22.04
+    needs: [update]
+    if: ${{ always() && needs.update.result == 'failure' }}
+    steps:
+      - name: File Failure Alert Issue
+        uses: paketo-buildpacks/github-config/actions/issue/file@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repo: ${{ github.repository }}
+          label: "failure:go-get-update"
+          comment_if_exists: true
+          issue_title: "Failure: Go get update workflow"
+          issue_body: |
+            Go get update workflow [failed](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}).
+            Please take a look to ensure CVE patches can be released. (cc @pivotal-cf/commercial-buildpacks).
+          comment_body: |
+            Another failure occurred: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
