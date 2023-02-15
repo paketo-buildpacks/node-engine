@@ -1,5 +1,7 @@
 # Paketo Buildpack for Node Engine
 
+## `gcr.io/paketo-buildpacks/node-engine`
+
 The Node Engine CNB provides the Node binary distribution.  The buildpack
 installs the Node binary distribution onto the `$PATH` which makes it available
 for subsequent buildpacks and in the final running container.  Examples of
