@@ -10,13 +10,14 @@ import (
 
 var (
 	lts = map[string]int{
-		"argon":   4,
-		"boron":   6,
-		"carbon":  8,
-		"dubnium": 10,
-		"erbium":  12,
-		"fermium": 14,
-		"gallium": 16,
+		"argon":    4,
+		"boron":    6,
+		"carbon":   8,
+		"dubnium":  10,
+		"erbium":   12,
+		"fermium":  14,
+		"gallium":  16,
+		"hydrogen": 18,
 	}
 )
 
