@@ -34,6 +34,15 @@
 - name: "failure:push"
   description: An issue filed automatically when a push buildpackage workflow run fails
   color: f00a0a
-- name: "failure/update-dependencies"
+- name: "failure:update-dependencies"
   description: An issue filed automatically when updating buildpack.toml dependencies fails in a workflow
+  color: f00a0a
+- name: "failure:go-get-update"
+  description: An issue filed automatically when a go get update workflow run fails
+  color: f00a0a
+- name: "failure:update-github-config"
+  description: An issue filed automatically when a github config update workflow run fails
+  color: f00a0a
+- name: "failure:approve-bot-pr"
+  description: An issue filed automatically when a PR auto-approve workflow run fails
   color: f00a0a
