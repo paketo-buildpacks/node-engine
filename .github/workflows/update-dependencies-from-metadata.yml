@@ -341,7 +341,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repo: ${{ github.repository }}
-          label: "failure/update-dependencies"
+          label: "failure:update-dependencies"
           comment_if_exists: true
           issue_title: "Failure: Update Dependencies workflow"
           issue_body: |
