@@ -53,7 +53,7 @@ function main() {
       util::print::warn "** WARNING  No Integration tests **"
   fi
 
-  tools::install
+  tools::install "${GIT_TOKEN:-}"
 
   if [ ${#builderArray[@]} -eq 0 ]; then
     util::print::title "No builders provided. Finding builders in integration.json..."
@@ -97,11 +97,16 @@ USAGE
 }
 
 function tools::install() {
+  local token
+  token="${1}"
+
   util::tools::pack::install \
-    --directory "${BUILDPACKDIR}/.bin"
+    --directory "${BUILDPACKDIR}/.bin" \
+    --token "${token}"
 
   util::tools::jam::install \
-    --directory "${BUILDPACKDIR}/.bin"
+    --directory "${BUILDPACKDIR}/.bin" \
+    --token "${token}"
 
   util::tools::create-package::install \
     --directory "${BUILDPACKDIR}/.bin"
