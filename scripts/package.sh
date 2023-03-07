@@ -14,7 +14,8 @@ source "${ROOT_DIR}/scripts/.util/tools.sh"
 source "${ROOT_DIR}/scripts/.util/print.sh"
 
 function main {
-  local version output
+  local version output token
+  token=""
 
   while [[ "${#}" != 0 ]]; do
     case "${1}" in
@@ -25,6 +26,11 @@ function main {
 
       --output|-o)
         output="${2}"
+        shift 2
+        ;;
+
+      --token|-t)
+        token="${2}"
         shift 2
         ;;
 
@@ -55,6 +61,9 @@ function main {
   fi
 
   repo::prepare
+
+  tools::install "${token}"
+
   buildpack::archive "${version}"
   buildpackage::create "${output}"
 }
@@ -69,6 +78,7 @@ OPTIONS
   --help               -h            prints the command usage
   --version <version>  -v <version>  specifies the version number to use when packaging the buildpack
   --output <output>    -o <output>   location to output the packaged buildpackage artifact (default: ${ROOT_DIR}/build/buildpackage.cnb)
+  --token <token>                    Token used to download assets from GitHub (e.g. jam, pack, etc) (optional)
 USAGE
 }
 
@@ -83,6 +93,24 @@ function repo::prepare() {
   export PATH="${BIN_DIR}:${PATH}"
 }
 
+function tools::install() {
+  local token
+  token="${1}"
+
+  util::tools::pack::install \
+    --directory "${BIN_DIR}" \
+    --token "${token}"
+
+  if [[ -f "${ROOT_DIR}/.libbuildpack" ]]; then
+    util::tools::packager::install \
+      --directory "${BIN_DIR}"
+  else
+    util::tools::jam::install \
+      --directory "${BIN_DIR}" \
+      --token "${token}"
+  fi
+}
+
 function buildpack::archive() {
   local version
   version="${1}"
@@ -90,16 +118,12 @@ function buildpack::archive() {
   util::print::title "Packaging buildpack into ${BUILD_DIR}/buildpack.tgz..."
 
   if [[ -f "${ROOT_DIR}/.libbuildpack" ]]; then
-    util::tools::packager::install --directory "${BIN_DIR}"
-
     packager \
       --uncached \
       --archive \
       --version "${version}" \
       "${BUILD_DIR}/buildpack"
   else
-    util::tools::jam::install --directory "${BIN_DIR}"
-
     jam pack \
       --buildpack "${ROOT_DIR}/buildpack.toml" \
       --version "${version}" \
@@ -112,8 +136,6 @@ function buildpackage::create() {
   output="${1}"
 
   util::print::title "Packaging buildpack..."
-
-  util::tools::pack::install --directory "${BIN_DIR}"
 
   pack \
     buildpack package "${output}" \
