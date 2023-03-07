@@ -3,6 +3,7 @@ package nodeengine_test
 import (
 	"bytes"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -139,16 +140,55 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			nodeengine.DepKey: "",
 		}))
 
-		Expect(layer.SBOM.Formats()).To(Equal([]packit.SBOMFormat{
-			{
-				Extension: sbom.Format(sbom.CycloneDXFormat).Extension(),
-				Content:   sbom.NewFormattedReader(sbom.SBOM{}, sbom.CycloneDXFormat),
+		Expect(layer.SBOM.Formats()).To(HaveLen(2))
+
+		cdx := layer.SBOM.Formats()[0]
+		spdx := layer.SBOM.Formats()[1]
+
+		Expect(cdx.Extension).To(Equal("cdx.json"))
+		content, err := io.ReadAll(cdx.Content)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(content)).To(MatchJSON(`{
+			"bomFormat": "CycloneDX",
+			"components": [],
+			"metadata": {
+				"tools": [
+					{
+						"name": "syft",
+						"vendor": "anchore",
+						"version": "[not provided]"
+					}
+				]
 			},
-			{
-				Extension: sbom.Format(sbom.SPDXFormat).Extension(),
-				Content:   sbom.NewFormattedReader(sbom.SBOM{}, sbom.SPDXFormat),
+			"specVersion": "1.3",
+			"version": 1
+		}`))
+
+		Expect(spdx.Extension).To(Equal("spdx.json"))
+		content, err = io.ReadAll(spdx.Content)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(content)).To(MatchJSON(`{
+			"SPDXID": "SPDXRef-DOCUMENT",
+			"creationInfo": {
+				"created": "0001-01-01T00:00:00Z",
+				"creators": [
+					"Organization: Anchore, Inc",
+					"Tool: syft-"
+				],
+				"licenseListVersion": "3.16"
 			},
-		}))
+			"dataLicense": "CC0-1.0",
+			"documentNamespace": "https://paketo.io/packit/unknown-source-type/unknown-88cfa225-65e0-5755-895f-c1c8f10fde76",
+			"name": "unknown",
+			"relationships": [
+				{
+					"relatedSpdxElement": "SPDXRef-DOCUMENT",
+					"relationshipType": "DESCRIBES",
+					"spdxElementId": "SPDXRef-DOCUMENT"
+				}
+			],
+			"spdxVersion": "SPDX-2.2"
+		}`))
 
 		Expect(filepath.Join(layersDir, "node")).To(BeADirectory())
 
