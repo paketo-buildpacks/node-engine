@@ -67,6 +67,5 @@ jobs:
           issue_title: "Failure: Go get update workflow"
           issue_body: |
             Go get update workflow [failed](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}).
-            Please take a look to ensure CVE patches can be released. (cc @pivotal-cf/commercial-buildpacks).
           comment_body: |
             Another failure occurred: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
