@@ -10,6 +10,7 @@ import (
 func TestUnitNode(t *testing.T) {
 	suite := spec.New("node", spec.Report(report.Terminal{}))
 	suite("Build", testBuild)
+	suite("IsLayerReusable", testIsLayerReusable)
 	suite("Detect", testDetect)
 	suite("NvmrcParser", testNvmrcParser)
 	suite("NodeVersionParser", testNodeVersionParser)
