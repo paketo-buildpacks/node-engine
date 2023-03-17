@@ -33,6 +33,18 @@ type SBOMGenerator interface {
 	GenerateFromDependency(dependency postal.Dependency, dir string) (sbom.SBOM, error)
 }
 
+func IsLayerReusable(metadata map[string]interface{}, checksum string, build bool, launch bool) bool {
+	cachedChecksum, _ := metadata[DepKey].(string)
+
+	cachedBuild, found := metadata[BuildKey].(bool)
+	buildOK := found && (build == cachedBuild)
+
+	cachedLaunch, found := metadata[LaunchKey].(bool)
+	launchOK := found && (launch == cachedLaunch)
+
+	return cargo.Checksum(checksum).MatchString(cachedChecksum) && buildOK && launchOK
+}
+
 func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbomGenerator SBOMGenerator, logger scribe.Emitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
@@ -87,8 +99,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
 		}
 
-		cachedChecksum, ok := nodeLayer.Metadata[DepKey].(string)
-		if ok && cargo.Checksum(dependency.Checksum).MatchString(cachedChecksum) {
+		if IsLayerReusable(nodeLayer.Metadata, dependency.Checksum, build, launch) {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
@@ -110,7 +121,9 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
 
 		nodeLayer.Metadata = map[string]interface{}{
-			DepKey: dependency.Checksum,
+			DepKey:    dependency.Checksum,
+			BuildKey:  build,
+			LaunchKey: launch,
 		}
 
 		logger.Subprocess("Installing Node Engine %s", dependency.Version)

@@ -137,7 +137,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}))
 
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
-			nodeengine.DepKey: "",
+			nodeengine.DepKey:    "",
+			nodeengine.BuildKey:  false,
+			nodeengine.LaunchKey: false,
 		}))
 
 		Expect(layer.SBOM.Formats()).To(HaveLen(2))
@@ -303,6 +305,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(layer.Build).To(BeTrue())
 			Expect(layer.Launch).To(BeTrue())
 			Expect(layer.Cache).To(BeTrue())
+			Expect(layer.Metadata).To(HaveKeyWithValue(nodeengine.BuildKey, true))
+			Expect(layer.Metadata).To(HaveKeyWithValue(nodeengine.BuildKey, true))
 			Expect(result.Launch.BOM).To(Equal(
 				[]packit.BOMEntry{
 					{
@@ -339,7 +343,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	context("when there is a dependency cache match", func() {
 		it.Before(func() {
-			err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\n"), 0600)
+			err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte("[metadata]\ndependency-sha = \"some-sha\"\nbuild = false\nlaunch = true\n"), 0600)
 			Expect(err).NotTo(HaveOccurred())
 
 			dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
@@ -347,10 +351,50 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				Checksum: "some-sha",
 			}
 			entryResolver.MergeLayerTypesCall.Returns.Launch = true
-			entryResolver.MergeLayerTypesCall.Returns.Build = true
+			entryResolver.MergeLayerTypesCall.Returns.Build = false
 		})
 
 		it("exits build process early", func() {
+			result, err := build(buildContext)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.CallCount).To(Equal(1))
+			Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
+				{
+					Name:     "Node Engine",
+					Checksum: "some-sha",
+				},
+			}))
+			Expect(result.Launch.BOM).To(Equal(
+				[]packit.BOMEntry{
+					{
+						Name: "node",
+						Metadata: paketosbom.BOMMetadata{
+							URI:     "node-dependency-uri",
+							Version: "~10",
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
+								Hash:      "node-dependency-sha",
+							},
+						},
+					},
+				},
+			))
+			Expect(result.Build.BOM).To(BeNil())
+			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(0))
+			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
+			// Expect(environment.ConfigureCall.CallCount).To(Equal(0))
+
+			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
+			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
+			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
+			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
+			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
+		})
+
+		it("the cached layer is NOT used if build requirements do not match", func() {
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
+
 			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -391,16 +435,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 			))
-			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(0))
-			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
+			Expect(sbomGenerator.GenerateFromDependencyCall.CallCount).To(Equal(1))
+			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(1))
 			// Expect(environment.ConfigureCall.CallCount).To(Equal(0))
 
 			Expect(buffer.String()).To(ContainSubstring("Some Buildpack 1.2.3"))
 			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
 			Expect(buffer.String()).To(ContainSubstring("Selected Node Engine version (using BP_NODE_VERSION): "))
-			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
-			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
+			Expect(buffer.String()).To(ContainSubstring("Installing Node Engine"))
+			Expect(buffer.String()).To(ContainSubstring("Executing build process"))
 		})
+
 	})
 
 	context("when nodejs has already been provided", func() {
@@ -512,4 +557,58 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 
 	})
+}
+
+func testIsLayerReusable(t *testing.T, context spec.G, it spec.S) {
+	var (
+		Expect = NewWithT(t).Expect
+
+		metadata map[string]interface{}
+		checksum = "sha256:de15b44738578367cfb250b6551b4c97e0e0e8050fa931a4a9a7262d374d6034/sha256"
+		build    = true
+		launch   = true
+	)
+
+	it.Before(func() {
+		metadata = map[string]interface{}{nodeengine.DepKey: checksum, nodeengine.BuildKey: build, nodeengine.LaunchKey: launch}
+	})
+
+	it("returns true if the layer can be reused", func() {
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		Expect(isReusable).To(BeTrue())
+	})
+
+	it("returns false if the checksum differs", func() {
+		isReusable := nodeengine.IsLayerReusable(metadata, "sha256:aaaab44738578367cfb250b6551b4c97e0e0e8050fa931a4a9a7262d3740000/sha256", build, launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
+	it("returns false if the build requirement changes", func() {
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, !build, launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
+	it("returns false if the launch requirement changes", func() {
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, !launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
+	it("returns false if the checksum is missing in metadata", func() {
+		delete(metadata, nodeengine.DepKey)
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
+	it("returns false if the build is missing in metadata", func() {
+		delete(metadata, nodeengine.BuildKey)
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
+	it("returns false if the launch is missing in metadata", func() {
+		delete(metadata, nodeengine.LaunchKey)
+		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		Expect(isReusable).To(BeFalse())
+	})
+
 }
