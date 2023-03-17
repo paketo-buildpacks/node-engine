@@ -6,8 +6,8 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/Masterminds/semver/v3 v3.2.0
 	github.com/onsi/gomega v1.27.4
-	github.com/paketo-buildpacks/occam v0.15.1
-	github.com/paketo-buildpacks/packit/v2 v2.8.2
+	github.com/paketo-buildpacks/occam v0.16.0
+	github.com/paketo-buildpacks/packit/v2 v2.9.0
 	github.com/sclevine/spec v1.4.0
 )
 
@@ -34,6 +34,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/containerd/containerd v1.7.0 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.14.3 // indirect
+	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/docker/cli v23.0.1+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v23.0.1+incompatible // indirect
@@ -91,7 +92,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/sylabs/sif/v2 v2.11.0 // indirect
 	github.com/sylabs/squashfs v0.6.1 // indirect
-	github.com/testcontainers/testcontainers-go v0.17.0 // indirect
+	github.com/testcontainers/testcontainers-go v0.19.0 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/vbatts/go-mtree v0.5.2 // indirect
