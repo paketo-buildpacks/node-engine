@@ -78,7 +78,8 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 			`    NODE_OPTIONS    -> "--use-openssl-ca"`,
 			`    NODE_VERBOSE    -> "false"`,
 			`    OPTIMIZE_MEMORY -> "true"`,
-			"",
+		))
+		Expect(logs).To(ContainLines(
 			"    Writing exec.d/0-optimize-memory",
 			"      Calculates available memory based on container limits at launch time.",
 			"      Made available in the MEMORY_AVAILABLE environment variable.",
