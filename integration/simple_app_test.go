@@ -86,33 +86,40 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      <unknown> -> \"\"",
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					MatchRegexp(`    Selected Node Engine version \(using <unknown>\): \d+\.\d+\.\d+`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Executing build process",
 					MatchRegexp(`    Installing Node Engine \d+\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Writing SBOM in the following format(s):",
 					"    application/vnd.cyclonedx+json",
 					"    application/spdx+json",
 					"    application/vnd.syft+json",
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
@@ -188,7 +195,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
@@ -252,28 +260,34 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"    Candidate version sources (in priority order):",
 					"      .node-version -> \"16.*\"",
 					"      <unknown>     -> \"\"",
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 16\.\d+\.\d+`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Executing build process",
 					MatchRegexp(`    Installing Node Engine 16\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",
@@ -332,28 +346,34 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					"    Candidate version sources (in priority order):",
 					"      .nvmrc    -> \"16.*\"",
 					"      <unknown> -> \"\"",
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					MatchRegexp(`    Selected Node Engine version \(using \.nvmrc\): 16\.\d+\.\d+`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Executing build process",
 					MatchRegexp(`    Installing Node Engine 16\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring build environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"  Configuring launch environment",
 					`    NODE_ENV     -> "production"`,
 					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
 					`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					`    NODE_VERBOSE -> "false"`,
-					"",
+				))
+				Expect(logs).To(ContainLines(
 					"    Writing exec.d/0-optimize-memory",
 					"      Calculates available memory based on container limits at launch time.",
 					"      Made available in the MEMORY_AVAILABLE environment variable.",

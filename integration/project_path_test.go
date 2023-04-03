@@ -75,7 +75,8 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 				"    Candidate version sources (in priority order):",
 				"      .node-version -> \"16.*\"",
 				"      <unknown>     -> \"\"",
-				"",
+			))
+			Expect(logs).To(ContainLines(
 				MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 16\.\d+\.\d+`),
 			))
 
