@@ -162,7 +162,7 @@ api = "0.7"
     version = "18.15.0"
 
   [[metadata.dependencies]]
-    checksum = "sha256:b8541034ec3dce89bf14bf85a9f713ff865e4173526c71f67b3f0de77e28558a"
+    checksum = "sha256:b4f01d473f04c2fe90f7461c7c7512b6378d887a4d9df87fb1697943df413a30"
     cpe = "cpe:2.3:a:nodejs:node.js:18.16.0:*:*:*:*:*:*:*"
     deprecation_date = "2025-04-30T00:00:00Z"
     id = "node"
@@ -172,7 +172,7 @@ api = "0.7"
     source = "https://nodejs.org/dist/v18.16.0/node-v18.16.0-linux-x64.tar.xz"
     source-checksum = "sha256:44d93d9b4627fe5ae343012d855491d62c7381b236c347f7666a7ad070f26548"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://artifacts.paketo.io/node/node_v18.16.0_linux_x64_bionic_b8541034.tgz"
+    uri = "https://artifacts.paketo.io/node/node_v18.16.0_linux_x64_bionic_b4f01d47.tgz"
     version = "18.16.0"
 
   [[metadata.dependencies]]
