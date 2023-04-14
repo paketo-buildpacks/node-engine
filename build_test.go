@@ -567,47 +567,51 @@ func testIsLayerReusable(t *testing.T, context spec.G, it spec.S) {
 		checksum = "sha256:de15b44738578367cfb250b6551b4c97e0e0e8050fa931a4a9a7262d374d6034/sha256"
 		build    = true
 		launch   = true
+		layer    = packit.Layer{}
+		logger   = scribe.NewEmitter(io.Discard)
 	)
 
 	it.Before(func() {
 		metadata = map[string]interface{}{nodeengine.DepKey: checksum, nodeengine.BuildKey: build, nodeengine.LaunchKey: launch}
+		layer.Path = "test"
+		layer.Metadata = metadata
 	})
 
 	it("returns true if the layer can be reused", func() {
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, build, launch, logger)
 		Expect(isReusable).To(BeTrue())
 	})
 
 	it("returns false if the checksum differs", func() {
-		isReusable := nodeengine.IsLayerReusable(metadata, "sha256:aaaab44738578367cfb250b6551b4c97e0e0e8050fa931a4a9a7262d3740000/sha256", build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, "sha256:aaaab44738578367cfb250b6551b4c97e0e0e8050fa931a4a9a7262d3740000/sha256", build, launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 
 	it("returns false if the build requirement changes", func() {
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, !build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, !build, launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 
 	it("returns false if the launch requirement changes", func() {
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, !launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, build, !launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 
 	it("returns false if the checksum is missing in metadata", func() {
 		delete(metadata, nodeengine.DepKey)
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, build, launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 
 	it("returns false if the build is missing in metadata", func() {
 		delete(metadata, nodeengine.BuildKey)
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, build, launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 
 	it("returns false if the launch is missing in metadata", func() {
 		delete(metadata, nodeengine.LaunchKey)
-		isReusable := nodeengine.IsLayerReusable(metadata, checksum, build, launch)
+		isReusable := nodeengine.IsLayerReusable(layer, checksum, build, launch, logger)
 		Expect(isReusable).To(BeFalse())
 	})
 

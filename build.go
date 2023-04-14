@@ -33,16 +33,25 @@ type SBOMGenerator interface {
 	GenerateFromDependency(dependency postal.Dependency, dir string) (sbom.SBOM, error)
 }
 
-func IsLayerReusable(metadata map[string]interface{}, checksum string, build bool, launch bool) bool {
+func IsLayerReusable(nodeLayer packit.Layer, depChecksum string, build bool, launch bool, logger scribe.Emitter) bool {
+	logger.Debug.Process("Checking if layer %s can be reused", nodeLayer.Path)
+
+	metadata := nodeLayer.Metadata
 	cachedChecksum, _ := metadata[DepKey].(string)
+	logger.Debug.Subprocess("Checksum of dependency: %s", depChecksum)
+	logger.Debug.Subprocess("Checksum of layer: %s", cachedChecksum)
 
 	cachedBuild, found := metadata[BuildKey].(bool)
 	buildOK := found && (build == cachedBuild)
+	logger.Debug.Subprocess("Build requirements match: %v", buildOK)
 
 	cachedLaunch, found := metadata[LaunchKey].(bool)
 	launchOK := found && (launch == cachedLaunch)
+	logger.Debug.Subprocess("Launch requirements match: %v", launchOK)
 
-	return cargo.Checksum(checksum).MatchString(cachedChecksum) && buildOK && launchOK
+	logger.Debug.Break()
+
+	return cargo.Checksum(depChecksum).MatchString(cachedChecksum) && buildOK && launchOK
 }
 
 func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbomGenerator SBOMGenerator, logger scribe.Emitter, clock chronos.Clock) packit.BuildFunc {
@@ -99,7 +108,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
 		}
 
-		if IsLayerReusable(nodeLayer.Metadata, dependency.Checksum, build, launch) {
+		if IsLayerReusable(nodeLayer, dependency.Checksum, build, launch, logger) {
 			logger.Process("Reusing cached layer %s", nodeLayer.Path)
 			logger.Break()
 
