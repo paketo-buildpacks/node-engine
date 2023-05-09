@@ -28,7 +28,7 @@ require (
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
 	github.com/anchore/stereoscope v0.0.0-20230412183729-8602f1afc574 // indirect
-	github.com/anchore/syft v0.80.0 // indirect
+	github.com/anchore/syft v0.79.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/apex/log v1.9.0 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect
