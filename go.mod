@@ -17,18 +17,19 @@ require (
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/ForestEckhardt/freezer v0.0.12 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230518184743-7afd39499903 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230528122434-6f98819771a1 // indirect
 	github.com/acobaugh/osrelease v0.1.0 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
-	github.com/anchore/go-logger v0.0.0-20230512132723-e9c89b2ace31 // indirect
+	github.com/anchore/go-logger v0.0.0-20230526175617-0324e97600a2 // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
 	github.com/anchore/go-struct-converter v0.0.0-20221221214134-65614c61201e // indirect
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20230104203445-02e0a6721501 // indirect
-	github.com/anchore/stereoscope v0.0.0-20230508133058-5543439b749f // indirect
-	github.com/anchore/syft v0.80.0 // indirect
+	github.com/anchore/stereoscope v0.0.0-20230522170632-e14bc4437b2e // indirect
+	github.com/anchore/syft v0.82.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/apex/log v1.9.0 // indirect
 	github.com/becheran/wildmatch-go v1.0.0 // indirect
@@ -39,9 +40,9 @@ require (
 	github.com/containerd/stargz-snapshotter/estargz v0.14.3 // indirect
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/deitch/magic v0.0.0-20230404182410-1ff89d7342da // indirect
-	github.com/docker/cli v24.0.1+incompatible // indirect
+	github.com/docker/cli v24.0.2+incompatible // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/docker/docker v24.0.1+incompatible // indirect
+	github.com/docker/docker v24.0.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
@@ -50,11 +51,13 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/facebookincubator/nvdtools v0.1.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/go-git/gcfg v1.5.0 // indirect
+	github.com/github/go-spdx/v2 v2.1.2 // indirect
+	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.4.1 // indirect
-	github.com/go-git/go-git/v5 v5.6.1 // indirect
+	github.com/go-git/go-git/v5 v5.7.0 // indirect
 	github.com/go-restruct/restruct v1.2.0-alpha // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -64,7 +67,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
-	github.com/imdario/mergo v0.3.15 // indirect
+	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
@@ -101,7 +104,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/skeema/knownhosts v1.1.1 // indirect
-	github.com/spdx/tools-golang v0.5.0 // indirect
+	github.com/spdx/tools-golang v0.5.1 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/sylabs/sif/v2 v2.11.4 // indirect
@@ -117,7 +120,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20230519143937-03e91628a987 // indirect
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
@@ -125,7 +128,7 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.9.1 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526203410-71b5a4ffd15e // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
