@@ -448,17 +448,46 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	})
 
-	context("when nodejs has already been provided", func() {
+	context("when nodejs has already been provided by an extension", func() {
 		it.Before(func() {
 			entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 				Name: "",
 			}
 		})
 
-		it("no attempt to install node", func() {
+		it("nodejs layer with environment variables is present", func() {
 			result, err := build(buildContext)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Layers).To(HaveLen(0))
+			Expect(result.Layers).To(HaveLen(1))
+			layer := result.Layers[0]
+
+			Expect(layer.Name).To(Equal("node"))
+			Expect(layer.Path).To(Equal(filepath.Join(layersDir, "node")))
+			Expect(layer.SharedEnv).To(Equal(packit.Environment{
+				"NODE_HOME.default":    filepath.Join(layersDir, "node"),
+				"NODE_ENV.default":     "production",
+				"NODE_VERBOSE.default": "false",
+				"NODE_OPTIONS.default": "--use-openssl-ca",
+			}))
+			Expect(layer.ExecD).To(Equal([]string{
+				filepath.Join(cnbDir, "bin", "optimize-memory"),
+			}))
+
+			Expect(layer.Metadata).To(Equal(map[string]interface{}{
+				nodeengine.BuildKey:  false,
+				nodeengine.LaunchKey: true,
+			}))
+
+			Expect(filepath.Join(layersDir, "node")).To(BeADirectory())
+
+			Expect(buffer.String()).To(ContainSubstring("Resolving Node Engine version"))
+			Expect(buffer.String()).To(ContainSubstring("Node no longer requested by plan, satisfied by extension"))
+
+			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/0-optimize-memory"))
+			Expect(buffer.String()).To(ContainSubstring("      Calculates available memory based on container limits at launch time."))
+			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
+			Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
+			Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
 		})
 	})
 

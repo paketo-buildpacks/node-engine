@@ -57,6 +57,14 @@ func IsLayerReusable(nodeLayer packit.Layer, depChecksum string, build bool, lau
 func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbomGenerator SBOMGenerator, logger scribe.Emitter, clock chronos.Clock) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
+
+		var buildMetadata = packit.BuildMetadata{}
+		var launchMetadata = packit.LaunchMetadata{}
+		nodeLayer, err := context.Layers.Get(Node)
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
 		logger.Process("Resolving Node Engine version")
 
 		priorities := []interface{}{
@@ -68,93 +76,80 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 
 		entry, allEntries := entryResolver.Resolve("node", context.Plan.Entries, priorities)
 		if entry.Name == "" && len(allEntries) == 0 {
-			logger.Process("Node no longer requested by plan")
-			return packit.BuildResult{}, nil
-		}
-		logger.Candidates(allEntries)
+			logger.Process("Node no longer requested by plan, satisfied by extension")
 
-		version, _ := entry.Metadata["version"].(string)
-		dependency, err := dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+			logger.Process("Setting up launch layer for environment variables")
+			nodeLayer, err = nodeLayer.Reset()
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 
-		logger.SelectedDependency(entry, dependency, clock.Now())
+			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = true, false, false
+			nodeLayer.Metadata = map[string]interface{}{
+				BuildKey:  false,
+				LaunchKey: true,
+			}
+		} else {
+			logger.Candidates(allEntries)
 
-		sbomDisabled, err := checkSbomDisabled()
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+			version, _ := entry.Metadata["version"].(string)
+			dependency, err := dependencyManager.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), entry.Name, version, context.Stack)
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 
-		var legacySBOM []packit.BOMEntry
-		if !sbomDisabled {
-			legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
-		}
+			logger.SelectedDependency(entry, dependency, clock.Now())
 
-		nodeLayer, err := context.Layers.Get(Node)
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+			sbomDisabled, err := checkSbomDisabled()
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 
-		launch, build := entryResolver.MergeLayerTypes("node", context.Plan.Entries)
+			var legacySBOM []packit.BOMEntry
+			if !sbomDisabled {
+				legacySBOM = dependencyManager.GenerateBillOfMaterials(dependency)
+			}
 
-		var buildMetadata = packit.BuildMetadata{}
-		var launchMetadata = packit.LaunchMetadata{}
-		if build {
-			buildMetadata = packit.BuildMetadata{BOM: legacySBOM}
-		}
+			launch, build := entryResolver.MergeLayerTypes("node", context.Plan.Entries)
 
-		if launch {
-			launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
-		}
+			if build {
+				buildMetadata = packit.BuildMetadata{BOM: legacySBOM}
+			}
 
-		if IsLayerReusable(nodeLayer, dependency.Checksum, build, launch, logger) {
-			logger.Process("Reusing cached layer %s", nodeLayer.Path)
-			logger.Break()
+			if launch {
+				launchMetadata = packit.LaunchMetadata{BOM: legacySBOM}
+			}
+
+			if IsLayerReusable(nodeLayer, dependency.Checksum, build, launch, logger) {
+				logger.Process("Reusing cached layer %s", nodeLayer.Path)
+				logger.Break()
+
+				nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
+				return packit.BuildResult{
+					Layers: []packit.Layer{nodeLayer},
+					Build:  buildMetadata,
+					Launch: launchMetadata,
+				}, nil
+			}
+
+			logger.Process("Executing build process")
+
+			nodeLayer, err = nodeLayer.Reset()
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
 
 			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
-			return packit.BuildResult{
-				Layers: []packit.Layer{nodeLayer},
-				Build:  buildMetadata,
-				Launch: launchMetadata,
-			}, nil
-		}
 
-		logger.Process("Executing build process")
+			nodeLayer.Metadata = map[string]interface{}{
+				DepKey:    dependency.Checksum,
+				BuildKey:  build,
+				LaunchKey: launch,
+			}
 
-		nodeLayer, err = nodeLayer.Reset()
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = launch, build, build
-
-		nodeLayer.Metadata = map[string]interface{}{
-			DepKey:    dependency.Checksum,
-			BuildKey:  build,
-			LaunchKey: launch,
-		}
-
-		logger.Subprocess("Installing Node Engine %s", dependency.Version)
-		duration, err := clock.Measure(func() error {
-			return dependencyManager.Deliver(dependency, context.CNBPath, nodeLayer.Path, context.Platform.Path)
-		})
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		logger.Action("Completed in %s", duration.Round(time.Millisecond))
-		logger.Break()
-
-		if sbomDisabled {
-			logger.Subprocess("Skipping SBOM generation for Node Engine")
-			logger.Break()
-		} else {
-			logger.GeneratingSBOM(nodeLayer.Path)
-			var sbomContent sbom.SBOM
-			duration, err = clock.Measure(func() error {
-				sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, nodeLayer.Path)
-				return err
+			logger.Subprocess("Installing Node Engine %s", dependency.Version)
+			duration, err := clock.Measure(func() error {
+				return dependencyManager.Deliver(dependency, context.CNBPath, nodeLayer.Path, context.Platform.Path)
 			})
 			if err != nil {
 				return packit.BuildResult{}, err
@@ -163,10 +158,28 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			logger.Action("Completed in %s", duration.Round(time.Millisecond))
 			logger.Break()
 
-			logger.FormattingSBOM(context.BuildpackInfo.SBOMFormats...)
-			nodeLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
-			if err != nil {
-				return packit.BuildResult{}, err
+			if sbomDisabled {
+				logger.Subprocess("Skipping SBOM generation for Node Engine")
+				logger.Break()
+			} else {
+				logger.GeneratingSBOM(nodeLayer.Path)
+				var sbomContent sbom.SBOM
+				duration, err = clock.Measure(func() error {
+					sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, nodeLayer.Path)
+					return err
+				})
+				if err != nil {
+					return packit.BuildResult{}, err
+				}
+
+				logger.Action("Completed in %s", duration.Round(time.Millisecond))
+				logger.Break()
+
+				logger.FormattingSBOM(context.BuildpackInfo.SBOMFormats...)
+				nodeLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
+				if err != nil {
+					return packit.BuildResult{}, err
+				}
 			}
 		}
 
