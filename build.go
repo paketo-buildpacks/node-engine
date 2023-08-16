@@ -13,6 +13,7 @@ import (
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
+	"github.com/paketo-buildpacks/libnodejs"
 )
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
@@ -67,14 +68,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 
 		logger.Process("Resolving Node Engine version")
 
-		priorities := []interface{}{
-			"BP_NODE_VERSION",
-			"package.json",
-			".nvmrc",
-			".node-version",
-		}
-
-		entry, allEntries := entryResolver.Resolve("node", context.Plan.Entries, priorities)
+		entry, allEntries := libnodejs.ResolveNodeVersion(entryResolver.Resolve, context.Plan)
 		if entry.Name == "" && len(allEntries) == 0 {
 			logger.Process("Node no longer requested by plan, satisfied by extension")
 

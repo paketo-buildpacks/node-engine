@@ -191,6 +191,35 @@ api = "0.7"
     version = "18.17.1"
 
   [[metadata.dependencies]]
+    checksum = "sha256:43dae3c1f609db4133d1822a2fe20a5f67af9f2ca0027741de7630eeeec0659a"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.17.0:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v18.17.0?checksum=f36facda28c4d5ce76b3a1b4344e688d29d9254943a47f2f1909b1a10acb1959&download_url=https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz"
+    source-checksum = "sha256:f36facda28c4d5ce76b3a1b4344e688d29d9254943a47f2f1909b1a10acb1959"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://artifacts.paketo.io/node/node_v18.17.0_linux_x64_bionic_43dae3c1.tgz"
+    version = "18.17.0"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:f36facda28c4d5ce76b3a1b4344e688d29d9254943a47f2f1909b1a10acb1959"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.17.0:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v18.17.0?checksum=f36facda28c4d5ce76b3a1b4344e688d29d9254943a47f2f1909b1a10acb1959&download_url=https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz"
+    source-checksum = "sha256:f36facda28c4d5ce76b3a1b4344e688d29d9254943a47f2f1909b1a10acb1959"
+    stacks = ["io.buildpacks.stacks.jammy"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz"
+    version = "18.17.0"
+
+  [[metadata.dependencies]]
     checksum = "sha256:a4269bb04894442de0236b7da13719d911832ad46a6f5d51bf891c7ac2c76b5d"
     cpe = "cpe:2.3:a:nodejs:node.js:19.8.1:*:*:*:*:*:*:*"
     deprecation_date = "2023-06-01T00:00:00Z"
