@@ -273,7 +273,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~14"}).
+				WithEnv(map[string]string{"BP_NODE_VERSION": "~18"}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -287,15 +287,15 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 				"  Resolving Node Engine version",
 				"    Candidate version sources (in priority order):",
-				"      BP_NODE_VERSION -> \"~14\"",
+				"      BP_NODE_VERSION -> \"~18\"",
 				"      <unknown>       -> \"\"",
 			))
 			Expect(logs).To(ContainLines(
-				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 14\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 18\.\d+\.\d+`),
 			))
 			Expect(logs).To(ContainLines(
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 14\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine 18\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+(\.\d+)?`),
 			))
 			Expect(logs).To(ContainLines(
