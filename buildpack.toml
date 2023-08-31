@@ -219,36 +219,6 @@ api = "0.7"
     uri = "https://nodejs.org/dist/v19.9.0/node-v19.9.0-linux-x64.tar.xz"
     version = "19.9.0"
 
-  [[metadata.dependencies]]
-    checksum = "sha256:c12ee9efe21f3ff9909fbf5d7d3780f16c86fad411f13d715016646c766e8213"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.5.0:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v20.5.0?checksum=c12ee9efe21f3ff9909fbf5d7d3780f16c86fad411f13d715016646c766e8213&download_url=https://nodejs.org/dist/v20.5.0/node-v20.5.0-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.5.0/node-v20.5.0-linux-x64.tar.xz"
-    source-checksum = "sha256:c12ee9efe21f3ff9909fbf5d7d3780f16c86fad411f13d715016646c766e8213"
-    stacks = ["io.buildpacks.stacks.jammy"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v20.5.0/node-v20.5.0-linux-x64.tar.xz"
-    version = "20.5.0"
-
-  [[metadata.dependencies]]
-    checksum = "sha256:a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.5.1:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v20.5.1?checksum=a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4&download_url=https://nodejs.org/dist/v20.5.1/node-v20.5.1-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.5.1/node-v20.5.1-linux-x64.tar.xz"
-    source-checksum = "sha256:a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4"
-    stacks = ["io.buildpacks.stacks.jammy"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v20.5.1/node-v20.5.1-linux-x64.tar.xz"
-    version = "20.5.1"
-
   [[metadata.dependency-constraints]]
     constraint = "16.*"
     id = "node"
