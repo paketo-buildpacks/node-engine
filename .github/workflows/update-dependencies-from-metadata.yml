@@ -2,9 +2,8 @@ name: Update Dependencies From Metadata (Retrieve, Metadata, Compile, Test, Crea
 
 on:
   workflow_dispatch:
-  # https://crontab.guru/every-12-hours
   schedule:
-    - cron: '0 */12 * * *'
+    - cron: '57 13 * * *' # daily at 13:57 UTC
 
 jobs:
   retrieve:
