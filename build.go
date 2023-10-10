@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/paketo-buildpacks/libnodejs"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
-	"github.com/paketo-buildpacks/libnodejs"
 )
 
 //go:generate faux --interface EntryResolver --output fakes/entry_resolver.go
@@ -191,8 +191,10 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 		}
 
 		logger.EnvironmentVariables(nodeLayer)
-
-		nodeLayer.ExecD = []string{filepath.Join(context.CNBPath, "bin", "optimize-memory")}
+		nodeLayer.ExecD = []string{
+			filepath.Join(context.CNBPath, "bin", "optimize-memory"),
+			filepath.Join(context.CNBPath, "bin", "inspector"),
+		}
 
 		logger.Subprocess("Writing exec.d/0-optimize-memory")
 		logger.Action("Calculates available memory based on container limits at launch time.")
@@ -201,6 +203,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			logger.Action("Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.")
 			logger.Action("Limits the total size of all objects on the heap to 75%% of the MEMORY_AVAILABLE.")
 		}
+		logger.Subprocess("Writing exec.d/1-inspector")
 		logger.Break()
 
 		return packit.BuildResult{

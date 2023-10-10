@@ -138,6 +138,17 @@ the `BP_NODE_PROJECT_PATH` environment variable at build time either directly
 file](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md).
 This could be useful if your app is a part of a monorepo.
 
+### Enabling Inspector for Remote Debugging
+
+To enable the Inspector set the `BPL_DEBUG_ENABLED` environment variable at launch time. Optionally, you can specify the `BPL_DEBUG_PORT` environment variable to use a specific port.
+
+```shell
+$BPL_DEBUG_ENABLED="true"
+$BPL_DEBUG_PORT="9009"
+```
+
+For more information on debugging, see [Official Documentation](https://nodejs.org/en/docs/guides/debugging-getting-started)
+
 ## Run Tests
 
 To run all unit tests, run:

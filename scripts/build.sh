@@ -73,16 +73,20 @@ function cmd::build() {
     for src in "${BUILDPACKDIR}"/cmd/*; do
       name="$(basename "${src}")"
 
-      printf "%s" "Building ${name}... "
+      if [[ -f "${src}/main.go" ]]; then
+        printf "%s" "Building ${name}... "
 
-      GOOS="linux" \
-      CGO_ENABLED=0 \
-        go build \
-          -ldflags="-s -w" \
-          -o "${BUILDPACKDIR}/bin/${name}" \
-            "${src}/main.go"
+        GOOS="linux" \
+        CGO_ENABLED=0 \
+          go build \
+            -ldflags="-s -w" \
+            -o "${BUILDPACKDIR}/bin/${name}" \
+              "${src}/main.go"
 
-      echo "Success!"
+        echo "Success!"
+      else
+        printf "%s" "Skipping ${name}... "
+      fi
     done
   fi
 }
