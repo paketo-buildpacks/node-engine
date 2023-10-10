@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/paketo-buildpacks/occam"
@@ -14,7 +13,7 @@ import (
 	. "github.com/paketo-buildpacks/occam/matchers"
 )
 
-func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
+func testInspector(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect     = NewWithT(t).Expect
 		Eventually = NewWithT(t).Eventually
@@ -44,7 +43,7 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Expect(os.RemoveAll(source)).To(Succeed())
 	})
 
-	it("sets max_old_space_size when nodejs.optimize-memory is set with env variable BP_NODE_OPTIMIZE_MEMORY", func() {
+	it("sets --inspect if set with env variable BPL_DEBUG_ENABLED", func() {
 		var err error
 		source, err = occam.Source(filepath.Join("testdata", "simple_app"))
 		Expect(err).NotTo(HaveOccurred())
@@ -56,35 +55,22 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 				settings.Buildpacks.NodeEngine.Online,
 				settings.Buildpacks.Processes.Online,
 			).
-			WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
 			Execute(name, source)
 
 		Expect(err).NotTo(HaveOccurred())
+		Expect(logs).To(ContainLines(
+			"    Writing exec.d/1-inspector",
+		))
 
 		container, err = docker.Container.Run.
 			WithMemory("128m").
 			WithPublish("8080").
-			WithEnv(map[string]string{"NODE_OPTIONS": "--no-warnings"}).
+			WithEnv(map[string]string{"BPL_DEBUG_ENABLED": "true", "BPL_DEBUG_PORT": "9000", "NODE_OPTIONS": "--no-warnings"}).
 			Execute(image.ID)
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(container).Should(BeAvailable())
-		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --no-warnings --max_old_space_size=96")).OnPort(8080).WithEndpoint("/node-options"))
+		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --no-warnings --inspect=127.0.0.1:9000")).OnPort(8080).WithEndpoint("/node-options"))
 
-		Expect(logs).To(ContainLines(
-			"  Configuring launch environment",
-			`    NODE_ENV        -> "production"`,
-			fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-			`    NODE_OPTIONS    -> "--use-openssl-ca"`,
-			`    NODE_VERBOSE    -> "false"`,
-			`    OPTIMIZE_MEMORY -> "true"`,
-		))
-		Expect(logs).To(ContainLines(
-			"    Writing exec.d/0-optimize-memory",
-			"      Calculates available memory based on container limits at launch time.",
-			"      Made available in the MEMORY_AVAILABLE environment variable.",
-			"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
-			"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
-		))
 	})
 }
