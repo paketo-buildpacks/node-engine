@@ -14,7 +14,7 @@ api = "0.7"
   include-files = ["bin/build", "bin/detect", "bin/run", "bin/optimize-memory", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
   [metadata.default-versions]
-    node = "18.*.*"
+    node = "20.*.*"
 
   [[metadata.dependencies]]
     checksum = "sha256:9d4f5fcafb8e67f5fb251f661d27634bba27899c89b712f84d4fd2bbc89f91ea"

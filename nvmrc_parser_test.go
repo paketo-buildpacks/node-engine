@@ -43,7 +43,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 			"10.1.1":       "10.1.1",
 			"10.1.*":       "10.1.*",
 			"10.*":         "10.*",
-			"lts/*":        "18.*",
+			"lts/*":        "20.*",
 			"lts/argon":    "4.*",
 			"lts/boron":    "6.*",
 			"lts/carbon":   "8.*",
@@ -52,6 +52,7 @@ func testNvmrcParser(t *testing.T, context spec.G, it spec.S) {
 			"lts/fermium":  "14.*",
 			"lts/gallium":  "16.*",
 			"lts/hydrogen": "18.*",
+			"lts/iron":     "20.*",
 			"node":         "*",
 		}
 

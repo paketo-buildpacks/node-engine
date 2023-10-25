@@ -18,6 +18,7 @@ var (
 		"fermium":  14,
 		"gallium":  16,
 		"hydrogen": 18,
+		"iron":     20,
 	}
 )
 
