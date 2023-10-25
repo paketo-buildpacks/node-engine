@@ -136,5 +136,44 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				))
 			})
 		})
+
+		context("when running Node 20", func() {
+			it("uses the OpenSSL CA store to verify certificates", func() {
+				var (
+					logs fmt.Stringer
+					err  error
+				)
+
+				image, logs, err = pack.WithNoColor().Build.
+					WithBuildpacks(
+						settings.Buildpacks.NodeEngine.Online,
+						settings.Buildpacks.BuildPlan.Online,
+					).
+					WithPullPolicy("never").
+					WithEnv(map[string]string{
+						"BP_NODE_VERSION": "20.*.*",
+					}).
+					Execute(name, source)
+				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				container, err = docker.Container.Run.
+					WithPublish("8080").
+					WithCommand("node server.js").
+					Execute(image.ID)
+				Expect(err).NotTo(HaveOccurred())
+
+				Eventually(container).Should(Serve("hello world"))
+				Expect(container).To(Serve(ContainSubstring("v20.")).WithEndpoint("/version"))
+				Expect(container).To(Serve(ContainSubstring("301 Moved")).WithEndpoint("/test-openssl-ca"))
+
+				Expect(logs).To(ContainLines(
+					"  Configuring launch environment",
+					`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					`    NODE_OPTIONS -> "--use-openssl-ca"`,
+					`    NODE_VERBOSE -> "false"`,
+				))
+			})
+		})
 	})
 }
