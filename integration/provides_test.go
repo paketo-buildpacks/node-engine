@@ -31,12 +31,20 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 			image  occam.Image
 			name   string
 			source string
+
+			pullPolicy       = "never"
+			extenderBuildStr = ""
 		)
 
 		it.Before(func() {
 			var err error
 			name, err = occam.RandomName()
 			Expect(err).NotTo(HaveOccurred())
+
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				pullPolicy = "always"
+				extenderBuildStr = "[extender (build)] "
+			}
 		})
 
 		it.After(func() {
@@ -53,7 +61,10 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 
 			var logs fmt.Stringer
 			image, logs, err = pack.WithNoColor().Build.
-				WithPullPolicy("never").
+				WithPullPolicy(pullPolicy).
+				WithExtensions(
+					settings.Extensions.UbiNodejsExtension.Online,
+				).
 				WithBuildpacks(
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
@@ -61,42 +72,55 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
+					"[extender (build)]   Resolving Node Engine version",
+					"[extender (build)]   Node no longer requested by plan, satisfied by extension",
+				))
+
+			} else {
+
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      <unknown> -> \"\"",
+				))
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 18\.\d+\.\d+`),
+				))
+				Expect(logs).To(ContainLines(
+					"  Executing build process",
+					MatchRegexp(`    Installing Node Engine 18\.\d+\.\d+`),
+					MatchRegexp(`      Completed in \d+(\.\d+)?`),
+				))
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					MatchRegexp(`      Completed in \d+(\.?\d+)*`),
+				))
+
+			}
+
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
-				"  Resolving Node Engine version",
-				"    Candidate version sources (in priority order):",
-				"      <unknown> -> \"\"",
+				extenderBuildStr+"  Configuring build environment",
+				extenderBuildStr+`    NODE_ENV     -> "production"`,
+				fmt.Sprintf(`%s    NODE_HOME    -> "/layers/%s/node"`, extenderBuildStr, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+				extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
+				extenderBuildStr+`    NODE_VERBOSE -> "false"`,
 			))
 			Expect(logs).To(ContainLines(
-				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 20\.\d+\.\d+`),
+				extenderBuildStr+"  Configuring launch environment",
+				extenderBuildStr+`    NODE_ENV     -> "production"`,
+				fmt.Sprintf(`%s    NODE_HOME    -> "/layers/%s/node"`, extenderBuildStr, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+				extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
+				extenderBuildStr+`    NODE_VERBOSE -> "false"`,
 			))
 			Expect(logs).To(ContainLines(
-				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 20\.\d+\.\d+`),
-				MatchRegexp(`      Completed in \d+(\.\d+)?`),
-			))
-			Expect(logs).To(ContainLines(
-				fmt.Sprintf("  Generating SBOM for /layers/%s/node", strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-				MatchRegexp(`      Completed in \d+(\.?\d+)*`),
-			))
-			Expect(logs).To(ContainLines(
-				"  Configuring build environment",
-				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-				`    NODE_OPTIONS -> "--use-openssl-ca"`,
-				`    NODE_VERBOSE -> "false"`,
-			))
-			Expect(logs).To(ContainLines(
-				"  Configuring launch environment",
-				`    NODE_ENV     -> "production"`,
-				fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-				`    NODE_OPTIONS -> "--use-openssl-ca"`,
-				`    NODE_VERBOSE -> "false"`,
-			))
-			Expect(logs).To(ContainLines(
-				"    Writing exec.d/0-optimize-memory",
-				"      Calculates available memory based on container limits at launch time.",
-				"      Made available in the MEMORY_AVAILABLE environment variable.",
+				extenderBuildStr+"    Writing exec.d/0-optimize-memory",
+				extenderBuildStr+"      Calculates available memory based on container limits at launch time.",
+				extenderBuildStr+"      Made available in the MEMORY_AVAILABLE environment variable.",
 			))
 		})
 	})
