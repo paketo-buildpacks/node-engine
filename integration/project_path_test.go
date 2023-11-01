@@ -35,12 +35,18 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			container occam.Container
 			name      string
 			source    string
+
+			pullPolicy = "never"
 		)
 
 		it.Before(func() {
 			var err error
 			name, err = occam.RandomName()
 			Expect(err).NotTo(HaveOccurred())
+
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				pullPolicy = "always"
+			}
 		})
 
 		it.After(func() {
@@ -58,7 +64,10 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 
 			var logs fmt.Stringer
 			image, logs, err = pack.WithNoColor().Build.
-				WithPullPolicy("never").
+				WithPullPolicy(pullPolicy).
+				WithExtensions(
+					settings.Extensions.UbiNodejsExtension.Online,
+				).
 				WithBuildpacks(
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
@@ -69,16 +78,24 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
-			Expect(logs).To(ContainLines(
-				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
-				"  Resolving Node Engine version",
-				"    Candidate version sources (in priority order):",
-				"      .node-version -> \"18.*\"",
-				"      <unknown>     -> \"\"",
-			))
-			Expect(logs).To(ContainLines(
-				MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 18\.\d+\.\d+`),
-			))
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
+					"[extender (build)]   Resolving Node Engine version",
+					"[extender (build)]   Node no longer requested by plan, satisfied by extension",
+				))
+			} else {
+				Expect(logs).To(ContainLines(
+					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      .node-version -> \"16.*\"",
+					"      <unknown>     -> \"\"",
+				))
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 16\.\d+\.\d+`),
+				))
+			}
 
 			container, err = docker.Container.Run.
 				WithCommand("node hello_world_server/server.js").
