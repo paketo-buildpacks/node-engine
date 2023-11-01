@@ -153,6 +153,7 @@ function tests::run() {
   util::print::title "Run Buildpack Runtime Integration Tests"
   util::print::info "Using ${1} as builder..."
 
+  pack config experimental true
   export CGO_ENABLED=0
   pushd "${BUILDPACKDIR}" > /dev/null
     if GOMAXPROCS="${GOMAXPROCS:-4}" go test -count=1 -timeout 0 ./integration/... -v -run Integration | tee "${2}"; then

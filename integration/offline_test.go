@@ -19,6 +19,8 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 		Eventually = NewWithT(t).Eventually
 		pack       occam.Pack
 		docker     occam.Docker
+
+		pullPolicy = "never"
 	)
 
 	it.Before(func() {
@@ -38,6 +40,10 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			var err error
 			name, err = occam.RandomName()
 			Expect(err).NotTo(HaveOccurred())
+
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				pullPolicy = "always"
+			}
 		})
 
 		it.After(func() {
@@ -54,13 +60,15 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 
 			var logs fmt.Stringer
 			image, logs, err = pack.WithNoColor().Build.
-				WithPullPolicy("never").
+				WithPullPolicy(pullPolicy).
+				WithExtensions(
+					settings.Extensions.UbiNodejsExtension.Online,
+				).
 				WithBuildpacks(
 					settings.Buildpacks.NodeEngine.Offline,
 					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
-				WithNetwork("none").
 				Execute(name, source)
 
 			Expect(err).NotTo(HaveOccurred(), logs.String())

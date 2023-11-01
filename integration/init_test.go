@@ -31,13 +31,20 @@ var settings struct {
 		}
 	}
 
+	Extensions struct {
+		UbiNodejsExtension struct {
+			Online string
+		}
+	}
+
 	Buildpack struct {
 		ID   string
 		Name string
 	}
 
 	Config struct {
-		BuildPlan string `json:"build-plan"`
+		BuildPlan          string `json:"build-plan"`
+		UbiNodejsExtension string `json:"ubi-nodejs-extension"`
 	}
 }
 
@@ -61,6 +68,17 @@ func TestIntegration(t *testing.T) {
 	Expect(file.Close()).To(Succeed())
 
 	buildpackStore := occam.NewBuildpackStore()
+
+	pack := occam.NewPack()
+
+	builder, err := pack.Builder.Inspect.Execute()
+	Expect(err).NotTo(HaveOccurred())
+
+	if builder.BuilderName == "paketocommunity/builder-ubi-buildpackless-base:latest" {
+		settings.Extensions.UbiNodejsExtension.Online, err = buildpackStore.Get.
+			Execute(settings.Config.UbiNodejsExtension)
+		Expect(err).ToNot(HaveOccurred())
+	}
 
 	settings.Buildpacks.NodeEngine.Online, err = buildpackStore.Get.
 		WithVersion("1.2.3").
@@ -116,11 +134,11 @@ func TestIntegration(t *testing.T) {
 
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
 	suite("Offline", testOffline)
+	suite("OpenSSL", testOpenSSL)
 	suite("OptimizeMemory", testOptimizeMemory)
 	suite("ProjectPath", testProjectPath)
 	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
 	suite("Simple", testSimple)
-	suite("OpenSSL", testOpenSSL)
 	suite.Run(t)
 }
