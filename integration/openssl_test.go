@@ -35,6 +35,9 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 			name      string
 			source    string
 			sbomDir   string
+
+			pullPolicy       = "never"
+			extenderBuildStr = ""
 		)
 
 		it.Before(func() {
@@ -48,6 +51,10 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 
 			source, err = occam.Source(filepath.Join("testdata", "simple_app"))
 			Expect(err).ToNot(HaveOccurred())
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				pullPolicy = "always"
+				extenderBuildStr = "[extender (build)] "
+			}
 		})
 
 		it.After(func() {
@@ -66,11 +73,14 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				)
 
 				image, logs, err = pack.WithNoColor().Build.
+					WithExtensions(
+						settings.Extensions.UbiNodejsExtension.Online,
+					).
 					WithBuildpacks(
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
-					WithPullPolicy("never").
+					WithPullPolicy(pullPolicy).
 					WithEnv(map[string]string{
 						"BP_NODE_VERSION": "16.*.*",
 					}).
@@ -88,11 +98,11 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				Expect(container).To(Serve(ContainSubstring("301 Moved")).WithEndpoint("/test-openssl-ca"))
 
 				Expect(logs).To(ContainLines(
-					"  Configuring launch environment",
-					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-					`    NODE_OPTIONS -> "--use-openssl-ca"`,
-					`    NODE_VERBOSE -> "false"`,
+					extenderBuildStr+"  Configuring launch environment",
+					extenderBuildStr+`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`%s    NODE_HOME    -> "/layers/%s/node"`, extenderBuildStr, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
+					extenderBuildStr+`    NODE_VERBOSE -> "false"`,
 				))
 
 			})
@@ -106,11 +116,14 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				)
 
 				image, logs, err = pack.WithNoColor().Build.
+					WithExtensions(
+						settings.Extensions.UbiNodejsExtension.Online,
+					).
 					WithBuildpacks(
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
-					WithPullPolicy("never").
+					WithPullPolicy(pullPolicy).
 					WithEnv(map[string]string{
 						"BP_NODE_VERSION": "18.*.*",
 					}).
@@ -128,11 +141,11 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				Expect(container).To(Serve(ContainSubstring("301 Moved")).WithEndpoint("/test-openssl-ca"))
 
 				Expect(logs).To(ContainLines(
-					"  Configuring launch environment",
-					`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`    NODE_HOME    -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-					`    NODE_OPTIONS -> "--use-openssl-ca"`,
-					`    NODE_VERBOSE -> "false"`,
+					extenderBuildStr+"  Configuring launch environment",
+					extenderBuildStr+`    NODE_ENV     -> "production"`,
+					fmt.Sprintf(`%s    NODE_HOME    -> "/layers/%s/node"`, extenderBuildStr, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+					extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
+					extenderBuildStr+`    NODE_VERBOSE -> "false"`,
 				))
 			})
 		})
