@@ -26,6 +26,9 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		container occam.Container
 		name      string
 		source    string
+
+		pullPolicy       = "never"
+		extenderBuildStr = ""
 	)
 
 	it.Before(func() {
@@ -35,6 +38,11 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		var err error
 		name, err = occam.RandomName()
 		Expect(err).NotTo(HaveOccurred())
+
+		if settings.Extensions.UbiNodejsExtension.Online != "" {
+			pullPolicy = "always"
+			extenderBuildStr = "[extender (build)] "
+		}
 	})
 
 	it.After(func() {
@@ -51,7 +59,10 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 
 		var logs fmt.Stringer
 		image, logs, err = pack.WithNoColor().Build.
-			WithPullPolicy("never").
+			WithPullPolicy(pullPolicy).
+			WithExtensions(
+				settings.Extensions.UbiNodejsExtension.Online,
+			).
 			WithBuildpacks(
 				settings.Buildpacks.NodeEngine.Online,
 				settings.Buildpacks.Processes.Online,
@@ -72,19 +83,19 @@ func testOptimizeMemory(t *testing.T, context spec.G, it spec.S) {
 		Eventually(container).Should(Serve(ContainSubstring("NodeOptions: --no-warnings --max_old_space_size=96")).OnPort(8080))
 
 		Expect(logs).To(ContainLines(
-			"  Configuring launch environment",
-			`    NODE_ENV        -> "production"`,
-			fmt.Sprintf(`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-			`    NODE_OPTIONS    -> "--use-openssl-ca"`,
-			`    NODE_VERBOSE    -> "false"`,
-			`    OPTIMIZE_MEMORY -> "true"`,
+			extenderBuildStr+"  Configuring launch environment",
+			extenderBuildStr+`    NODE_ENV        -> "production"`,
+			fmt.Sprintf(extenderBuildStr+`    NODE_HOME       -> "/layers/%s/node"`, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
+			extenderBuildStr+`    NODE_OPTIONS    -> "--use-openssl-ca"`,
+			extenderBuildStr+`    NODE_VERBOSE    -> "false"`,
+			extenderBuildStr+`    OPTIMIZE_MEMORY -> "true"`,
 		))
 		Expect(logs).To(ContainLines(
-			"    Writing exec.d/0-optimize-memory",
-			"      Calculates available memory based on container limits at launch time.",
-			"      Made available in the MEMORY_AVAILABLE environment variable.",
-			"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
-			"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
+			extenderBuildStr+"    Writing exec.d/0-optimize-memory",
+			extenderBuildStr+"      Calculates available memory based on container limits at launch time.",
+			extenderBuildStr+"      Made available in the MEMORY_AVAILABLE environment variable.",
+			extenderBuildStr+"      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory.",
+			extenderBuildStr+"      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE.",
 		))
 	})
 }
