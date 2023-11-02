@@ -95,11 +95,22 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				if settings.Extensions.UbiNodejsExtension.Online != "" {
 
 					Expect(logs).To(ContainLines(
+						MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+						"  Resolving Node Engine version",
+						"    Candidate version sources (in priority order):",
+						"      <unknown>     -> \"\"",
+					))
+
+					Expect(logs).To(ContainLines(
+						"[extender (build)] Enabling module streams:",
+						MatchRegexp(`[extender (build)]     nodejs:\d+`),
+					))
+
+					Expect(logs).To(ContainLines(
 						fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 						"[extender (build)]   Resolving Node Engine version",
 						"[extender (build)]   Node no longer requested by plan, satisfied by extension",
 					))
-
 				} else {
 
 					Expect(logs).To(ContainLines(
@@ -292,7 +303,20 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 
 				if settings.Extensions.UbiNodejsExtension.Online != "" {
 					Expect(logs).To(ContainLines(
-						"[extender (build)] Paketo Buildpack for Node Engine 1.2.3",
+						MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+						"  Resolving Node Engine version",
+						"    Candidate version sources (in priority order):",
+						"      .node-version -> \"18.*\"",
+						"      <unknown>     -> \"\"",
+					))
+
+					Expect(logs).To(ContainLines(
+						"[extender (build)] Enabling module streams:",
+						"[extender (build)]     nodejs:18",
+					))
+
+					Expect(logs).To(ContainLines(
+						fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 						"[extender (build)]   Resolving Node Engine version",
 						"[extender (build)]   Node no longer requested by plan, satisfied by extension",
 					))

@@ -79,6 +79,20 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
 			if settings.Extensions.UbiNodejsExtension.Online != "" {
+
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      .node-version -> \"18.*\"",
+					"      <unknown>     -> \"\"",
+				))
+
+				Expect(logs).To(ContainLines(
+					"[extender (build)] Enabling module streams:",
+					"[extender (build)]     nodejs:18",
+				))
+
 				Expect(logs).To(ContainLines(
 					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 					"[extender (build)]   Resolving Node Engine version",

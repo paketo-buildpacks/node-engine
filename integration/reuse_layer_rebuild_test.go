@@ -98,11 +98,22 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			if settings.Extensions.UbiNodejsExtension.Online != "" {
 
 				Expect(logs).To(ContainLines(
+					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      <unknown>     -> \"\"",
+				))
+
+				Expect(logs).To(ContainLines(
+					"[extender (build)] Enabling module streams:",
+					MatchRegexp(`[extender (build)]     nodejs:\d+`),
+				))
+
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 					"[extender (build)]   Resolving Node Engine version",
 					"[extender (build)]   Node no longer requested by plan, satisfied by extension",
 				))
-
 			} else {
 
 				Expect(logs).To(ContainLines(
@@ -176,6 +187,17 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      <unknown>     -> \"\"",
+				))
+
+				Expect(logs).To(ContainLines(
+					"[extender (build)] Enabling module streams:",
+					MatchRegexp(`[extender (build)]     nodejs:\d+`),
+				))
 
 				Expect(logs).To(ContainLines(
 					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
@@ -256,13 +278,24 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			if settings.Extensions.UbiNodejsExtension.Online != "" {
 
 				Expect(logs).To(ContainLines(
+					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      .node-version -> \"~18.*\"",
+					"      <unknown>     -> \"\"",
+				))
+
+				Expect(logs).To(ContainLines(
+					"[extender (build)] Enabling module streams:",
+					"[extender (build)]     nodejs:18",
+				))
+
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 					"[extender (build)]   Resolving Node Engine version",
 					"[extender (build)]   Node no longer requested by plan, satisfied by extension",
 				))
-
 			} else {
-
 				Expect(logs).To(ContainLines(
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
@@ -337,6 +370,19 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			if settings.Extensions.UbiNodejsExtension.Online != "" {
 				Expect(logs).To(ContainLines(
+					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
+					"  Resolving Node Engine version",
+					"    Candidate version sources (in priority order):",
+					"      .node-version -> \"~20.*\"",
+					"      <unknown>     -> \"\"",
+				))
+
+				Expect(logs).To(ContainLines(
+					"[extender (build)] Enabling module streams:",
+					"[extender (build)]     nodejs:20",
+				))
+
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("[extender (build)] %s 1.2.3", settings.Buildpack.Name),
 					"[extender (build)]   Resolving Node Engine version",
 					"[extender (build)]   Node no longer requested by plan, satisfied by extension",
@@ -346,17 +392,17 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      BP_NODE_VERSION -> \"~18\"",
+					"      BP_NODE_VERSION -> \"~20\"",
 					"      <unknown>       -> \"\"",
 				))
 
 				Expect(logs).To(ContainLines(
-					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 18\.\d+\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using BP_NODE_VERSION\): 20\.\d+\.\d+`),
 				))
 
 				Expect(logs).To(ContainLines(
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 18\.\d+\.\d+`),
+					MatchRegexp(`    Installing Node Engine 20\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
 				))
 				Expect(logs).To(ContainLines(
