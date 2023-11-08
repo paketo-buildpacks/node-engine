@@ -53,9 +53,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Run Integration Tests
-      run: ./scripts/integration.sh --use-token --builder ${{ matrix.builder }}
+      run: ./scripts/integration.sh --builder ${{ matrix.builder }} --token ${{ github.token }}
       env:
-        GIT_TOKEN: ${{ github.token }}
         TMPDIR: "${{ runner.temp }}"
 
   release:
