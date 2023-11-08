@@ -19,15 +19,12 @@ source "${PROGDIR}/.util/git.sh"
 source "${PROGDIR}/.util/builders.sh"
 
 function main() {
-  local builderArray
+  local builderArray token
   builderArray=()
+  token=""
+
   while [[ "${#}" != 0 ]]; do
     case "${1}" in
-      --use-token|-t)
-        shift 1
-        token::fetch
-        ;;
-
       --help|-h)
         shift 1
         usage
@@ -36,6 +33,11 @@ function main() {
 
       --builder|-b)
         builderArray+=("${2}")
+        shift 2
+        ;;
+
+      --token|-t)
+        token="${2}"
         shift 2
         ;;
 
@@ -53,7 +55,7 @@ function main() {
       util::print::warn "** WARNING  No Integration tests **"
   fi
 
-  tools::install "${GIT_TOKEN:-}"
+  tools::install "${token}"
 
   if [ ${#builderArray[@]} -eq 0 ]; then
     util::print::title "No builders provided. Finding builders in integration.json..."
@@ -93,9 +95,9 @@ Runs the integration test suite.
 
 OPTIONS
   --help           -h         prints the command usage
-  --use-token      -t         use GIT_TOKEN from lastpass
   --builder <name> -b <name>  sets the name of the builder(s) that are pulled / used for testing.
                               Defaults to "builders" array in integration.json, if present.
+  --token <token>             Token used to download assets from GitHub (e.g. jam, pack, etc) (optional)
 USAGE
 }
 
@@ -142,11 +144,6 @@ function builder_images::pull() {
 
   util::print::title "Pulling lifecycle image..."
   docker pull "${lifecycle_image}"
-}
-
-function token::fetch() {
-  GIT_TOKEN="$(util::git::token::fetch)"
-  export GIT_TOKEN
 }
 
 function tests::run() {
