@@ -12,9 +12,6 @@ source "${PROGDIR}/.util/tools.sh"
 # shellcheck source=SCRIPTDIR/.util/print.sh
 source "${PROGDIR}/.util/print.sh"
 
-# shellcheck source=SCRIPTDIR/.util/git.sh
-source "${PROGDIR}/.util/git.sh"
-
 # shellcheck source=SCRIPTDIR/.util/builders.sh
 source "${PROGDIR}/.util/builders.sh"
 
