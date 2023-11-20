@@ -464,7 +464,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(layer.Name).To(Equal("node"))
 			Expect(layer.Path).To(Equal(filepath.Join(layersDir, "node")))
 			Expect(layer.SharedEnv).To(Equal(packit.Environment{
-				"NODE_HOME.default":    filepath.Join(layersDir, "node"),
+				"NODE_HOME.default":    "",
 				"NODE_ENV.default":     "production",
 				"NODE_VERBOSE.default": "false",
 				"NODE_OPTIONS.default": "--use-openssl-ca",
@@ -474,7 +474,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			}))
 
 			Expect(layer.Metadata).To(Equal(map[string]interface{}{
-				nodeengine.BuildKey:  false,
+				nodeengine.BuildKey:  true,
 				nodeengine.LaunchKey: true,
 			}))
 

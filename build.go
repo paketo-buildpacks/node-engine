@@ -78,11 +78,13 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 				return packit.BuildResult{}, err
 			}
 
-			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = true, false, false
+			nodeLayer.Launch, nodeLayer.Build, nodeLayer.Cache = true, true, false
 			nodeLayer.Metadata = map[string]interface{}{
-				BuildKey:  false,
+				BuildKey:  true,
 				LaunchKey: true,
 			}
+
+			nodeLayer.SharedEnv.Default("NODE_HOME", "")
 		} else {
 			logger.Candidates(allEntries)
 
@@ -175,6 +177,7 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 					return packit.BuildResult{}, err
 				}
 			}
+			nodeLayer.SharedEnv.Default("NODE_HOME", nodeLayer.Path)
 		}
 
 		var optimizedMemory bool
@@ -182,7 +185,6 @@ func Build(entryResolver EntryResolver, dependencyManager DependencyManager, sbo
 			optimizedMemory = true
 		}
 
-		nodeLayer.SharedEnv.Default("NODE_HOME", nodeLayer.Path)
 		nodeLayer.SharedEnv.Default("NODE_ENV", "production")
 		nodeLayer.SharedEnv.Default("NODE_VERBOSE", "false")
 		nodeLayer.SharedEnv.Default("NODE_OPTIONS", "--use-openssl-ca")
