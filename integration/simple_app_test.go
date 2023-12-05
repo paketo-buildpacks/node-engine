@@ -98,12 +98,12 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 						MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
 						"  Resolving Node Engine version",
 						"    Candidate version sources (in priority order):",
-						"      <unknown>     -> \"\"",
+						"      <unknown> -> \"\"",
 					))
 
 					Expect(logs).To(ContainLines(
 						"[extender (build)] Enabling module streams:",
-						MatchRegexp(`[extender (build)]     nodejs:\d+`),
+						MatchRegexp(`\[extender \(build\)\]     nodejs:\d+`),
 					))
 
 					Expect(logs).To(ContainLines(
@@ -187,24 +187,24 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				)
 
 				//ubi does not support SBOM for node at the moment
-				if settings.Extensions.UbiNodejsExtension.Online == "" {
-
-					// check that legacy SBOM is included via sbom.legacy.json
-					contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", "sbom.legacy.json"))
-					Expect(err).NotTo(HaveOccurred())
-					Expect(string(contents)).To(ContainSubstring(`"name":"Node Engine"`))
-
-					// check that all required SBOM files are present
-					Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
-					Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
-					Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
-
-					// check an SBOM file to make sure it has an entry for node
-					contents, err = os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
-					Expect(err).NotTo(HaveOccurred())
-					Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
-
+				if settings.Extensions.UbiNodejsExtension.Online != "" {
+					return
 				}
+
+				// check that legacy SBOM is included via sbom.legacy.json
+				contents, err := os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", "sbom.legacy.json"))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(ContainSubstring(`"name":"Node Engine"`))
+
+				// check that all required SBOM files are present
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.spdx.json")).To(BeARegularFile())
+				Expect(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.syft.json")).To(BeARegularFile())
+
+				// check an SBOM file to make sure it has an entry for node
+				contents, err = os.ReadFile(filepath.Join(sbomDir, "sbom", "launch", strings.ReplaceAll(settings.Buildpack.ID, "/", "_"), "node", "sbom.cdx.json"))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(ContainSubstring(`"name": "Node Engine"`))
 			})
 		})
 
