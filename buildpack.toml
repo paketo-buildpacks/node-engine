@@ -40,7 +40,7 @@ api = "0.7"
     purl = "pkg:generic/node@v16.20.1?checksum=b6c60e1e106ad7d8881e83945a5208c1b1d1b63e6901c04b9dafa607aff3a154&download_url=https://nodejs.org/dist/v16.20.1/node-v16.20.1-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v16.20.1/node-v16.20.1-linux-x64.tar.xz"
     source-checksum = "sha256:b6c60e1e106ad7d8881e83945a5208c1b1d1b63e6901c04b9dafa607aff3a154"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v16.20.1/node-v16.20.1-linux-x64.tar.xz"
     version = "16.20.1"
@@ -69,7 +69,7 @@ api = "0.7"
     purl = "pkg:generic/node@v16.20.2?checksum=874463523f26ed528634580247f403d200ba17a31adf2de98a7b124c6eb33d87&download_url=https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-x64.tar.xz"
     source-checksum = "sha256:874463523f26ed528634580247f403d200ba17a31adf2de98a7b124c6eb33d87"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-x64.tar.xz"
     version = "16.20.2"
@@ -98,7 +98,7 @@ api = "0.7"
     purl = "pkg:generic/node@v18.18.1?checksum=1db684d7da5fec4ae335ac5d8049a10a8bf30bad9e1d0aa9dcd92baa1f90c6e5&download_url=https://nodejs.org/dist/v18.18.1/node-v18.18.1-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v18.18.1/node-v18.18.1-linux-x64.tar.xz"
     source-checksum = "sha256:1db684d7da5fec4ae335ac5d8049a10a8bf30bad9e1d0aa9dcd92baa1f90c6e5"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v18.18.1/node-v18.18.1-linux-x64.tar.xz"
     version = "18.18.1"
@@ -127,7 +127,7 @@ api = "0.7"
     purl = "pkg:generic/node@v18.18.2?checksum=75aba25ae76999309fc6c598efe56ce53fbfc221381a44a840864276264ab8ac&download_url=https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.xz"
     source-checksum = "sha256:75aba25ae76999309fc6c598efe56ce53fbfc221381a44a840864276264ab8ac"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.xz"
     version = "18.18.2"
@@ -156,7 +156,7 @@ api = "0.7"
     purl = "pkg:generic/node@v19.8.1?checksum=b8ecd95eebda5882bb70c1088595d87a1fd69cc4be81c317191f4f5ebb34b7ac&download_url=https://nodejs.org/dist/v19.8.1/node-v19.8.1-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v19.8.1/node-v19.8.1-linux-x64.tar.xz"
     source-checksum = "sha256:b8ecd95eebda5882bb70c1088595d87a1fd69cc4be81c317191f4f5ebb34b7ac"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v19.8.1/node-v19.8.1-linux-x64.tar.xz"
     version = "19.8.1"
@@ -185,7 +185,7 @@ api = "0.7"
     purl = "pkg:generic/node@v19.9.0?checksum=e8ea737ee15a62c8752159d12765ed757b5d4b18036b1011d9e4c9e692a4e58d&download_url=https://nodejs.org/dist/v19.9.0/node-v19.9.0-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v19.9.0/node-v19.9.0-linux-x64.tar.xz"
     source-checksum = "sha256:e8ea737ee15a62c8752159d12765ed757b5d4b18036b1011d9e4c9e692a4e58d"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v19.9.0/node-v19.9.0-linux-x64.tar.xz"
     version = "19.9.0"
@@ -214,7 +214,7 @@ api = "0.7"
     purl = "pkg:generic/node@v20.8.1?checksum=44096f6276cf735f3b25f47ffaaa1629b0abad4d9932c3a77d9dcdc743a3ff92&download_url=https://nodejs.org/dist/v20.8.1/node-v20.8.1-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v20.8.1/node-v20.8.1-linux-x64.tar.xz"
     source-checksum = "sha256:44096f6276cf735f3b25f47ffaaa1629b0abad4d9932c3a77d9dcdc743a3ff92"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v20.8.1/node-v20.8.1-linux-x64.tar.xz"
     version = "20.8.1"
@@ -243,7 +243,7 @@ api = "0.7"
     purl = "pkg:generic/node@v20.9.0?checksum=9033989810bf86220ae46b1381bdcdc6c83a0294869ba2ad39e1061f1e69217a&download_url=https://nodejs.org/dist/v20.9.0/node-v20.9.0-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v20.9.0/node-v20.9.0-linux-x64.tar.xz"
     source-checksum = "sha256:9033989810bf86220ae46b1381bdcdc6c83a0294869ba2ad39e1061f1e69217a"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v20.9.0/node-v20.9.0-linux-x64.tar.xz"
     version = "20.9.0"
