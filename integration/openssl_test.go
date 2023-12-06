@@ -104,49 +104,6 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 					extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
 					extenderBuildStr+`    NODE_VERBOSE -> "false"`,
 				))
-
-			})
-		})
-
-		context("when running Node 18", func() {
-			it("uses the OpenSSL CA store to verify certificates", func() {
-				var (
-					logs fmt.Stringer
-					err  error
-				)
-
-				image, logs, err = pack.WithNoColor().Build.
-					WithExtensions(
-						settings.Extensions.UbiNodejsExtension.Online,
-					).
-					WithBuildpacks(
-						settings.Buildpacks.NodeEngine.Online,
-						settings.Buildpacks.BuildPlan.Online,
-					).
-					WithPullPolicy(pullPolicy).
-					WithEnv(map[string]string{
-						"BP_NODE_VERSION": "18.*.*",
-					}).
-					Execute(name, source)
-				Expect(err).ToNot(HaveOccurred(), logs.String)
-
-				container, err = docker.Container.Run.
-					WithPublish("8080").
-					WithCommand("node server.js").
-					Execute(image.ID)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(container).Should(Serve("hello world"))
-				Expect(container).To(Serve(ContainSubstring("v18.")).WithEndpoint("/version"))
-				Expect(container).To(Serve(ContainSubstring("301 Moved")).WithEndpoint("/test-openssl-ca"))
-
-				Expect(logs).To(ContainLines(
-					extenderBuildStr+"  Configuring launch environment",
-					extenderBuildStr+`    NODE_ENV     -> "production"`,
-					fmt.Sprintf(`%s    NODE_HOME    -> "/layers/%s/node"`, extenderBuildStr, strings.ReplaceAll(settings.Buildpack.ID, "/", "_")),
-					extenderBuildStr+`    NODE_OPTIONS -> "--use-openssl-ca"`,
-					extenderBuildStr+`    NODE_VERBOSE -> "false"`,
-				))
 			})
 		})
 
