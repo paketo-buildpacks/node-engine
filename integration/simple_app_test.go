@@ -92,6 +92,8 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
+				fmt.Println(logs.String())
+
 				if settings.Extensions.UbiNodejsExtension.Online != "" {
 
 					Expect(logs).To(ContainLines(
@@ -307,7 +309,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 						"  Resolving Node Engine version",
 						"    Candidate version sources (in priority order):",
 						"      .node-version -> \"18.*\"",
-						"      <unknown>     -> \"\"",
+						"      <unknown> -> \"\"",
 					))
 
 					Expect(logs).To(ContainLines(

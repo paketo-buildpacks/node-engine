@@ -101,7 +101,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      <unknown>     -> \"\"",
+					"      <unknown> -> \"\"",
 				))
 
 				Expect(logs).To(ContainLines(
@@ -191,7 +191,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					MatchRegexp(`Ubi Node.js Extension \d+\.\d+\.\d+`),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      <unknown>     -> \"\"",
+					"      <unknown> -> \"\"",
 				))
 
 				Expect(logs).To(ContainLines(
@@ -282,7 +282,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .node-version -> \"~18.*\"",
-					"      <unknown>     -> \"\"",
+					"      <unknown> -> \"\"",
 				))
 
 				Expect(logs).To(ContainLines(
@@ -374,7 +374,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
 					"      .node-version -> \"~20.*\"",
-					"      <unknown>     -> \"\"",
+					"      <unknown> -> \"\"",
 				))
 
 				Expect(logs).To(ContainLines(
