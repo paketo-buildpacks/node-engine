@@ -40,10 +40,6 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			var err error
 			name, err = occam.RandomName()
 			Expect(err).NotTo(HaveOccurred())
-
-			if settings.Extensions.UbiNodejsExtension.Online != "" {
-				pullPolicy = "always"
-			}
 		})
 
 		it.After(func() {
@@ -54,6 +50,12 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		it("sets max_old_space_size when nodejs.optimize-memory is set with env variable BP_NODE_OPTIMIZE_MEMORY", func() {
+
+			//UBI does not support offline build ATM
+			if settings.Extensions.UbiNodejsExtension.Online != "" {
+				return
+			}
+
 			var err error
 			source, err = occam.Source(filepath.Join("testdata", "optimize_memory"))
 			Expect(err).NotTo(HaveOccurred())
