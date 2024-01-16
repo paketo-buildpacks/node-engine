@@ -18,6 +18,10 @@ const server = http.createServer((request, response) => {
     case '/version':
       response.end(process.version);
       break;
+    
+    case '/node-options':
+      response.end(`NodeOptions: ${process.env.NODE_OPTIONS}`);
+      break;
 
     default:
       response.end("hello world");
