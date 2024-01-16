@@ -134,6 +134,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}))
 		Expect(layer.ExecD).To(Equal([]string{
 			filepath.Join(cnbDir, "bin", "optimize-memory"),
+			filepath.Join(cnbDir, "bin", "inspector"),
 		}))
 
 		Expect(layer.Metadata).To(Equal(map[string]interface{}{
@@ -238,6 +239,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
 		Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 		Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
+		Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/1-inspector"))
 	})
 
 	context("when the os environment contains a directive to optimize memory", func() {
@@ -471,6 +473,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			}))
 			Expect(layer.ExecD).To(Equal([]string{
 				filepath.Join(cnbDir, "bin", "optimize-memory"),
+				filepath.Join(cnbDir, "bin", "inspector"),
 			}))
 
 			Expect(layer.Metadata).To(Equal(map[string]interface{}{
@@ -488,6 +491,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(buffer.String()).To(ContainSubstring("      Made available in the MEMORY_AVAILABLE environment variable."))
 			Expect(buffer.String()).NotTo(ContainSubstring("      Assigns the NODE_OPTIONS environment variable with flag setting to optimize memory."))
 			Expect(buffer.String()).NotTo(ContainSubstring("      Limits the total size of all objects on the heap to 75% of the MEMORY_AVAILABLE."))
+			Expect(buffer.String()).To(ContainSubstring("    Writing exec.d/1-inspector"))
 		})
 	})
 
