@@ -117,6 +117,7 @@ func TestIntegration(t *testing.T) {
 	suite := spec.New("Integration", spec.Report(report.Terminal{}), spec.Parallel())
 	suite("Offline", testOffline)
 	suite("OptimizeMemory", testOptimizeMemory)
+	suite("Inspector", testInspector)
 	suite("ProjectPath", testProjectPath)
 	suite("Provides", testProvides)
 	suite("ReusingLayerRebuild", testReusingLayerRebuild)
