@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/paketo-buildpacks/node-engine/cmd/optimize-memory/internal"
+	"github.com/paketo-buildpacks/node-engine/cmd/inspector/internal"
 	"github.com/paketo-buildpacks/node-engine/cmd/util"
 )
 
