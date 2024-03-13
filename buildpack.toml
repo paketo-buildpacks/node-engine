@@ -243,7 +243,7 @@ api = "0.7"
     purl = "pkg:generic/node@v20.11.0?checksum=822780369d0ea309e7d218e41debbd1a03f8cdf354ebf8a4420e89f39cc2e612&download_url=https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz"
     source = "https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz"
     source-checksum = "sha256:822780369d0ea309e7d218e41debbd1a03f8cdf354ebf8a4420e89f39cc2e612"
-    stacks = ["io.buildpacks.stacks.jammy"]
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
     uri = "https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz"
     version = "20.11.0"
