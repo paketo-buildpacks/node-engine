@@ -56,7 +56,15 @@ function run::build() {
 
       echo "Success!"
 
-      for name in detect build; do
+      names=("detect")
+
+      if [ -f "extension.toml" ]; then
+        names+=("generate")
+      else
+        names+=("build")
+      fi
+
+      for name in "${names[@]}"; do
         printf "%s" "Linking ${name}... "
 
         ln -sf "run" "${name}"
@@ -73,16 +81,20 @@ function cmd::build() {
     for src in "${BUILDPACKDIR}"/cmd/*; do
       name="$(basename "${src}")"
 
-      printf "%s" "Building ${name}... "
+      if [[ -f "${src}/main.go" ]]; then
+        printf "%s" "Building ${name}... "
 
-      GOOS="linux" \
-      CGO_ENABLED=0 \
-        go build \
-          -ldflags="-s -w" \
-          -o "${BUILDPACKDIR}/bin/${name}" \
-            "${src}/main.go"
+        GOOS="linux" \
+        CGO_ENABLED=0 \
+          go build \
+            -ldflags="-s -w" \
+            -o "${BUILDPACKDIR}/bin/${name}" \
+              "${src}/main.go"
 
-      echo "Success!"
+        echo "Success!"
+      else
+        printf "%s" "Skipping ${name}... "
+      fi
     done
   fi
 }
