@@ -56,7 +56,15 @@ function run::build() {
 
       echo "Success!"
 
-      for name in detect build; do
+      names=("detect")
+
+      if [ -f "extension.toml" ]; then
+        names+=("generate")
+      else
+        names+=("build")
+      fi
+
+      for name in "${names[@]}"; do
         printf "%s" "Linking ${name}... "
 
         ln -sf "run" "${name}"
