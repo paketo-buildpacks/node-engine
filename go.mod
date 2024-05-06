@@ -1,4 +1,4 @@
-module github.com/paketo-buildpacks/node-engine
+module github.com/paketo-buildpacks/node-engine/v3
 
 go 1.18
 

@@ -1,4 +1,4 @@
-module github.com/paketo-buildpacks/node-engine/retrieval
+module github.com/paketo-buildpacks/node-engine/v3/retrieval
 
 go 1.19
 
