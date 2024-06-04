@@ -137,7 +137,7 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		return nil, fmt.Errorf("could get create bionic dependency: %w", err)
 	}
 
-	dep.Stacks = []string{"io.buildpacks.stacks.jammy"}
+	dep.Stacks = []string{"io.buildpacks.stacks.jammy", "*"}
 	dep.URI = url
 	dep.Checksum = fmt.Sprintf("sha256:%s", checksum)
 	dep.StripComponents = 1
