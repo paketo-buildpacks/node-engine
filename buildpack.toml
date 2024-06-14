@@ -134,39 +134,9 @@ api = "0.7"
     version = "20.13.0"
 
   [[metadata.dependencies]]
-    checksum = "sha256:9d55843dd4b2400fe4034de3281003de718dbd0c6f61ce6b53e94e987b16c9dc"
-    cpe = "cpe:2.3:a:nodejs:node.js:21.7.2/:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v21.7.2/?checksum=9d55843dd4b2400fe4034de3281003de718dbd0c6f61ce6b53e94e987b16c9dc&download_url=https://nodejs.org/dist/v21.7.2/node-v21.7.2-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v21.7.2/node-v21.7.2-linux-x64.tar.xz"
-    source-checksum = "sha256:9d55843dd4b2400fe4034de3281003de718dbd0c6f61ce6b53e94e987b16c9dc"
-    stacks = ["*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v21.7.2/node-v21.7.2-linux-x64.tar.xz"
-    version = "21.7.2"
-
-  [[metadata.dependencies]]
-    checksum = "sha256:19e17a77e59044de169cd19be3f3bccae686982fba022f9634421b44724ee90c"
-    cpe = "cpe:2.3:a:nodejs:node.js:21.7.3/:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v21.7.3/?checksum=19e17a77e59044de169cd19be3f3bccae686982fba022f9634421b44724ee90c&download_url=https://nodejs.org/dist/v21.7.3/node-v21.7.3-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v21.7.3/node-v21.7.3-linux-x64.tar.xz"
-    source-checksum = "sha256:19e17a77e59044de169cd19be3f3bccae686982fba022f9634421b44724ee90c"
-    stacks = ["*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v21.7.3/node-v21.7.3-linux-x64.tar.xz"
-    version = "21.7.3"
-
-  [[metadata.dependencies]]
     checksum = "sha256:3544eee9cb1414d6e9003efd56bc807ffb0f4445d2fc383e1df04c3e5e72c91b"
     cpe = "cpe:2.3:a:nodejs:node.js:22.2.0/:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
+    deprecation_date = "2027-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
@@ -181,7 +151,7 @@ api = "0.7"
   [[metadata.dependencies]]
     checksum = "sha256:33429139d4c4416439bf023b2eb2dc257da188fd793b64f21c8c03a0f04a5840"
     cpe = "cpe:2.3:a:nodejs:node.js:22.3.0/:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
+    deprecation_date = "2027-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
@@ -200,11 +170,6 @@ api = "0.7"
 
   [[metadata.dependency-constraints]]
     constraint = "20.*"
-    id = "node"
-    patches = 2
-  
-  [[metadata.dependency-constraints]]
-    constraint = "21.*"
     id = "node"
     patches = 2
 
