@@ -16,36 +16,6 @@ api = "0.7"
   [metadata.default-versions]
     node = "20.*.*"
 
-
-  [[metadata.dependencies]]
-    checksum = "sha256:bd81d33bb3834f06428d101e39ea86bead0ba53a64299ea37b4a77a13811070f"
-    cpe = "cpe:2.3:a:nodejs:node.js:18.20.1:*:*:*:*:*:*:*"
-    deprecation_date = "2025-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v18.20.1?checksum=1d08285abd9fad971af5c73d13e8f2a6ae9f2906ee036095dad7d5c286642a4e&download_url=https://nodejs.org/dist/v18.20.1/node-v18.20.1-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v18.20.1/node-v18.20.1-linux-x64.tar.xz"
-    source-checksum = "sha256:1d08285abd9fad971af5c73d13e8f2a6ae9f2906ee036095dad7d5c286642a4e"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://artifacts.paketo.io/node/node_v18.20.1_linux_x64_bionic_bd81d33b.tgz"
-    version = "18.20.1"
-
-  [[metadata.dependencies]]
-    checksum = "sha256:1d08285abd9fad971af5c73d13e8f2a6ae9f2906ee036095dad7d5c286642a4e"
-    cpe = "cpe:2.3:a:nodejs:node.js:18.20.1:*:*:*:*:*:*:*"
-    deprecation_date = "2025-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v18.20.1?checksum=1d08285abd9fad971af5c73d13e8f2a6ae9f2906ee036095dad7d5c286642a4e&download_url=https://nodejs.org/dist/v18.20.1/node-v18.20.1-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v18.20.1/node-v18.20.1-linux-x64.tar.xz"
-    source-checksum = "sha256:1d08285abd9fad971af5c73d13e8f2a6ae9f2906ee036095dad7d5c286642a4e"
-    stacks = ["io.buildpacks.stacks.jammy", "*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v18.20.1/node-v18.20.1-linux-x64.tar.xz"
-    version = "18.20.1"
-
   [[metadata.dependencies]]
     checksum = "sha256:bc57445077a3fe6050da28b51b5d65f1528ead2f673bbcbe196bf7defa44cda4"
     cpe = "cpe:2.3:a:nodejs:node.js:18.20.2:*:*:*:*:*:*:*"
@@ -76,62 +46,91 @@ api = "0.7"
     version = "18.20.2"
 
   [[metadata.dependencies]]
-    checksum = "sha256:1c3a6b391824b7152ae3f83343cdee7bc811bf14b3eb24e3ffdfcb84254b74e2"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.12.2:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
+    checksum = "sha256:9b8a64df7b0fa13010a962f383c9fbbd4b94d7b5f7829e1f56a329498f8b7a0d"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.20.3:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
-    purl = "pkg:generic/node@v20.12.2?checksum=595272130310cbe12301430756f23d153f7ab95d00174c02adc11a2e3703d183&download_url=https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-x64.tar.xz"
-    source-checksum = "sha256:595272130310cbe12301430756f23d153f7ab95d00174c02adc11a2e3703d183"
+    purl = "pkg:generic/node@v18.20.3?checksum=ffd6147c263b81016742dc1e72dc68885a3ca9b441d9744f9b76cad362d0cc5f&download_url=https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-x64.tar.xz"
+    source-checksum = "sha256:ffd6147c263b81016742dc1e72dc68885a3ca9b441d9744f9b76cad362d0cc5f"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://artifacts.paketo.io/node/node_v20.12.2_linux_x64_bionic_1c3a6b39.tgz"
-    version = "20.12.2"
+    uri = "https://artifacts.paketo.io/node/node_v18.20.3_linux_x64_bionic_9b8a64df.tgz"
+    version = "18.20.3"
 
   [[metadata.dependencies]]
-    checksum = "sha256:595272130310cbe12301430756f23d153f7ab95d00174c02adc11a2e3703d183"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.12.2:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
+    checksum = "sha256:ffd6147c263b81016742dc1e72dc68885a3ca9b441d9744f9b76cad362d0cc5f"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.20.3:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
-    purl = "pkg:generic/node@v20.12.2?checksum=595272130310cbe12301430756f23d153f7ab95d00174c02adc11a2e3703d183&download_url=https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-x64.tar.xz"
-    source-checksum = "sha256:595272130310cbe12301430756f23d153f7ab95d00174c02adc11a2e3703d183"
+    purl = "pkg:generic/node@v18.20.3?checksum=ffd6147c263b81016742dc1e72dc68885a3ca9b441d9744f9b76cad362d0cc5f&download_url=https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-x64.tar.xz"
+    source-checksum = "sha256:ffd6147c263b81016742dc1e72dc68885a3ca9b441d9744f9b76cad362d0cc5f"
     stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
-    uri = "https://nodejs.org/dist/v20.12.2/node-v20.12.2-linux-x64.tar.xz"
-    version = "20.12.2"
+    uri = "https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-x64.tar.xz"
+    version = "18.20.3"
 
   [[metadata.dependencies]]
-    checksum = "sha256:05fdcf0d62005442cd674edd19d5461eb22f4711b06808662d621c084e3dc599"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.13.0:*:*:*:*:*:*:*"
+    checksum = "sha256:3ff5a751ec472c228f068cc110d0c731bf583ac6d7d47ea814cc65d88456f039"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.13.1:*:*:*:*:*:*:*"
     deprecation_date = "2026-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
-    purl = "pkg:generic/node@v20.13.0?checksum=a58d5d99b4ccf95d966dd1e3d3a560f4686e3e1e4f7331258860d429f13fc7eb&download_url=https://nodejs.org/dist/v20.13.0/node-v20.13.0-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.13.0/node-v20.13.0-linux-x64.tar.xz"
-    source-checksum = "sha256:a58d5d99b4ccf95d966dd1e3d3a560f4686e3e1e4f7331258860d429f13fc7eb"
+    purl = "pkg:generic/node@v20.13.1?checksum=efc0f295dd878e510ab12ea36bbadc3db03c687ab30c07e86c7cdba7eed879a9&download_url=https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.xz"
+    source-checksum = "sha256:efc0f295dd878e510ab12ea36bbadc3db03c687ab30c07e86c7cdba7eed879a9"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://artifacts.paketo.io/node/node_v20.13.0_linux_x64_bionic_05fdcf0d.tgz"
-    version = "20.13.0"
+    uri = "https://artifacts.paketo.io/node/node_v20.13.1_linux_x64_bionic_3ff5a751.tgz"
+    version = "20.13.1"
 
   [[metadata.dependencies]]
-    checksum = "sha256:a58d5d99b4ccf95d966dd1e3d3a560f4686e3e1e4f7331258860d429f13fc7eb"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.13.0:*:*:*:*:*:*:*"
+    checksum = "sha256:efc0f295dd878e510ab12ea36bbadc3db03c687ab30c07e86c7cdba7eed879a9"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.13.1:*:*:*:*:*:*:*"
     deprecation_date = "2026-04-30T00:00:00Z"
     id = "node"
     licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
     name = "Node Engine"
-    purl = "pkg:generic/node@v20.13.0?checksum=a58d5d99b4ccf95d966dd1e3d3a560f4686e3e1e4f7331258860d429f13fc7eb&download_url=https://nodejs.org/dist/v20.13.0/node-v20.13.0-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.13.0/node-v20.13.0-linux-x64.tar.xz"
-    source-checksum = "sha256:a58d5d99b4ccf95d966dd1e3d3a560f4686e3e1e4f7331258860d429f13fc7eb"
+    purl = "pkg:generic/node@v20.13.1?checksum=efc0f295dd878e510ab12ea36bbadc3db03c687ab30c07e86c7cdba7eed879a9&download_url=https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.xz"
+    source-checksum = "sha256:efc0f295dd878e510ab12ea36bbadc3db03c687ab30c07e86c7cdba7eed879a9"
     stacks = ["io.buildpacks.stacks.jammy", "*"]
     strip-components = 1
-    uri = "https://nodejs.org/dist/v20.13.0/node-v20.13.0-linux-x64.tar.xz"
-    version = "20.13.0"
+    uri = "https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.xz"
+    version = "20.13.1"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:77ac64f65caa8c7b00f133ed68983956c08cfaddbaf3d47958709d7e642e5c4a"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.14.0:*:*:*:*:*:*:*"
+    deprecation_date = "2026-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v20.14.0?checksum=fedf8fa73b6f51c4ffcc5da8f86cd1ed381bc9dceae0829832c7d683a78b8e36&download_url=https://nodejs.org/dist/v20.14.0/node-v20.14.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.14.0/node-v20.14.0-linux-x64.tar.xz"
+    source-checksum = "sha256:fedf8fa73b6f51c4ffcc5da8f86cd1ed381bc9dceae0829832c7d683a78b8e36"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://artifacts.paketo.io/node/node_v20.14.0_linux_x64_bionic_77ac64f6.tgz"
+    version = "20.14.0"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:fedf8fa73b6f51c4ffcc5da8f86cd1ed381bc9dceae0829832c7d683a78b8e36"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.14.0:*:*:*:*:*:*:*"
+    deprecation_date = "2026-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v20.14.0?checksum=fedf8fa73b6f51c4ffcc5da8f86cd1ed381bc9dceae0829832c7d683a78b8e36&download_url=https://nodejs.org/dist/v20.14.0/node-v20.14.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.14.0/node-v20.14.0-linux-x64.tar.xz"
+    source-checksum = "sha256:fedf8fa73b6f51c4ffcc5da8f86cd1ed381bc9dceae0829832c7d683a78b8e36"
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v20.14.0/node-v20.14.0-linux-x64.tar.xz"
+    version = "20.14.0"
 
   [[metadata.dependencies]]
     checksum = "sha256:3544eee9cb1414d6e9003efd56bc807ffb0f4445d2fc383e1df04c3e5e72c91b"
