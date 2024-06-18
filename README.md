@@ -9,6 +9,16 @@ buildpacks that might use the Node binary distribution are the [NPM
 CNB](https://github.com/paketo-buildpacks/npm) and [Yarn Install
 CNB](https://github.com/paketo-buildpacks/yarn-install)
 
+## Version support
+
+node-engine will include Node.js versions which are supported as `LTS` in the
+community as well as the active `current` release. When a Node.js version goes
+End of Life (EOL) in the community it may be removed from node-engine
+any time after that.
+
+For more information on what versions are `LTS` and `current` refer to Node.js
+projects [Release Schedule](https://github.com/nodejs/release#release-schedule).
+
 ## Integration
 
 The Node Engine CNB provides `node` and `npm` as dependencies. Downstream buildpacks, like
