@@ -58,7 +58,7 @@ function run::build() {
 
       names=("detect")
 
-      if [ -f "extension.toml" ]; then
+      if [ -f "${BUILDPACKDIR}/extension.toml" ]; then
         names+=("generate")
       else
         names+=("build")
