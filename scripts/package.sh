@@ -64,20 +64,25 @@ function main {
 
   tools::install "${token}"
 
-  buildpack::archive "${version}"
-  buildpackage::create "${output}"
+  buildpack_type=buildpack
+  if [ -f "${ROOT_DIR}/extension.toml" ]; then
+    buildpack_type=extension
+  fi
+
+  buildpack::archive "${version}" "${buildpack_type}"
+  buildpackage::create "${output}" "${buildpack_type}"
 }
 
 function usage() {
   cat <<-USAGE
 package.sh --version <version> [OPTIONS]
 
-Packages the buildpack into a buildpackage .cnb file.
+Packages a buildpack or an extension into a buildpackage .cnb file.
 
 OPTIONS
   --help               -h            prints the command usage
-  --version <version>  -v <version>  specifies the version number to use when packaging the buildpack
-  --output <output>    -o <output>   location to output the packaged buildpackage artifact (default: ${ROOT_DIR}/build/buildpackage.cnb)
+  --version <version>  -v <version>  specifies the version number to use when packaging a buildpack or an extension
+  --output <output>    -o <output>   location to output the packaged buildpackage or extension artifact (default: ${ROOT_DIR}/build/buildpackage.cnb)
   --token <token>                    Token used to download assets from GitHub (e.g. jam, pack, etc) (optional)
 USAGE
 }
@@ -114,8 +119,9 @@ function tools::install() {
 function buildpack::archive() {
   local version
   version="${1}"
+  buildpack_type="${2}"
 
-  util::print::title "Packaging buildpack into ${BUILD_DIR}/buildpack.tgz..."
+  util::print::title "Packaging ${buildpack_type} into ${BUILD_DIR}/buildpack.tgz..."
 
   if [[ -f "${ROOT_DIR}/.libbuildpack" ]]; then
     packager \
@@ -125,7 +131,7 @@ function buildpack::archive() {
       "${BUILD_DIR}/buildpack"
   else
     jam pack \
-      --buildpack "${ROOT_DIR}/buildpack.toml" \
+      "--${buildpack_type}" "${ROOT_DIR}/${buildpack_type}.toml"\
       --version "${version}" \
       --output "${BUILD_DIR}/buildpack.tgz"
   fi
@@ -134,13 +140,30 @@ function buildpack::archive() {
 function buildpackage::create() {
   local output
   output="${1}"
+  buildpack_type="${2}"
 
-  util::print::title "Packaging buildpack..."
+  util::print::title "Packaging ${buildpack_type}... ${output}"
 
-  pack \
-    buildpack package "${output}" \
-      --path "${BUILD_DIR}/buildpack.tgz" \
-      --format file
+  if [ "$buildpack_type" == "extension" ]; then
+    cwd=$(pwd)
+    cd ${BUILD_DIR}
+    mkdir cnbdir
+    cd cnbdir
+    cp ../buildpack.tgz .
+    tar -xvf buildpack.tgz
+    rm buildpack.tgz
+
+    pack \
+      extension package "${output}" \
+        --format file
+
+    cd $cwd
+  else
+    pack \
+      buildpack package "${output}" \
+        --path "${BUILD_DIR}/buildpack.tgz" \
+        --format file
+  fi
 }
 
 main "${@:-}"
