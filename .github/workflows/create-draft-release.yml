@@ -66,16 +66,19 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 'stable'
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
         fetch-tags: true
+
     - name: Reset Draft Release
       id: reset
       uses: paketo-buildpacks/github-config/actions/release/reset-draft@main
       with:
         repo: ${{ github.repository }}
         token: ${{ github.token }}
+
     - name: Calculate Semver Tag
       if: github.event.inputs.version == ''
       id: semver
@@ -84,6 +87,7 @@ jobs:
         repo: ${{ github.repository }}
         token: ${{ github.token }}
         ref-name: ${{ github.ref_name }}
+
     - name: Set Release Tag
       id: tag
       run: |
@@ -92,14 +96,28 @@ jobs:
           tag="${{ steps.semver.outputs.tag }}"
         fi
         echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
     - name: Package
       run: ./scripts/package.sh --version "${{ steps.tag.outputs.tag }}"
+
+    - name: Get buildpack type
+      id: get_buildpack_type
+      run: |
+
+        if [ -f "extension.toml" ]; then
+          echo "buildpack_type=extension" >> "$GITHUB_OUTPUT"
+        else
+          echo "buildpack_type=buildpack" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Create Release Notes
       id: create-release-notes
       uses: paketo-buildpacks/github-config/actions/release/notes@main
       with:
         repo: ${{ github.repository }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        buildpack_type: ${{ steps.get_buildpack_type.outputs.buildpack_type }}
+
     - name: Create Release
       uses: paketo-buildpacks/github-config/actions/release/create@main
       with:
