@@ -4,12 +4,17 @@ on:
   release:
     types:
     - published
+env:
+  REGISTRIES_FILENAME: "registries.json"
 
 jobs:
   push:
     name: Push
     runs-on: ubuntu-22.04
     steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
 
     - name: Parse Event
       id: event
@@ -30,6 +35,26 @@ jobs:
         output: "/github/workspace/buildpackage.cnb"
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
+    - name: Parse Configs
+      id: parse_configs
+      run: |
+        registries_filename="${{ env.REGISTRIES_FILENAME }}"
+
+        push_to_dockerhub=true
+        push_to_gcr=true
+
+        if [[ -f $registries_filename ]]; then
+          if jq 'has("dockerhub")' $registries_filename > /dev/null; then
+            push_to_dockerhub=$(jq '.dockerhub' $registries_filename)
+          fi
+          if jq 'has("GCR")' $registries_filename > /dev/null; then
+            push_to_gcr=$(jq '.GCR' $registries_filename)
+          fi
+        fi
+
+        echo "push_to_dockerhub=${push_to_dockerhub}" >> "$GITHUB_OUTPUT"
+        echo "push_to_gcr=${push_to_gcr}" >> "$GITHUB_OUTPUT"
+
     - name: Validate version
       run: |
         buidpackTomlVersion=$(sudo skopeo inspect "oci-archive:${GITHUB_WORKSPACE}/buildpackage.cnb" | jq -r '.Labels."io.buildpacks.buildpackage.metadata" | fromjson | .version')
@@ -40,6 +65,7 @@ jobs:
         fi
 
     - name: Push to GCR
+      if: ${{  steps.parse_configs.outputs.push_to_gcr == 'true' }}
       env:
         GCR_PUSH_BOT_JSON_KEY: ${{ secrets.GCR_PUSH_BOT_JSON_KEY }}
       run: |
@@ -50,7 +76,7 @@ jobs:
         sudo skopeo copy "oci-archive:${GITHUB_WORKSPACE}/buildpackage.cnb" "docker://gcr.io/${{ github.repository }}:latest"
 
     - name: Push to DockerHub
-      id: push
+      if: ${{  steps.parse_configs.outputs.push_to_dockerhub == 'true' }}
       env:
         DOCKERHUB_USERNAME: ${{ secrets.PAKETO_BUILDPACKS_DOCKERHUB_USERNAME }}
         DOCKERHUB_PASSWORD: ${{ secrets.PAKETO_BUILDPACKS_DOCKERHUB_PASSWORD }}
