@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	nodeengine "github.com/paketo-buildpacks/node-engine"
+	nodeengine "github.com/paketo-buildpacks/node-engine/v4"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
