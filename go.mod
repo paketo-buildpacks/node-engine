@@ -1,4 +1,4 @@
-module github.com/paketo-buildpacks/node-engine
+module github.com/paketo-buildpacks/node-engine/v4
 
 go 1.22.5
 

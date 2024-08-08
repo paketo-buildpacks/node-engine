@@ -3,7 +3,7 @@ package util_test
 import (
 	"testing"
 
-	"github.com/paketo-buildpacks/node-engine/cmd/util"
+	"github.com/paketo-buildpacks/node-engine/v4/cmd/util"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
