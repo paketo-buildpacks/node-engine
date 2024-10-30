@@ -131,7 +131,8 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		Checksum:        fmt.Sprintf("sha256:%s", checksum),
 		Licenses:        retrieve.LookupLicenses(url, upstream.DefaultDecompress),
 		DeprecationDate: deprecationDate,
-		Stacks:          []string{"io.buildpacks.stacks.jammy"},
+		StripComponents: 1,
+		Stacks:          []string{"io.buildpacks.stacks.jammy", "*"},
 	}
 
 	jammyDependency, err := versionology.NewDependency(dep, "jammy")
@@ -139,17 +140,7 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		return nil, fmt.Errorf("could get create jammy dependency: %w", err)
 	}
 
-	dep.Stacks = []string{"io.buildpacks.stacks.noble", "*"}
-	dep.URI = url
-	dep.Checksum = fmt.Sprintf("sha256:%s", checksum)
-	dep.StripComponents = 1
-
-	nobleDependency, err := versionology.NewDependency(dep, "noble")
-	if err != nil {
-		return nil, fmt.Errorf("could get create noble dependency: %w", err)
-	}
-
-	return []versionology.Dependency{jammyDependency, nobleDependency}, nil
+	return []versionology.Dependency{jammyDependency}, nil
 }
 
 func getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.Time {
