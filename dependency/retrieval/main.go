@@ -128,6 +128,7 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),
 		PURL:            retrieve.GeneratePURL("node", version, checksum, url),
 		URI:             url,
+		Checksum:        fmt.Sprintf("sha256:%s", checksum),
 		Licenses:        retrieve.LookupLicenses(url, upstream.DefaultDecompress),
 		DeprecationDate: deprecationDate,
 		Stacks:          []string{"io.buildpacks.stacks.jammy"},
