@@ -26,6 +26,8 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Run Unit Tests
+      env:
+        GO_TEST_PARAMS: -count=5
       run: ./scripts/unit.sh
 
     - name: Get builders from integration.json

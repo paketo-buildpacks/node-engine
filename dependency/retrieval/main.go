@@ -127,27 +127,20 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		SourceChecksum:  fmt.Sprintf("sha256:%s", checksum),
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),
 		PURL:            retrieve.GeneratePURL("node", version, checksum, url),
+		URI:             url,
+		Checksum:        fmt.Sprintf("sha256:%s", checksum),
 		Licenses:        retrieve.LookupLicenses(url, upstream.DefaultDecompress),
 		DeprecationDate: deprecationDate,
-		Stacks:          []string{"io.buildpacks.stacks.bionic"},
+		StripComponents: 1,
+		Stacks:          []string{"io.buildpacks.stacks.jammy", "*"},
 	}
-
-	bionicDependency, err := versionology.NewDependency(dep, "bionic")
-	if err != nil {
-		return nil, fmt.Errorf("could get create bionic dependency: %w", err)
-	}
-
-	dep.Stacks = []string{"io.buildpacks.stacks.jammy", "*"}
-	dep.URI = url
-	dep.Checksum = fmt.Sprintf("sha256:%s", checksum)
-	dep.StripComponents = 1
 
 	jammyDependency, err := versionology.NewDependency(dep, "jammy")
 	if err != nil {
 		return nil, fmt.Errorf("could get create jammy dependency: %w", err)
 	}
 
-	return []versionology.Dependency{bionicDependency, jammyDependency}, nil
+	return []versionology.Dependency{jammyDependency}, nil
 }
 
 func getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.Time {
