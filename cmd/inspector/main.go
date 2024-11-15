@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/paketo-buildpacks/node-engine/v4/cmd/inspector/internal"
-	"github.com/paketo-buildpacks/node-engine/v4/cmd/util"
+	"github.com/paketo-buildpacks/node-engine/v5/cmd/inspector/internal"
+	"github.com/paketo-buildpacks/node-engine/v5/cmd/util"
 )
 
 func main() {
