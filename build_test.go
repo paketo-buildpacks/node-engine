@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	nodeengine "github.com/paketo-buildpacks/node-engine/v4"
-	"github.com/paketo-buildpacks/node-engine/v4/fakes"
+	nodeengine "github.com/paketo-buildpacks/node-engine/v5"
+	"github.com/paketo-buildpacks/node-engine/v5/fakes"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
