@@ -12,6 +12,9 @@ jobs:
     outputs:
       metadata-filepath: ${{ steps.retrieve.outputs.metadata-filepath }}
       metadata-json: ${{ steps.retrieve.outputs.metadata-json }}
+      # from-source-metadata-filepath is the path to a file containing a subset
+      # of metadata-json entries for NON-compiled dependencies
+      from-source-metadata-filepath: ${{ steps.retrieve.outputs.from-source-metadata-filepath }}
       # compilation-json is a subset of metadata-json entries which are missing
       # a `checksum` and `uri`
       compilation-json: ${{ steps.retrieve.outputs.compilation-json }}
@@ -20,10 +23,10 @@ jobs:
       compilation-length: ${{ steps.retrieve.outputs.compilation-length }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: 'stable'
 
@@ -31,6 +34,10 @@ jobs:
         id: retrieve
         working-directory: dependency
         run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
           OUTPUT="/tmp/metadata.json"
 
           make retrieve \
@@ -44,6 +51,9 @@ jobs:
 
           compilation=$(echo $content | jq -r 'map(select(.checksum == null and .uri == null))'?)
           complength=$(echo $compilation | jq -r '. | length')
+          echo $content | jq -r 'map(select(.checksum != null and .uri != null))'? > "/tmp/from-source-metadata.json"
+          echo "from-source-metadata-filepath=/tmp/from-source-metadata.json" >> "$GITHUB_OUTPUT"
+
 
           delimiter="$(uuidgen)"
           echo "metadata-filepath=${OUTPUT}" >> "$GITHUB_OUTPUT"
@@ -55,10 +65,16 @@ jobs:
 
 
       - name: Upload `${{ steps.retrieve.outputs.metadata-filepath }}`
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: metadata.json
           path: ${{ steps.retrieve.outputs.metadata-filepath }}
+
+      - name: Upload `${{ steps.retrieve.outputs.from-source-metadata-filepath }}`
+        uses: actions/upload-artifact@v4
+        with:
+          name: from-source-metadata.json
+          path: ${{ steps.retrieve.outputs.from-source-metadata-filepath }}
 
   # Check if there is buildpack-provided compilation code and testing code
   # Optional compilation code expected at: <buildpack>/dependency/actions/compile/
@@ -71,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Has Compilation Action?
         id: compile-check
@@ -106,12 +122,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Make Temporary Artifact Directory
         id: make-outputdir
-        run: |
-          echo "outputdir=$(mktemp -d)" >> "$GITHUB_OUTPUT"
+        run: echo "outputdir=$(mktemp -d)" >> "$GITHUB_OUTPUT"
 
       # Download the tarball for testing if:
       #   (1) dependency testing code is present in the buildpack directory
@@ -119,6 +134,10 @@ jobs:
       - name: Download upstream tarball (if not compiled)
         if: ${{ matrix.includes.uri != ''  && needs.get-compile-and-test.outputs.should-test == 'true' }}
         run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
           curl ${{ matrix.includes.uri }} \
             --fail-with-body \
             --show-error \
@@ -135,7 +154,6 @@ jobs:
           make test \
             version="${{ matrix.includes.version }}" \
             tarballPath="${{ steps.make-outputdir.outputs.outputdir }}/*.tgz"
-
   compile:
     name: Compile and Test Dependency
     needs:
@@ -153,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Make Temporary Artifact Directory
         id: make-outputdir
@@ -175,7 +193,7 @@ jobs:
 
       # If compiled, upload the tarball and checksum file for usage in the Update metadata job
       - name: Upload workflow asset
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ needs.get-compile-and-test.outputs.should-compile && matrix.includes.checksum == '' && matrix.includes.uri == '' }}
         with:
           name: '${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.target }}'
@@ -187,6 +205,10 @@ jobs:
         working-directory: dependency
         if: ${{ needs.get-compile-and-test.outputs.should-test == 'true' }}
         run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
           make test \
             version="${{ matrix.includes.version }}" \
             tarballPath="${{ steps.make-outputdir.outputs.outputdir }}/*.tgz"
@@ -201,23 +223,24 @@ jobs:
     strategy:
       matrix:
         includes: ${{ fromJSON(needs.retrieve.outputs.compilation-json) }}
-      # Run metadata update step sequentially so that metadata.json can be
-      # modified for each version
-      max-parallel: 1
     if: ${{ needs.retrieve.outputs.compilation-length > 0 && needs.get-compile-and-test.outputs.should-compile == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download artifact files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: '${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.target }}'
 
       - name: Get artifact file name
         id: get-file-names
         run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
           echo "artifact-file=$(basename ./*.tgz)" >> "$GITHUB_OUTPUT"
           echo "checksum-file=$(basename ./*.tgz.checksum)" >> "$GITHUB_OUTPUT"
 
@@ -241,9 +264,22 @@ jobs:
         run: echo "checksum=$(cat ${{ steps.get-file-names.outputs.checksum-file }})" >> "$GITHUB_OUTPUT"
 
       - name: Download metadata.json
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: metadata.json
+
+      # Create target/version specific metadata files
+      # Due to limitations with the upload action, we can no longer modify/upload the same metadata file
+      - name: Write dependency-specific metadata to new file
+        id: dependency-metadata
+        run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
+          metadata_file_name="${{ matrix.includes.target }}-${{ matrix.includes.version }}-metadata-file.json"
+          cat metadata.json | jq -r ['.[] | select( .version == "${{ matrix.includes.version }}" and .target == "${{ matrix.includes.target }}")'] > $metadata_file_name
+          echo "file=$(echo $metadata_file_name)" >> "$GITHUB_OUTPUT"
 
       - name: Update `checksum` and `uri` in metadata for ${{ matrix.includes.target }} ${{ matrix.includes.version }}
         if: ${{ matrix.includes.checksum == '' && matrix.includes.uri == '' }}
@@ -253,13 +289,13 @@ jobs:
           target: ${{ matrix.includes.target }}
           checksum: ${{ steps.get-checksum.outputs.checksum }}
           uri: ${{ steps.upload.outputs.dependency-uri }}
-          file: "metadata.json"
+          file: ${{ steps.dependency-metadata.outputs.file }}
 
       - name: Upload modified metadata
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: "metadata.json"
-          path: "metadata.json"
+          name: ${{ steps.dependency-metadata.outputs.file }}
+          path: ${{ steps.dependency-metadata.outputs.file }}
 
   assemble:
     name: Update buildpack.toml
@@ -277,7 +313,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Checkout Branch
         uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
@@ -286,14 +322,35 @@ jobs:
 
       - name: Make Temporary Artifact Directory
         id: make-outputdir
-        run: |
-          echo "outputdir=$(mktemp -d)" >> "$GITHUB_OUTPUT"
+        run: echo "outputdir=$(mktemp -d)" >> "$GITHUB_OUTPUT"
 
-      - name: Download metadata.json
-        uses: actions/download-artifact@v3
+
+      # Metadata file for the non-compiled dependencies, if there are any
+      - name: Download metadata.json file
+        uses: actions/download-artifact@v4
         with:
-          name: metadata.json
-          path: "${{ steps.make-outputdir.outputs.outputdir }}"
+          path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
+          pattern: "from-source-metadata.json"
+          merge-multiple: true
+
+      # If we compiled the dependency, and updated the metadata:
+      # Download each metadata file, and combine them into one
+      - name: Download individual metadata-file.json file(s)
+        if: ${{ needs.update-metadata.result == 'success' }}
+        uses: actions/download-artifact@v4
+        with:
+          path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
+          pattern: "*metadata-file.json"
+          merge-multiple: true
+      - name: Display Metadata Files
+        run: ls "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
+      - name: Combine Metadata Files
+        run: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          shopt -s inherit_errexit
+
+          jq -s 'add' ${{ steps.make-outputdir.outputs.outputdir }}/metadata-files/* > "${{ steps.make-outputdir.outputs.outputdir }}/metadata.json"
 
       - name: Update dependencies from metadata.json
         id: update
