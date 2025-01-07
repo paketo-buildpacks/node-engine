@@ -142,12 +142,10 @@ function util::tools::pack::install() {
       pack_config_enable_experimental="false"
     fi
 
-    tmp_location="/tmp/pack.tgz"
     curl_args=(
       "--fail"
       "--silent"
       "--location"
-      "--output" "${tmp_location}"
     )
 
     if [[ "${token}" != "" ]]; then
@@ -160,16 +158,14 @@ function util::tools::pack::install() {
     arch=$(util::tools::arch --blank-amd64)
 
     curl "https://github.com/buildpacks/pack/releases/download/${version}/pack-${version}-${os}${arch:+-$arch}.tgz" \
-      "${curl_args[@]}"
-
-    tar xzf "${tmp_location}" -C "${dir}"
+      "${curl_args[@]}" | \
+        tar xzf - -C "${dir}"
     chmod +x "${dir}/pack"
 
     if [[ "${pack_config_enable_experimental}" == "true" ]]; then
       "${dir}"/pack config experimental true
     fi
 
-    rm "${tmp_location}"
   else
     util::print::info "Using pack $("${dir}"/pack version)"
   fi
