@@ -1,7 +1,8 @@
 module github.com/paketo-buildpacks/node-engine/retrieval
 
-go 1.21
-toolchain go1.23.4
+go 1.23.0
+
+toolchain go1.23.5
 
 // This is required because of a breaking change in a newer version
 replace github.com/ekzhu/minhash-lsh => github.com/ekzhu/minhash-lsh v0.0.0-20171225071031-5c06ee8586a1
