@@ -16,14 +16,19 @@ api = "0.7"
       "linux/amd64/bin/build",
       "linux/amd64/bin/detect",
       "linux/amd64/bin/run",
-      "linux/amd64/bin/setup-symlinks",
+      "linux/amd64/bin/optimize-memory,
+      "linux/amd64/bin/inspector,
       "linux/arm64/bin/build",
       "linux/arm64/bin/detect",
       "linux/arm64/bin/run",
-      "linux/arm64/bin/setup-symlinks"
+      "linux/arm64/bin/optimize-memory,
+      "linux/arm64/bin/inspector,
+      "buildpack.toml"
     ]
 
-    pre-package = "./scripts/build.sh --target linux/amd64 --target linux/arm64"  [metadata.default-versions]
+    pre-package = "./scripts/build.sh --target linux/amd64 --target linux/arm64"
+    
+    [metadata.default-versions]
       node = "20.*.*"
 
   [[metadata.dependencies]]

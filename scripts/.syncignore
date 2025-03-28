@@ -1,1 +1,4 @@
 options.json
+build.sh
+package.sh
+publish.sh
