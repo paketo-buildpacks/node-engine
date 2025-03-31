@@ -41,7 +41,7 @@ jobs:
         registries_filename="${{ env.REGISTRIES_FILENAME }}"
 
         push_to_dockerhub=true
-        push_to_gcr=true
+        push_to_gcr=false
 
         if [[ -f $registries_filename ]]; then
           if jq 'has("dockerhub")' $registries_filename > /dev/null; then
