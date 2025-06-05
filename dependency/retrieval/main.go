@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/joshuatcasey/libdependency/retrieve"
-	"github.com/joshuatcasey/libdependency/upstream"
-	"github.com/joshuatcasey/libdependency/versionology"
+	"github.com/paketo-buildpacks/libdependency/retrieve"
+	"github.com/paketo-buildpacks/libdependency/upstream"
+	"github.com/paketo-buildpacks/libdependency/versionology"
 	"github.com/paketo-buildpacks/packit/v2/cargo"
 )
 
