@@ -196,33 +196,6 @@ function util::tools::packager::install () {
     fi
 }
 
-function util::tools::create-package::install () {
-  local dir version
-    while [[ "${#}" != 0 ]]; do
-      case "${1}" in
-        --directory)
-          dir="${2}"
-          shift 2
-          ;;
-
-        *)
-          util::print::error "unknown argument \"${1}\""
-          ;;
-
-      esac
-    done
-
-    version="$(jq -r .createpackage "$(dirname "${BASH_SOURCE[0]}")/tools.json")"
-
-    mkdir -p "${dir}"
-    util::tools::path::export "${dir}"
-
-    if [[ ! -f "${dir}/create-package" ]]; then
-      util::print::title "Installing create-package"
-      GOBIN="${dir}" go install -ldflags="-s -w" "github.com/paketo-buildpacks/libpak/cmd/create-package@${version}"
-    fi
-}
-
 function util::tools::tests::checkfocus() {
   testout="${1}"
   if grep -q 'Focused: [1-9]' "${testout}"; then
