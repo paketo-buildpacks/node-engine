@@ -152,14 +152,13 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		content, err := io.ReadAll(cdx.Content)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(content)).To(MatchJSON(`{
+            "$schema": "http://cyclonedx.org/schema/bom-1.3.schema.json",
 			"bomFormat": "CycloneDX",
-			"components": [],
 			"metadata": {
 				"tools": [
 					{
-						"name": "syft",
-						"vendor": "anchore",
-						"version": "[not provided]"
+						"name": "",
+						"vendor": "anchore"
 					}
 				]
 			},
@@ -176,16 +175,28 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				"created": "0001-01-01T00:00:00Z",
 				"creators": [
 					"Organization: Anchore, Inc",
-					"Tool: syft-"
+					"Tool: -"
 				],
-				"licenseListVersion": "3.16"
+				"licenseListVersion": "3.25"
 			},
+            "packages": [
+                {
+                  "SPDXID": "SPDXRef-DocumentRoot-Unknown-",
+                  "copyrightText": "NOASSERTION",
+                  "downloadLocation": "NOASSERTION",
+                  "filesAnalyzed": false,
+                  "licenseConcluded": "NOASSERTION",
+                  "licenseDeclared": "NOASSERTION",
+                  "name": "",
+                  "supplier": "NOASSERTION"
+                }
+              ],
 			"dataLicense": "CC0-1.0",
-			"documentNamespace": "https://paketo.io/packit/unknown-source-type/unknown-88cfa225-65e0-5755-895f-c1c8f10fde76",
+            "documentNamespace": "https://paketo.io/unknown-source-type/unknown-9ecf240a-d971-5a3c-8e7b-6d3f3ea4d9c2",
 			"name": "unknown",
 			"relationships": [
 				{
-					"relatedSpdxElement": "SPDXRef-DOCUMENT",
+				    "relatedSpdxElement": "SPDXRef-DocumentRoot-Unknown-",
 					"relationshipType": "DESCRIBES",
 					"spdxElementId": "SPDXRef-DOCUMENT"
 				}
