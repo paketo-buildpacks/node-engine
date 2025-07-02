@@ -258,15 +258,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      .node-version -> \"18.*\"",
+					"      .node-version -> \"20.*\"",
 					"      <unknown>     -> \"\"",
 				))
 				Expect(logs).To(ContainLines(
-					MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 18\.\d+\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using \.node-version\): 20\.\d+\.\d+`),
 				))
 				Expect(logs).To(ContainLines(
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 18\.\d+\.\d+`),
+					MatchRegexp(`    Installing Node Engine 20\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
 				))
 				Expect(logs).To(ContainLines(
@@ -344,15 +344,15 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
-					"      .nvmrc    -> \"18.*\"",
+					"      .nvmrc    -> \"20.*\"",
 					"      <unknown> -> \"\"",
 				))
 				Expect(logs).To(ContainLines(
-					MatchRegexp(`    Selected Node Engine version \(using \.nvmrc\): 18\.\d+\.\d+`),
+					MatchRegexp(`    Selected Node Engine version \(using \.nvmrc\): 20\.\d+\.\d+`),
 				))
 				Expect(logs).To(ContainLines(
 					"  Executing build process",
-					MatchRegexp(`    Installing Node Engine 18\.\d+\.\d+`),
+					MatchRegexp(`    Installing Node Engine 20\.\d+\.\d+`),
 					MatchRegexp(`      Completed in \d+(\.\d+)?`),
 				))
 				Expect(logs).To(ContainLines(
