@@ -58,7 +58,7 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 			Expect(os.RemoveAll(sbomDir)).To(Succeed())
 		})
 
-		context("when running Node 18", func() {
+		context("when running Node 20", func() {
 			it("uses the OpenSSL CA store to verify certificates", func() {
 				var (
 					logs fmt.Stringer
@@ -72,7 +72,7 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 					).
 					WithPullPolicy("never").
 					WithEnv(map[string]string{
-						"BP_NODE_VERSION": "18.*.*",
+						"BP_NODE_VERSION": "20.*.*",
 					}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
@@ -84,7 +84,7 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(container).Should(Serve("hello world"))
-				Expect(container).To(Serve(ContainSubstring("v18.")).WithEndpoint("/version"))
+				Expect(container).To(Serve(ContainSubstring("v20.")).WithEndpoint("/version"))
 				Expect(container).To(Serve(ContainSubstring("301 Moved")).WithEndpoint("/test-openssl-ca"))
 
 				Expect(logs).To(ContainLines(

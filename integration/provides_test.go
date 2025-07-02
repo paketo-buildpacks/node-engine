@@ -68,11 +68,11 @@ func testProvides(t *testing.T, context spec.G, it spec.S) {
 				"      <unknown> -> \"\"",
 			))
 			Expect(logs).To(ContainLines(
-				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 20\.\d+\.\d+`),
+				MatchRegexp(`    Selected Node Engine version \(using <unknown>\): 22\.\d+\.\d+`),
 			))
 			Expect(logs).To(ContainLines(
 				"  Executing build process",
-				MatchRegexp(`    Installing Node Engine 20\.\d+\.\d+`),
+				MatchRegexp(`    Installing Node Engine 22\.\d+\.\d+`),
 				MatchRegexp(`      Completed in \d+(\.\d+)?`),
 			))
 			Expect(logs).To(ContainLines(
