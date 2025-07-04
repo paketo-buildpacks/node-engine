@@ -16,6 +16,36 @@ api = "0.7"
   [metadata.default-versions]
     node = "22.*.*"
 
+[[metadata.dependencies]]
+    checksum = "sha256:deaf9695966087815a09c1c8e7fb0cfeb5b5b4471836e5993431230a845becad"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.20.7:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v18.20.7?checksum=deaf9695966087815a09c1c8e7fb0cfeb5b5b4471836e5993431230a845becad&download_url=https://nodejs.org/dist/v18.20.7/node-v18.20.7-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.20.7/node-v18.20.7-linux-x64.tar.xz"
+    source-checksum = "sha256:deaf9695966087815a09c1c8e7fb0cfeb5b5b4471836e5993431230a845becad"
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v18.20.7/node-v18.20.7-linux-x64.tar.xz"
+    version = "18.20.7"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:5467ee62d6af1411d46b6a10e3fb5cacc92734dbcef465fea14e7b90993001c9"
+    cpe = "cpe:2.3:a:nodejs:node.js:18.20.8:*:*:*:*:*:*:*"
+    deprecation_date = "2025-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v18.20.8?checksum=5467ee62d6af1411d46b6a10e3fb5cacc92734dbcef465fea14e7b90993001c9&download_url=https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz"
+    source-checksum = "sha256:5467ee62d6af1411d46b6a10e3fb5cacc92734dbcef465fea14e7b90993001c9"
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz"
+    version = "18.20.8"
+
   [[metadata.dependencies]]
     checksum = "sha256:cbe59620b21732313774df4428586f7222a84af29e556f848abf624ba41caf90"
     cpe = "cpe:2.3:a:nodejs:node.js:20.19.2:*:*:*:*:*:*:*"
@@ -105,6 +135,11 @@ api = "0.7"
     strip-components = 1
     uri = "https://nodejs.org/dist/v24.3.0/node-v24.3.0-linux-x64.tar.xz"
     version = "24.3.0"
+
+  [[metadata.dependency-constraints]]
+    constraint = "18.*"
+    id = "node"
+    patches = 2
 
   [[metadata.dependency-constraints]]
     constraint = "20.*"
