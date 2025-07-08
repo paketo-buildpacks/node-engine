@@ -17,7 +17,7 @@ concurrency: release
 jobs:
   unit:
     name: Unit Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       builders: ${{ steps.builders.outputs.builders }}
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   integration:
     name: Integration Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: unit
     strategy:
       matrix:
@@ -59,7 +59,7 @@ jobs:
 
   release:
     name: Release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: integration
     steps:
     - name: Setup Go
@@ -144,7 +144,7 @@ jobs:
 
   failure:
     name: Alert on Failure
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ unit, integration, release ]
     if: ${{ always() && needs.unit.result == 'failure' || needs.integration.result == 'failure' || needs.release.result == 'failure' }}
     steps:

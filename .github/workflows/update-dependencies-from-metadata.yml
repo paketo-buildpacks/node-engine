@@ -388,7 +388,7 @@ jobs:
 
   failure:
     name: Alert on Failure
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ retrieve, get-compile-and-test, test, compile, update-metadata, assemble ]
     if: ${{ always() && needs.retrieve.result == 'failure' || needs.get-compile-and-test.result == 'failure' || needs.test.result == 'failure' || needs.compile.result == 'failure' || needs.update-metadata.result == 'failure' || needs.assemble.result == 'failure' }}
     steps:
