@@ -26,7 +26,7 @@ jobs:
       with:
         go-version: 'stable'
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Run Unit Tests
       run: ./scripts/unit.sh
     - name: Get builders from integration.json
@@ -51,7 +51,7 @@ jobs:
       with:
         go-version: 'stable'
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Run Integration Tests
       run: ./scripts/integration.sh --builder ${{ matrix.builder }} --token ${{ github.token }}
       env:
@@ -68,7 +68,7 @@ jobs:
         go-version: 'stable'
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-tags: true
 
