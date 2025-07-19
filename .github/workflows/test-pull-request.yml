@@ -18,7 +18,7 @@ jobs:
       builders: ${{ steps.builders.outputs.builders }}
     steps:
     - name: Setup Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 'stable'
 
@@ -49,7 +49,7 @@ jobs:
       fail-fast: false  # don't cancel all test jobs when one fails
     steps:
     - name: Setup Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 'stable'
 
