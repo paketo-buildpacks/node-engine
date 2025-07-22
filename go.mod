@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.37.0
 	github.com/paketo-buildpacks/libnodejs v0.4.0
 	github.com/paketo-buildpacks/occam v0.28.0
-	github.com/paketo-buildpacks/packit/v2 v2.21.0
+	github.com/paketo-buildpacks/packit/v2 v2.22.0
 	github.com/sclevine/spec v1.4.0
 )
 
@@ -54,8 +54,8 @@ require (
 	github.com/anchore/go-sync v0.0.0-20250326131806-4eda43a485b6 // indirect
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20250220190351-d62adb6e1115 // indirect
-	github.com/anchore/stereoscope v0.1.6 // indirect
-	github.com/anchore/syft v1.28.0 // indirect
+	github.com/anchore/stereoscope v0.1.7-0.20250716200927-94c6f92877d4 // indirect
+	github.com/anchore/syft v1.29.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aquasecurity/go-pep440-version v0.0.1 // indirect
@@ -88,7 +88,7 @@ require (
 	github.com/containerd/fifo v1.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
-	github.com/containerd/stargz-snapshotter/estargz v0.16.3 // indirect
+	github.com/containerd/stargz-snapshotter/estargz v0.17.0 // indirect
 	github.com/containerd/ttrpc v1.2.7 // indirect
 	github.com/containerd/typeurl/v2 v2.2.3 // indirect
 	github.com/cpuguy83/dockercfg v0.3.2 // indirect
