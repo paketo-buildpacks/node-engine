@@ -73,7 +73,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.3.1 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
-	github.com/charmbracelet/x/ansi v0.9.3 // indirect
+	github.com/charmbracelet/x/ansi v0.10.1 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
@@ -273,7 +273,7 @@ require (
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/api v0.244.0 // indirect
+	google.golang.org/api v0.246.0 // indirect
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250721164621-a45f3dfb1074 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
