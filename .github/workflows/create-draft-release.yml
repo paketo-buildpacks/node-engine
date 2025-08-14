@@ -21,12 +21,12 @@ jobs:
     outputs:
       builders: ${{ steps.builders.outputs.builders }}
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
-        go-version: 'stable'
-    - name: Checkout
-      uses: actions/checkout@v4
+        go-version-file: go.mod
     - name: Run Unit Tests
       run: ./scripts/unit.sh
     - name: Get builders from integration.json
@@ -46,12 +46,12 @@ jobs:
         builder: ${{ fromJSON(needs.unit.outputs.builders) }}
       fail-fast: false  # don't cancel all test jobs when one fails
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
-        go-version: 'stable'
-    - name: Checkout
-      uses: actions/checkout@v4
+        go-version-file: go.mod
     - name: Run Integration Tests
       run: ./scripts/integration.sh --builder ${{ matrix.builder }} --token ${{ github.token }}
       env:
@@ -62,15 +62,15 @@ jobs:
     runs-on: ubuntu-24.04
     needs: integration
     steps:
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: 'stable'
-
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-tags: true
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
 
     - name: Reset Draft Release
       id: reset
