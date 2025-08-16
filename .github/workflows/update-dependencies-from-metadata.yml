@@ -63,7 +63,6 @@ jobs:
           printf "compilation-json<<%s\n%s\n%s\n" "${delimiter}" "${compilation}" "${delimiter}" >> "$GITHUB_OUTPUT" # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
           echo "compilation-length=$complength" >> "$GITHUB_OUTPUT"
 
-
       - name: Upload `${{ steps.retrieve.outputs.metadata-filepath }}`
         uses: actions/upload-artifact@v4
         with:
@@ -168,50 +167,15 @@ jobs:
     #   AND:
     #   (3) there is at least one version to compile/test
     if: ${{ needs.retrieve.outputs.compilation-length > 0 && (needs.get-compile-and-test.outputs.should-compile == 'true' || needs.get-compile-and-test.outputs.should-test == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Make Temporary Artifact Directory
-        id: make-outputdir
-        run: |
-          echo "outputdir=$(mktemp -d)" >> "$GITHUB_OUTPUT"
-
-      # Compile if all of the following conditions are met:
-      #   (1) compilation Github Action presetn in the buildpack directory
-      #   (2) checksum in metadata.json is empty
-      #   (3) URI in metadata.json is empty
-      - name: Compile version ${{ matrix.includes.version }} on ${{ matrix.includes.target }} Dockerfile
-        id: compile
-        if: ${{ needs.get-compile-and-test.outputs.should-compile && matrix.includes.checksum == '' && matrix.includes.uri == '' }}
-        uses: ./dependency/actions/compile
-        with:
-          version: "${{ matrix.includes.version }}"
-          outputdir: "${{ steps.make-outputdir.outputs.outputdir }}"
-          target: "${{ matrix.includes.target }}"
-
-      # If compiled, upload the tarball and checksum file for usage in the Update metadata job
-      - name: Upload workflow asset
-        uses: actions/upload-artifact@v4
-        if: ${{ needs.get-compile-and-test.outputs.should-compile && matrix.includes.checksum == '' && matrix.includes.uri == '' }}
-        with:
-          name: '${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.target }}'
-          path: '${{ steps.make-outputdir.outputs.outputdir }}/*'
-
-      # Test the dependency tarball if:
-      #   (1) dependency testing code is present in the buildpack directory
-      - name: Test Dependency
-        working-directory: dependency
-        if: ${{ needs.get-compile-and-test.outputs.should-test == 'true' }}
-        run: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-          shopt -s inherit_errexit
-
-          make test \
-            version="${{ matrix.includes.version }}" \
-            tarballPath="${{ steps.make-outputdir.outputs.outputdir }}/*.tgz"
+    uses: ./.github/workflows/compile-dependency.yml
+    with:
+      version: "${{ matrix.includes.version }}"
+      target: "${{ matrix.includes.target }}"
+      os: "${{ matrix.includes.os }}"
+      arch: "${{ matrix.includes.arch }}"
+      shouldCompile: ${{ matrix.includes.checksum == '' && matrix.includes.uri == '' }}
+      shouldTest: ${{ matrix.includes.checksum == '' && matrix.includes.uri == '' && needs.get-compile-and-test.outputs.should-test == 'true' }}
+      uploadArtifactName: "${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.os != '' && matrix.includes.os || 'linux' }}-${{ matrix.includes.arch != '' && matrix.includes.arch || 'amd64' }}-${{ matrix.includes.target }}"
 
   # Add in the checksum and URI fields to the metadata if the dependency was compiled
   update-metadata:
@@ -232,7 +196,7 @@ jobs:
       - name: Download artifact files
         uses: actions/download-artifact@v4
         with:
-          name: '${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.target }}'
+          name: "${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.os != '' && matrix.includes.os || 'linux' }}-${{ matrix.includes.arch != '' && matrix.includes.arch || 'amd64' }}-${{ matrix.includes.target }}"
 
       - name: Get artifact file name
         id: get-file-names
@@ -277,8 +241,13 @@ jobs:
           set -euo pipefail
           shopt -s inherit_errexit
 
-          metadata_file_name="${{ matrix.includes.target }}-${{ matrix.includes.version }}-metadata-file.json"
-          cat metadata.json | jq -r ['.[] | select( .version == "${{ matrix.includes.version }}" and .target == "${{ matrix.includes.target }}")'] > $metadata_file_name
+          metadata_file_name="${{ matrix.includes.target }}-${{ matrix.includes.version }}-${{ matrix.includes.os != '' && matrix.includes.os || 'linux' }}-${{ matrix.includes.arch != '' && matrix.includes.arch || 'amd64' }}-metadata-file.json"
+          if [[ -z "${{ matrix.includes.os }}" && -z "${{ matrix.includes.arch }}" ]]; then
+            cat metadata.json | jq -r ['.[] | select( .version == "${{ matrix.includes.version }}" and .target == "${{ matrix.includes.target }}")'] > $metadata_file_name
+          else
+            echo "multi-arch buildpack with os and arch specified"
+            cat metadata.json | jq -r ['.[] | select( .version == "${{ matrix.includes.version }}" and .target == "${{ matrix.includes.target }}" and .os == "${{ matrix.includes.os }}" and .arch == "${{ matrix.includes.arch }}")'] > $metadata_file_name
+          fi
           echo "file=$(echo $metadata_file_name)" >> "$GITHUB_OUTPUT"
 
       - name: Update `checksum` and `uri` in metadata for ${{ matrix.includes.target }} ${{ matrix.includes.version }}
@@ -290,6 +259,8 @@ jobs:
           checksum: ${{ steps.get-checksum.outputs.checksum }}
           uri: ${{ steps.upload.outputs.dependency-uri }}
           file: ${{ steps.dependency-metadata.outputs.file }}
+          os: ${{ matrix.includes.os }}
+          arch: ${{ matrix.includes.arch }}
 
       - name: Upload modified metadata
         uses: actions/upload-artifact@v4
@@ -384,7 +355,7 @@ jobs:
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
           title: "Updates buildpack.toml with ${{ steps.update.outputs.new-versions }}"
-          branch: automation/buildpack.toml/update-from-metadata
+          branch: automation/dependencies/update-from-metadata
 
   failure:
     name: Alert on Failure
