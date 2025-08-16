@@ -61,6 +61,12 @@ jobs:
     name: Release
     runs-on: ubuntu-24.04
     needs: integration
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -110,6 +116,16 @@ jobs:
           echo "buildpack_type=buildpack" >> "$GITHUB_OUTPUT"
         fi
 
+    - name: Get buildpack path
+      id: get_buildpack_path
+      run: |
+
+        if [ -f "build/buildpackage.cnb" ]; then
+          echo "path=build/buildpackage.cnb" >> "$GITHUB_OUTPUT"
+        else
+          echo "path=build/buildpackage-linux-amd64.cnb" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Create Release Notes
       id: create-release-notes
       uses: paketo-buildpacks/github-config/actions/release/notes@main
@@ -117,6 +133,69 @@ jobs:
         repo: ${{ github.repository }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
         buildpack_type: ${{ steps.get_buildpack_type.outputs.buildpack_type }}
+        buildpackage_path: ${{ steps.get_buildpack_path.outputs.path }}
+
+    - name: Get Image Digest
+      id: image_digest
+      run: |
+        image_name="localhost:5000/npm-install:latest"
+
+        ./scripts/publish.sh \
+          --buildpack-type ${{ steps.get_buildpack_type.outputs.buildpack_type }} \
+          --image-ref $image_name
+
+        echo "digest=$(sudo skopeo inspect "docker://${image_name}" --tls-verify=false | jq -r .Digest)" >> "$GITHUB_OUTPUT"
+
+    - name: Set Correct Image Digest on the Release notes
+      run: |
+          printf '${{ steps.create-release-notes.outputs.release_body }}' \
+            | sed -E \
+              "s/\*\*Digest:\*\* \`sha256:[a-f0-9]{64}\`/\*\*Digest:\*\* \`${{ steps.image_digest.outputs.digest }}\`/" \
+              > ./release_notes
+
+          printf '${{ steps.image_digest.outputs.digest }}' > ./index-digest.sha256
+
+    - name: Create release assets
+      id: create_release_assets
+      run: |
+        release_assets=$(jq -n --arg repo_name "${{ github.event.repository.name }}" --arg tag "${{ steps.tag.outputs.tag }}" '
+        [
+          {
+            "path": "build/buildpack.tgz",
+            "name": ($repo_name + "-" + $tag + ".tgz"),
+            "content_type": "application/gzip"
+          },
+          {
+            "path": "./index-digest.sha256",
+            "name": ($repo_name + "-" + $tag + "-" + "index-digest.sha256"),
+            "content_type": "text/plain"
+          }
+        ]')
+
+        for filepath in build/*.cnb; do
+          filename=$(basename "$filepath")
+          asset_name=""
+          if [[ "$filename" == "buildpackage-linux-amd64.cnb" ]]; then
+            asset_name="${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.cnb"
+          elif [[ "$filename" == "buildpackage.cnb" ]]; then
+            asset_name="${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.cnb"
+          else
+            formatted_filename="${filename#buildpackage-}"
+            asset_name="${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}-${formatted_filename}"
+          fi
+
+          release_assets=$(echo "$release_assets" | jq --arg asset_name "${asset_name}" --arg filepath "$filepath" '
+          . + [
+            {
+              "path": $filepath,
+              "name": $asset_name,
+              "content_type": "application/gzip"
+            }
+          ]')
+        done
+
+        release_assets=$(jq -c <<< "$release_assets" )
+        printf "release_assets=%s\n" "${release_assets}" >> "$GITHUB_OUTPUT"
 
     - name: Create Release
       uses: paketo-buildpacks/github-config/actions/release/create@main
@@ -126,21 +205,9 @@ jobs:
         tag_name: v${{ steps.tag.outputs.tag }}
         target_commitish: ${{ github.sha }}
         name: v${{ steps.tag.outputs.tag }}
-        body: ${{ steps.create-release-notes.outputs.release_body }}
+        body_filepath: "./release_notes"
         draft: true
-        assets: |
-          [
-            {
-              "path": "build/buildpack.tgz",
-              "name": "${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz",
-              "content_type": "application/gzip"
-            },
-            {
-              "path": "build/buildpackage.cnb",
-              "name": "${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.cnb",
-              "content_type": "application/gzip"
-            }
-          ]
+        assets: ${{ steps.create_release_assets.outputs.release_assets }}
 
   failure:
     name: Alert on Failure
