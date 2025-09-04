@@ -37,7 +37,7 @@ func main() {
 	retrieve.NewMetadata("node", getAllVersions, generateMetadata)
 }
 
-func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionology.Dependency, error) {
+func generateMetadata(versionFetcher versionology.VersionFetcher, platform retrieve.Platform) ([]versionology.Dependency, error) {
 	version := versionFetcher.Version().String()
 
 	body, err := httpGet("https://nodejs.org/dist/index.json")
@@ -58,7 +58,7 @@ func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionolog
 
 	for _, release := range nodeReleases {
 		if strings.TrimPrefix(release.Version, "v") == version {
-			return createDependencyMetadata(release, releaseSchedule)
+			return createDependencyMetadata(release, releaseSchedule, platform)
 		}
 	}
 
@@ -108,11 +108,11 @@ func getReleaseSchedule() (ReleaseSchedule, error) {
 	return releaseSchedule, nil
 }
 
-func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedule) ([]versionology.Dependency, error) {
+func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedule, platform retrieve.Platform) ([]versionology.Dependency, error) {
 	version := release.Version
-	url := fmt.Sprintf("https://nodejs.org/dist/%[1]s/node-%[1]s-linux-x64.tar.xz", version)
+	url := fmt.Sprintf("https://nodejs.org/dist/%[1]s/node-%[1]s-%[2]s-%[3]s.tar.xz", version, platform.OS, platform.Arch)
 
-	checksum, err := getChecksum(version)
+	checksum, err := getChecksum(version, platform)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +133,8 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		DeprecationDate: deprecationDate,
 		StripComponents: 1,
 		Stacks:          []string{"io.buildpacks.stacks.jammy", "*"},
+		OS:              platform.OS,
+		Arch:            platform.Arch,
 	}
 
 	jammyDependency, err := versionology.NewDependency(dep, "jammy")
@@ -161,7 +163,8 @@ func getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.T
 	return &deprecationDate
 }
 
-func getChecksum(version string) (string, error) {
+func getChecksum(version string, platform retrieve.Platform) (string, error) {
+
 	body, err := httpGet(fmt.Sprintf("https://nodejs.org/dist/%s/SHASUMS256.txt", version))
 	if err != nil {
 		return "", fmt.Errorf("could not get SHA256 file: %w", err)
@@ -169,12 +172,12 @@ func getChecksum(version string) (string, error) {
 
 	var dependencySHA string
 	for _, line := range strings.Split(string(body), "\n") {
-		if strings.HasSuffix(line, fmt.Sprintf("node-%s-linux-x64.tar.xz", version)) {
+		if strings.HasSuffix(line, fmt.Sprintf("node-%[1]s-%[2]s-%[3]s.tar.xz", version, platform.OS, platform.Arch)) {
 			dependencySHA = strings.Fields(line)[0]
 		}
 	}
 	if dependencySHA == "" {
-		return "", fmt.Errorf("could not find SHA256 for node-%s-linux-x64.tar.xz", version)
+		return "", fmt.Errorf("could not find SHA256 for node-%s-%s-%s.tar.xz", version, platform.OS, platform.Arch)
 	}
 	return dependencySHA, nil
 }
