@@ -34,10 +34,10 @@ func (nodeMetadata NodeMetadata) Version() *semver.Version {
 }
 
 func main() {
-	retrieve.NewMetadata("node", getAllVersions, generateMetadata)
+	retrieve.NewMetadataWithPlatforms("node", getAllVersions, generateMetadataWithPlatform, transformPlatforms)
 }
 
-func generateMetadata(versionFetcher versionology.VersionFetcher, platform retrieve.Platform) ([]versionology.Dependency, error) {
+func generateMetadataWithPlatform(versionFetcher versionology.VersionFetcher, platform retrieve.Platform) ([]versionology.Dependency, error) {
 	version := versionFetcher.Version().String()
 
 	body, err := httpGet("https://nodejs.org/dist/index.json")
@@ -89,6 +89,26 @@ func getAllVersions() (versionology.VersionFetcherArray, error) {
 	}
 
 	return versions, nil
+}
+
+func transformPlatforms(platforms []retrieve.Platform) []retrieve.Platform {
+	var transformed []retrieve.Platform
+
+	if len(platforms) == 0 {
+		platforms = append(platforms, retrieve.Platform{
+			OS:   "linux",
+			Arch: "amd64",
+		})
+	}
+
+	for i := range platforms {
+		if platforms[i].Arch == "amd64" {
+			platforms[i].Arch = "x64"
+		}
+		transformed = append(transformed, platforms[i])
+	}
+	return transformed
+
 }
 
 func getReleaseSchedule() (ReleaseSchedule, error) {
