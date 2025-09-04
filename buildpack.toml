@@ -47,21 +47,6 @@ api = "0.7"
     version = "18.20.8"
 
   [[metadata.dependencies]]
-    checksum = "sha256:c210e1a547efad55e93af1e04fb80d2f7131b13872f2de4e9ebdfecb8e06caad"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.19.3:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "MIT", "MIT-0", "SHL-0.5", "SHL-0.51", "Unicode-TOU"]
-    name = "Node Engine"
-    purl = "pkg:generic/node@v20.19.3?checksum=c210e1a547efad55e93af1e04fb80d2f7131b13872f2de4e9ebdfecb8e06caad&download_url=https://nodejs.org/dist/v20.19.3/node-v20.19.3-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.19.3/node-v20.19.3-linux-x64.tar.xz"
-    source-checksum = "sha256:c210e1a547efad55e93af1e04fb80d2f7131b13872f2de4e9ebdfecb8e06caad"
-    stacks = ["io.buildpacks.stacks.jammy", "*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v20.19.3/node-v20.19.3-linux-x64.tar.xz"
-    version = "20.19.3"
-
-  [[metadata.dependencies]]
     checksum = "sha256:7a488a09e2fc02fbd1bc4ae084bea8a589314f741c182fc02c5f3f07c79a29d4"
     cpe = "cpe:2.3:a:nodejs:node.js:20.19.4:*:*:*:*:*:*:*"
     deprecation_date = "2026-04-30T00:00:00Z"
@@ -75,6 +60,21 @@ api = "0.7"
     strip-components = 1
     uri = "https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-x64.tar.xz"
     version = "20.19.4"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:315046739a513a70e03a4a55a8afda8cf979f30852e576075c340084e3f8ac0f"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.19.5:*:*:*:*:*:*:*"
+    deprecation_date = "2026-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "Zlib", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    purl = "pkg:generic/node@v20.19.5?checksum=315046739a513a70e03a4a55a8afda8cf979f30852e576075c340084e3f8ac0f&download_url=https://nodejs.org/dist/v20.19.5/node-v20.19.5-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.19.5/node-v20.19.5-linux-x64.tar.xz"
+    source-checksum = "sha256:315046739a513a70e03a4a55a8afda8cf979f30852e576075c340084e3f8ac0f"
+    stacks = ["io.buildpacks.stacks.jammy", "*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v20.19.5/node-v20.19.5-linux-x64.tar.xz"
+    version = "20.19.5"
 
   [[metadata.dependencies]]
     checksum = "sha256:c1bfeecf1d7404fa74728f9db72e697decbd8119ccc6f5a294d795756dfcfca7"
