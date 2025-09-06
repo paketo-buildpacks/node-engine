@@ -112,6 +112,7 @@ jobs:
         password: ${{ env.GCR_PASSWORD }}
         registry: ${{ env.GCR_REGISTRY }}
 
+    - uses: buildpacks/github-actions/setup-tools@v5.5.4
     - name: Push to DockerHub
       if: ${{  steps.parse_configs.outputs.push_to_dockerhub == 'true' }}
       id: push
@@ -126,11 +127,14 @@ jobs:
           --buildpack-type ${{ steps.get_buildpack_type.outputs.buildpack_type }} \
           --image-ref "${DOCKERHUB_REGISTRY}/${IMAGE}:${{ steps.event.outputs.tag_full }}"
 
-        ## Validate that the digest pushed to registry matches with the one mentioned on the readme file
-        pushed_image_index_digest=$(sudo skopeo inspect "docker://${DOCKERHUB_REGISTRY}/${IMAGE}:${{ steps.event.outputs.tag_full }}" | jq -r .Digest)
+        ## Validate that the image index digest pushed to registry matches with the one on the release notes
+        pushed_image_index_digest=$(crane digest "${DOCKERHUB_REGISTRY}/${IMAGE}:${{ steps.event.outputs.tag_full }}" | xargs)
+
+        echo "Index digest from release notes: $(cat ./index-digest.sha256)"
+        echo "Index digest pushed to registry: $pushed_image_index_digest"
 
         if [ "$(cat ./index-digest.sha256)" != "$pushed_image_index_digest" ]; then
-          echo "Image index digest pushed to registry does not match with the one mentioned on the readme file"
+          echo "The image index digest pushed to registry does not match the expected digest from release notes"
           exit 1;
         fi
 
