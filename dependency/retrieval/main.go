@@ -147,7 +147,7 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 
 	allStacksDependency, err := versionology.NewDependency(dep, "*")
 	if err != nil {
-		return nil, fmt.Errorf("could get create * dependency: %w", err)
+		return nil, fmt.Errorf("could not get create * dependency: %w", err)
 	}
 
 	return []versionology.Dependency{allStacksDependency}, nil
