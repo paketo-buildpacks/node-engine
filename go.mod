@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.38.2
 	github.com/paketo-buildpacks/libnodejs v0.4.0
 	github.com/paketo-buildpacks/occam v0.30.0
-	github.com/paketo-buildpacks/packit/v2 v2.24.0
+	github.com/paketo-buildpacks/packit/v2 v2.25.0
 	github.com/sclevine/spec v1.4.0
 )
 
@@ -297,7 +297,7 @@ require (
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
-	google.golang.org/grpc v1.75.0 // indirect
+	google.golang.org/grpc v1.75.1 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
