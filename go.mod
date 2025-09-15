@@ -1,12 +1,12 @@
 module github.com/paketo-buildpacks/node-engine/v5
 
-go 1.24.6
+go 1.24.7
 
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/onsi/gomega v1.38.2
-	github.com/paketo-buildpacks/libnodejs v0.4.0
+	github.com/paketo-buildpacks/libnodejs v0.4.1
 	github.com/paketo-buildpacks/occam v0.30.0
 	github.com/paketo-buildpacks/packit/v2 v2.25.0
 	github.com/sclevine/spec v1.4.0
@@ -304,7 +304,7 @@ require (
 	modernc.org/libc v1.66.8 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.38.2 // indirect
+	modernc.org/sqlite v1.39.0 // indirect
 )
 
 replace github.com/anchore/stereoscope v0.0.1 => github.com/anchore/stereoscope v0.0.0-20230412183729-8602f1afc574
