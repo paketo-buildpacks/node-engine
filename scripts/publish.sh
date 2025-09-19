@@ -29,7 +29,7 @@ function main {
       ;;
 
     --image-ref | -i)
-      image_ref+=("${2}")
+      image_ref="${2}"
       shift 2
       ;;
 
