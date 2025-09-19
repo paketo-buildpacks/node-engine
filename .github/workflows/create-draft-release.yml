@@ -22,9 +22,9 @@ jobs:
       builders: ${{ steps.builders.outputs.builders }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
     - name: Run Unit Tests
@@ -47,9 +47,9 @@ jobs:
       fail-fast: false  # don't cancel all test jobs when one fails
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
     - name: Run Integration Tests
@@ -63,18 +63,18 @@ jobs:
     needs: integration
     services:
       registry:
-        image: registry:2
+        image: registry:3
         ports:
           - 5000:5000
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-tags: true
 
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
