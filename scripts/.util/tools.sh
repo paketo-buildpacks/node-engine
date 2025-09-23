@@ -244,7 +244,7 @@ function util::tools::libpak-tools::install () {
     os=$(util::tools::os)
     arch=$(util::tools::arch --format-amd64-x86_64)
 
-    curl "https://github.com/paketo-buildpacks/libpak-tools/releases/download/${version}/libpak-tools_${os^}_${arch}.tar.gz" \
+    curl "https://github.com/paketo-buildpacks/libpak-tools/releases/download/${version}/libpak-tools_${os}_${arch}.tar.gz" \
       "${curl_args[@]}"
 
     tar -xzf "${dir}/libpak-tools.tar.gz" -C $dir
