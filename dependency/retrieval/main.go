@@ -34,10 +34,10 @@ func (nodeMetadata NodeMetadata) Version() *semver.Version {
 }
 
 func main() {
-	retrieve.NewMetadata("node", getAllVersions, generateMetadata)
+	retrieve.NewMetadataWithPlatforms("node", getAllVersions, generateMetadataWithPlatform)
 }
 
-func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionology.Dependency, error) {
+func generateMetadataWithPlatform(versionFetcher versionology.VersionFetcher, platform retrieve.Platform) ([]versionology.Dependency, error) {
 	version := versionFetcher.Version().String()
 
 	body, err := httpGet("https://nodejs.org/dist/index.json")
@@ -58,7 +58,7 @@ func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionolog
 
 	for _, release := range nodeReleases {
 		if strings.TrimPrefix(release.Version, "v") == version {
-			return createDependencyMetadata(release, releaseSchedule)
+			return createDependencyMetadata(release, releaseSchedule, platform)
 		}
 	}
 
@@ -108,11 +108,19 @@ func getReleaseSchedule() (ReleaseSchedule, error) {
 	return releaseSchedule, nil
 }
 
-func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedule) ([]versionology.Dependency, error) {
-	version := release.Version
-	url := fmt.Sprintf("https://nodejs.org/dist/%[1]s/node-%[1]s-linux-x64.tar.xz", version)
+func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedule, platform retrieve.Platform) ([]versionology.Dependency, error) {
 
-	checksum, err := getChecksum(version)
+	var nodeArch string
+	if platform.Arch == "amd64" {
+		nodeArch = "x64"
+	} else {
+		nodeArch = platform.Arch
+	}
+
+	version := release.Version
+	url := fmt.Sprintf("https://nodejs.org/dist/%[1]s/node-%[1]s-%[2]s-%[3]s.tar.xz", version, platform.OS, nodeArch)
+
+	checksum, err := getChecksum(version, platform)
 	if err != nil {
 		return nil, err
 	}
@@ -132,15 +140,17 @@ func createDependencyMetadata(release NodeRelease, releaseSchedule ReleaseSchedu
 		Licenses:        retrieve.LookupLicenses(url, upstream.DefaultDecompress),
 		DeprecationDate: deprecationDate,
 		StripComponents: 1,
-		Stacks:          []string{"io.buildpacks.stacks.jammy", "*"},
+		Stacks:          []string{"*"},
+		OS:              platform.OS,
+		Arch:            platform.Arch,
 	}
 
-	jammyDependency, err := versionology.NewDependency(dep, "jammy")
+	allStacksDependency, err := versionology.NewDependency(dep, "*")
 	if err != nil {
-		return nil, fmt.Errorf("could get create jammy dependency: %w", err)
+		return nil, fmt.Errorf("could not get create * dependency: %w", err)
 	}
 
-	return []versionology.Dependency{jammyDependency}, nil
+	return []versionology.Dependency{allStacksDependency}, nil
 }
 
 func getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.Time {
@@ -161,7 +171,15 @@ func getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.T
 	return &deprecationDate
 }
 
-func getChecksum(version string) (string, error) {
+func getChecksum(version string, platform retrieve.Platform) (string, error) {
+
+	var nodeArch string
+	if platform.Arch == "amd64" {
+		nodeArch = "x64"
+	} else {
+		nodeArch = platform.Arch
+	}
+
 	body, err := httpGet(fmt.Sprintf("https://nodejs.org/dist/%s/SHASUMS256.txt", version))
 	if err != nil {
 		return "", fmt.Errorf("could not get SHA256 file: %w", err)
@@ -169,12 +187,12 @@ func getChecksum(version string) (string, error) {
 
 	var dependencySHA string
 	for _, line := range strings.Split(string(body), "\n") {
-		if strings.HasSuffix(line, fmt.Sprintf("node-%s-linux-x64.tar.xz", version)) {
+		if strings.HasSuffix(line, fmt.Sprintf("node-%[1]s-%[2]s-%[3]s.tar.xz", version, platform.OS, nodeArch)) {
 			dependencySHA = strings.Fields(line)[0]
 		}
 	}
 	if dependencySHA == "" {
-		return "", fmt.Errorf("could not find SHA256 for node-%s-linux-x64.tar.xz", version)
+		return "", fmt.Errorf("could not find SHA256 for node-%s-%s-%s.tar.xz", version, platform.OS, nodeArch)
 	}
 	return dependencySHA, nil
 }
