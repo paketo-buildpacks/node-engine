@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.38.2
 	github.com/paketo-buildpacks/libnodejs v0.4.1
 	github.com/paketo-buildpacks/occam v0.30.1
-	github.com/paketo-buildpacks/packit/v2 v2.25.0
+	github.com/paketo-buildpacks/packit/v2 v2.25.1
 	github.com/sclevine/spec v1.4.0
 )
 
@@ -237,7 +237,7 @@ require (
 	github.com/sassoftware/go-rpmutils v0.4.0 // indirect
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
-	github.com/shirou/gopsutil/v4 v4.25.8 // indirect
+	github.com/shirou/gopsutil/v4 v4.25.9 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.4-0.20230606125235-dd1b4c2e81af // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
@@ -293,10 +293,10 @@ require (
 	golang.org/x/time v0.13.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.250.0 // indirect
+	google.golang.org/api v0.251.0 // indirect
 	google.golang.org/genproto v0.0.0-20250922171735-9219d122eba9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250922171735-9219d122eba9 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250922171735-9219d122eba9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
