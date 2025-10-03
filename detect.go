@@ -16,6 +16,8 @@ type VersionParser interface {
 type BuildPlanMetadata struct {
 	Version       string `toml:"version"`
 	VersionSource string `toml:"version-source"`
+	Build         bool   `toml:"build"`
+	Launch        bool   `toml:"launch"`
 }
 
 func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
@@ -76,6 +78,17 @@ func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 				Metadata: BuildPlanMetadata{
 					Version:       version,
 					VersionSource: NodeVersionSource,
+				},
+			})
+		}
+
+		targetOs := os.Getenv("CNB_TARGET_DISTRO_NAME")
+		if targetOs != "rhel" {
+			requirements = append(requirements, packit.BuildPlanRequirement{
+				Name: Cpython,
+				Metadata: BuildPlanMetadata{
+					Build:  true,
+					Launch: false,
 				},
 			})
 		}
