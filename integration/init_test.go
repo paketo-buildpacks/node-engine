@@ -30,7 +30,8 @@ var settings struct {
 			Online string
 		}
 		Cpython struct {
-			Online string
+			Online  string
+			Offline string
 		}
 	}
 
@@ -78,6 +79,11 @@ func TestIntegration(t *testing.T) {
 	Expect(err).NotTo(HaveOccurred())
 
 	settings.Buildpacks.Cpython.Online, err = buildpackStore.Get.
+		Execute(settings.Config.Cpython)
+	Expect(err).ToNot(HaveOccurred())
+
+	settings.Buildpacks.Cpython.Offline, err = buildpackStore.Get.
+		WithOfflineDependencies().
 		Execute(settings.Config.Cpython)
 	Expect(err).ToNot(HaveOccurred())
 
