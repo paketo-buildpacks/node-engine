@@ -31,7 +31,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		detect = nodeengine.Detect(nvmrcParser, nodeVersionParser)
 	})
 
-	it("returns a plan that provides node", func() {
+	it("returns a plan that provides node and cpython", func() {
 		result, err := detect(packit.DetectContext{
 			WorkingDir: "/working-dir",
 		})
@@ -40,11 +40,33 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			Provides: []packit.BuildPlanProvision{
 				{Name: nodeengine.Node},
 			},
+			Requires: []packit.BuildPlanRequirement{
+				{
+					Name: nodeengine.Cpython,
+					Metadata: nodeengine.BuildPlanMetadata{
+						Version:       "",
+						VersionSource: "",
+						Build:         true,
+						Launch:        false,
+					},
+				},
+			},
 			Or: []packit.BuildPlan{
 				{
 					Provides: []packit.BuildPlanProvision{
 						{Name: nodeengine.Node},
 						{Name: nodeengine.Npm},
+					},
+					Requires: []packit.BuildPlanRequirement{
+						{
+							Name: nodeengine.Cpython,
+							Metadata: nodeengine.BuildPlanMetadata{
+								Version:       "",
+								VersionSource: "",
+								Build:         true,
+								Launch:        false,
+							},
+						},
 					},
 				},
 			},
@@ -56,7 +78,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			nvmrcParser.ParseVersionCall.Returns.Version = "1.2.3"
 		})
 
-		it("returns a plan that provides and requires that version of node", func() {
+		it("returns a plan that provides and requires that version of node and cpython", func() {
 			result, err := detect(packit.DetectContext{
 				WorkingDir: "/working-dir",
 			})
@@ -73,6 +95,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							VersionSource: ".nvmrc",
 						},
 					},
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "",
+							VersionSource: "",
+							Build:         true,
+							Launch:        false,
+						},
+					},
 				},
 				Or: []packit.BuildPlan{
 					{
@@ -86,6 +117,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 								Metadata: nodeengine.BuildPlanMetadata{
 									Version:       "1.2.3",
 									VersionSource: ".nvmrc",
+								},
+							},
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "",
+									VersionSource: "",
+									Build:         true,
+									Launch:        false,
 								},
 							},
 						},
@@ -106,7 +146,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			os.Unsetenv("BP_NODE_VERSION")
 		})
 
-		it("returns a plan that provides and requires that version of node", func() {
+		it("returns a plan that provides and requires that version of node and cpython", func() {
 			result, err := detect(packit.DetectContext{
 				WorkingDir: "/working-dir",
 			})
@@ -123,6 +163,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							VersionSource: "BP_NODE_VERSION",
 						},
 					},
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "",
+							VersionSource: "",
+							Build:         true,
+							Launch:        false,
+						},
+					},
 				},
 				Or: []packit.BuildPlan{
 					{
@@ -136,6 +185,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 								Metadata: nodeengine.BuildPlanMetadata{
 									Version:       "4.5.6",
 									VersionSource: "BP_NODE_VERSION",
+								},
+							},
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "",
+									VersionSource: "",
+									Build:         true,
+									Launch:        false,
 								},
 							},
 						},
@@ -167,6 +225,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							VersionSource: ".node-version",
 						},
 					},
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "",
+							VersionSource: "",
+							Build:         true,
+							Launch:        false,
+						},
+					},
 				},
 				Or: []packit.BuildPlan{
 					{
@@ -180,6 +247,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 								Metadata: nodeengine.BuildPlanMetadata{
 									Version:       "7.8.9",
 									VersionSource: ".node-version",
+								},
+							},
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "",
+									VersionSource: "",
+									Build:         true,
+									Launch:        false,
 								},
 							},
 						},
@@ -221,6 +297,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							VersionSource: ".node-version",
 						},
 					},
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Version:       "",
+							VersionSource: "",
+							Build:         true,
+							Launch:        false,
+						},
+					},
 				},
 				Or: []packit.BuildPlan{
 					{
@@ -241,6 +326,15 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 								Metadata: nodeengine.BuildPlanMetadata{
 									Version:       "7.8.9",
 									VersionSource: ".node-version",
+								},
+							},
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Version:       "",
+									VersionSource: "",
+									Build:         true,
+									Launch:        false,
 								},
 							},
 						},
