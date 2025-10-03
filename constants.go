@@ -1,8 +1,9 @@
 package nodeengine
 
 const (
-	Node = "node"
-	Npm  = "npm"
+	Node    = "node"
+	Npm     = "npm"
+	Cpython = "cpython"
 
 	DepKey             = "dependency-sha"
 	BuildKey           = "build"
