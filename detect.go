@@ -2,6 +2,7 @@ package nodeengine
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit/v2"
@@ -16,6 +17,8 @@ type VersionParser interface {
 type BuildPlanMetadata struct {
 	Version       string `toml:"version"`
 	VersionSource string `toml:"version-source"`
+	Build         bool   `toml:"build"`
+	Launch        bool   `toml:"launch"`
 }
 
 func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
@@ -76,6 +79,20 @@ func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 				Metadata: BuildPlanMetadata{
 					Version:       version,
 					VersionSource: NodeVersionSource,
+				},
+			})
+		}
+
+		targetOs := os.Getenv("CNB_TARGET_DISTRO_NAME")
+		_, pythonNotFound := exec.LookPath("python")
+
+		installPython := (targetOs != "rhel" && pythonNotFound != nil)
+		if installPython {
+			requirements = append(requirements, packit.BuildPlanRequirement{
+				Name: Cpython,
+				Metadata: BuildPlanMetadata{
+					Build:  true,
+					Launch: false,
 				},
 			})
 		}

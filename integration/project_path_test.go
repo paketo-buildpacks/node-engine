@@ -60,6 +60,7 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
+					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
