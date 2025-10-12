@@ -81,7 +81,6 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 
 			imageIDs[firstImage.ID] = struct{}{}
 
-			//print first image content
 
 			Expect(firstImage.Buildpacks).To(HaveLen(3))
 			Expect(firstImage.Buildpacks[1].Key).To(Equal(settings.Buildpack.ID))
