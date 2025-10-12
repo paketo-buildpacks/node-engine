@@ -71,6 +71,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
@@ -183,6 +184,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					WithPullPolicy("never").
 					WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
@@ -248,6 +250,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
@@ -334,6 +337,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
@@ -415,6 +419,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Deprecated,
 						settings.Buildpacks.BuildPlan.Online,
 					).
@@ -443,6 +448,7 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).

@@ -29,6 +29,10 @@ var settings struct {
 		Processes struct {
 			Online string
 		}
+		Cpython struct {
+			Online  string
+			Offline string
+		}
 	}
 
 	Buildpack struct {
@@ -38,6 +42,7 @@ var settings struct {
 
 	Config struct {
 		BuildPlan string `json:"build-plan"`
+		Cpython   string `json:"cpython"`
 	}
 }
 
@@ -72,6 +77,15 @@ func TestIntegration(t *testing.T) {
 		WithVersion("1.2.3").
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
+
+	settings.Buildpacks.Cpython.Online, err = buildpackStore.Get.
+		Execute(settings.Config.Cpython)
+	Expect(err).ToNot(HaveOccurred())
+
+	settings.Buildpacks.Cpython.Offline, err = buildpackStore.Get.
+		WithOfflineDependencies().
+		Execute(settings.Config.Cpython)
+	Expect(err).ToNot(HaveOccurred())
 
 	tmpBuildpackDir, err := os.MkdirTemp("", "node-engine-outdated-deps")
 	Expect(err).NotTo(HaveOccurred())
