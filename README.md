@@ -2,9 +2,9 @@
 
 ## `docker.io/paketobuildpacks/node-engine`
 
-The Node Engine CNB provides the Node binary distribution.  The buildpack
+The Node Engine CNB provides the Node binary distribution. The buildpack
 installs the Node binary distribution onto the `$PATH` which makes it available
-for subsequent buildpacks and in the final running container.  Examples of
+for subsequent buildpacks and in the final running container. Examples of
 buildpacks that might use the Node binary distribution are the [NPM
 CNB](https://github.com/paketo-buildpacks/npm) and [Yarn Install
 CNB](https://github.com/paketo-buildpacks/yarn-install)
@@ -148,6 +148,13 @@ the `BP_NODE_PROJECT_PATH` environment variable at build time either directly
 file](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md).
 This could be useful if your app is a part of a monorepo.
 
+### Exclude python installation during the build process
+
+To exclude the participation of the cpython during the build process, please use
+the `BP_NODE_EXCLUDE_BUILD_PYTHON` environment variable at build time either directly (ex. `pack build my-app --env BP_NODE_EXCLUDE_BUILD_PYTHON`).
+
+This will skip the installation of python during the build process on the build base image, by not requiring the cpython buildpack through the build plan.
+
 ### Enabling Inspector for Remote Debugging
 
 To enable the Inspector set the `BPL_DEBUG_ENABLED` environment variable at launch time. Optionally, you can specify the `BPL_DEBUG_PORT` environment variable to use a specific port.
@@ -162,11 +169,13 @@ For more information on debugging, see [Official Documentation](https://nodejs.o
 ## Run Tests
 
 To run all unit tests, run:
+
 ```
 ./scripts/unit.sh
 ```
 
 To run all integration tests, run:
+
 ```
 /scripts/integration.sh
 ```
