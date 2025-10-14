@@ -67,13 +67,13 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 
 				image, logs, err = pack.WithNoColor().Build.
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithPullPolicy("never").
 					WithEnv(map[string]string{
-						"BP_NODE_VERSION": "20.*.*",
+						"BP_NODE_VERSION":              "20.*.*",
+						"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
 					}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
@@ -107,13 +107,13 @@ func testOpenSSL(t *testing.T, context spec.G, it spec.S) {
 
 				image, logs, err = pack.WithNoColor().Build.
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithPullPolicy("never").
 					WithEnv(map[string]string{
-						"BP_NODE_VERSION": "20.*.*",
+						"BP_NODE_VERSION":              "20.*.*",
+						"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
 					}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)

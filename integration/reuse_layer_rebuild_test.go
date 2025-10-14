@@ -72,19 +72,19 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
+				WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
 
 
-			Expect(firstImage.Buildpacks).To(HaveLen(3))
-			Expect(firstImage.Buildpacks[1].Key).To(Equal(settings.Buildpack.ID))
-			Expect(firstImage.Buildpacks[1].Layers).To(HaveKey("node"))
+			Expect(firstImage.Buildpacks).To(HaveLen(2))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
+			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
@@ -139,18 +139,18 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
+				WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
 
-			Expect(secondImage.Buildpacks).To(HaveLen(3))
-			Expect(secondImage.Buildpacks[1].Key).To(Equal(settings.Buildpack.ID))
-			Expect(secondImage.Buildpacks[1].Layers).To(HaveKey("node"))
+			Expect(secondImage.Buildpacks).To(HaveLen(2))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
+			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
@@ -184,8 +184,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(content).To(ContainSubstring("hello world"))
 
-			Expect(secondImage.Buildpacks[0].Layers["cpython"].SHA).To(Equal(firstImage.Buildpacks[0].Layers["cpython"].SHA))
-			Expect(secondImage.Buildpacks[1].Layers["node"].SHA).To(Equal(firstImage.Buildpacks[1].Layers["node"].SHA))
+			Expect(secondImage.Buildpacks[0].Layers["node"].SHA).To(Equal(firstImage.Buildpacks[0].Layers["node"].SHA))
 		})
 	})
 
@@ -207,19 +206,21 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~20"}).
+				WithEnv(map[string]string{
+					"BP_NODE_VERSION":              "~20",
+					"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
+				}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[firstImage.ID] = struct{}{}
 
-			Expect(firstImage.Buildpacks).To(HaveLen(3))
-			Expect(firstImage.Buildpacks[1].Key).To(Equal(settings.Buildpack.ID))
-			Expect(firstImage.Buildpacks[1].Layers).To(HaveKey("node"))
+			Expect(firstImage.Buildpacks).To(HaveLen(2))
+			Expect(firstImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
+			Expect(firstImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
@@ -275,19 +276,21 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
-				WithEnv(map[string]string{"BP_NODE_VERSION": "~22"}).
+				WithEnv(map[string]string{
+					"BP_NODE_VERSION":              "~22",
+					"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
+				}).
 				Execute(name, source)
 			Expect(err).NotTo(HaveOccurred())
 
 			imageIDs[secondImage.ID] = struct{}{}
 
-			Expect(secondImage.Buildpacks).To(HaveLen(3))
-			Expect(secondImage.Buildpacks[1].Key).To(Equal(settings.Buildpack.ID))
-			Expect(secondImage.Buildpacks[1].Layers).To(HaveKey("node"))
+			Expect(secondImage.Buildpacks).To(HaveLen(2))
+			Expect(secondImage.Buildpacks[0].Key).To(Equal(settings.Buildpack.ID))
+			Expect(secondImage.Buildpacks[0].Layers).To(HaveKey("node"))
 
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
@@ -347,7 +350,7 @@ func testReusingLayerRebuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(content).To(ContainSubstring("hello world"))
 
-			Expect(secondImage.Buildpacks[1].Layers["node"].SHA).NotTo(Equal(firstImage.Buildpacks[1].Layers["node"].SHA))
+			Expect(secondImage.Buildpacks[0].Layers["node"].SHA).NotTo(Equal(firstImage.Buildpacks[0].Layers["node"].SHA))
 		})
 	})
 }

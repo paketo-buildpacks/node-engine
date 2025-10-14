@@ -60,12 +60,12 @@ func testProjectPath(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Online,
 					settings.Buildpacks.NodeEngine.Online,
 					settings.Buildpacks.BuildPlan.Online,
 				).
 				WithEnv(map[string]string{
-					"BP_NODE_PROJECT_PATH": "hello_world_server",
+					"BP_NODE_PROJECT_PATH":         "hello_world_server",
+					"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
 				}).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)

@@ -83,6 +83,19 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
 				Expect(logs).To(ContainLines(
+					MatchRegexp(`    Selected CPython version \(using \): \d+\.\d+\.\d+`),
+				))
+				Expect(logs).To(ContainLines(
+					"  Executing build process",
+					MatchRegexp(`    Installing CPython \d+\.\d+\.\d+`),
+					MatchRegexp(`      Completed in \d+(\.\d+)?`),
+				))
+
+				Expect(logs).To(ContainLines(
+					"  Generating SBOM for /layers/paketo-buildpacks_cpython/cpython",
+				))
+
+				Expect(logs).To(ContainLines(
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),
 					"  Resolving Node Engine version",
 					"    Candidate version sources (in priority order):",
@@ -184,10 +197,10 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 					WithPullPolicy("never").
 					WithEnv(map[string]string{"NODE_ENV": "development", "NODE_VERBOSE": "true"}).
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
+					WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -250,10 +263,10 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
+					WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -337,10 +350,10 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
+					WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -419,10 +432,10 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Deprecated,
 						settings.Buildpacks.BuildPlan.Online,
 					).
+					WithEnv(map[string]string{"BP_NODE_EXCLUDE_BUILD_PYTHON": ""}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -448,14 +461,14 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithSBOMOutputDir(sbomDir).
 					WithEnv(map[string]string{
-						"BP_LOG_LEVEL":    "DEBUG",
-						"BP_DISABLE_SBOM": "true",
+						"BP_LOG_LEVEL":                 "DEBUG",
+						"BP_DISABLE_SBOM":              "true",
+						"BP_NODE_EXCLUDE_BUILD_PYTHON": "",
 					}).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
