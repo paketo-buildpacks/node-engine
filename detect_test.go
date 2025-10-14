@@ -279,6 +279,161 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
+	context("when $BP_NODE_EXCLUDE_BUILD_PYTHON is NOT set", func() {
+		var pathEntries string
+		it.Before(func() {
+			pathEntries = os.Getenv("PATH")
+			os.Setenv("PATH", "")
+		})
+
+		it.After(func() {
+			os.Setenv("PATH", pathEntries)
+		})
+		it("and python does NOT exist on the path, it includes cpython buildpack", func() {
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Build:  true,
+							Launch: false,
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Build:  true,
+									Launch: false,
+								},
+							},
+						},
+					},
+				},
+			}))
+
+		})
+	})
+
+	context("when $BP_NODE_EXCLUDE_BUILD_PYTHON is NOT set", func() {
+
+		var pathEntries string
+		it.Before(func() {
+			pathEntries = os.Getenv("PATH")
+			os.Setenv("PATH", pathEntries+":/some/path/to/python")
+		})
+
+		it.After(func() {
+			os.Setenv("PATH", pathEntries)
+		})
+		it("and python does exists on the path, it does NOT include on the plan", func() {
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+					},
+				},
+			}))
+		})
+	})
+
+	context("when $BP_NODE_EXCLUDE_BUILD_PYTHON is set", func() {
+		var pathEntries string
+		it.Before(func() {
+			pathEntries = os.Getenv("PATH")
+			os.Setenv("BP_NODE_EXCLUDE_BUILD_PYTHON", "true")
+			os.Setenv("PATH", "")
+		})
+
+		it.After(func() {
+			os.Setenv("PATH", pathEntries)
+			os.Unsetenv("BP_NODE_EXCLUDE_BUILD_PYTHON")
+		})
+
+		it("and python does NOT exist on the path, it does NOT include cpython buildpack", func() {
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+					},
+				},
+			}))
+		})
+
+	})
+	context("when $BP_NODE_EXCLUDE_BUILD_PYTHON is set", func() {
+
+		var pathEntries string
+		it.Before(func() {
+			pathEntries = os.Getenv("PATH")
+			os.Setenv("BP_NODE_EXCLUDE_BUILD_PYTHON", "true")
+			os.Setenv("PATH", pathEntries+":/some/path/to/python")
+		})
+
+		it.After(func() {
+			os.Setenv("PATH", pathEntries)
+			os.Unsetenv("BP_NODE_EXCLUDE_BUILD_PYTHON")
+		})
+		it("and python exists on the path, it does NOT include cpython buildpack", func() {
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+					},
+				},
+			}))
+
+		})
+	})
+
 	context("failure cases", func() {
 		context("when the dir specified by BP_NODE_PROJECT_PATH does not exist", func() {
 			var workingDir string

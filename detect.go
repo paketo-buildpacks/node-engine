@@ -83,10 +83,21 @@ func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 			})
 		}
 
-		targetOs := os.Getenv("CNB_TARGET_DISTRO_NAME")
-		_, pythonNotFound := exec.LookPath("python")
+		bpNodeExcludeBuildPython, bpNodeExcludeBuildPythonExists := os.LookupEnv("BP_NODE_EXCLUDE_BUILD_PYTHON")
+		excludePython := false
+		if bpNodeExcludeBuildPythonExists && (bpNodeExcludeBuildPython == "" || bpNodeExcludeBuildPython == "true") {
+			excludePython = true
+		}
 
-		installPython := (targetOs != "rhel" && pythonNotFound != nil)
+		_, pythonNotFoundErr := exec.LookPath("python")
+		_, python2NotFoundErr := exec.LookPath("python2")
+		_, python3NotFoundErr := exec.LookPath("python3")
+
+		pythonFound := (pythonNotFoundErr == nil || python2NotFoundErr == nil || python3NotFoundErr == nil)
+
+		targetOs := os.Getenv("CNB_TARGET_DISTRO_NAME")
+
+		installPython := (targetOs != "rhel" && !pythonFound && !excludePython)
 		if installPython {
 			requirements = append(requirements, packit.BuildPlanRequirement{
 				Name: Cpython,
