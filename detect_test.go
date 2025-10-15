@@ -279,6 +279,136 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
+	context("when $BP_NODE_INCLUDE_BUILD_PYTHON env variable is present", func() {
+		it.After(func() {
+			os.Unsetenv("BP_NODE_INCLUDE_BUILD_PYTHON")
+		})
+
+		it("has been set to true, it should include cpython buildpack", func() {
+			os.Setenv("BP_NODE_INCLUDE_BUILD_PYTHON", "true")
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Build:  true,
+							Launch: false,
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Build:  true,
+									Launch: false,
+								},
+							},
+						},
+					},
+				},
+			}))
+		})
+
+		it("has no value, it should include cpython buildpack", func() {
+			os.Setenv("BP_NODE_INCLUDE_BUILD_PYTHON", "")
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: nodeengine.Cpython,
+						Metadata: nodeengine.BuildPlanMetadata{
+							Build:  true,
+							Launch: false,
+						},
+					},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+						Requires: []packit.BuildPlanRequirement{
+							{
+								Name: nodeengine.Cpython,
+								Metadata: nodeengine.BuildPlanMetadata{
+									Build:  true,
+									Launch: false,
+								},
+							},
+						},
+					},
+				},
+			}))
+		})
+
+		it("has been set to false, it does not include cpython buildpack", func() {
+			os.Setenv("BP_NODE_INCLUDE_BUILD_PYTHON", "false")
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+					},
+				},
+			}))
+		})
+
+		it("has been set to random string, it does not include cpython buildpack", func() {
+			os.Setenv("BP_NODE_INCLUDE_BUILD_PYTHON", "random-string")
+
+			result, err := detect(packit.DetectContext{
+				WorkingDir: "/working-dir",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Plan).To(Equal(packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: nodeengine.Node},
+				},
+				Or: []packit.BuildPlan{
+					{
+						Provides: []packit.BuildPlanProvision{
+							{Name: nodeengine.Node},
+							{Name: nodeengine.Npm},
+						},
+					},
+				},
+			}))
+		})
+	})
+
 	context("failure cases", func() {
 		context("when the dir specified by BP_NODE_PROJECT_PATH does not exist", func() {
 			var workingDir string
