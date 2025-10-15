@@ -71,15 +71,30 @@ func testSimple(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
+						settings.Buildpacks.Cpython.Online,
 						settings.Buildpacks.NodeEngine.Online,
 						settings.Buildpacks.BuildPlan.Online,
 					).
 					WithEnv(map[string]string{
-						"BP_LOG_LEVEL": "DEBUG",
+						"BP_LOG_LEVEL":                 "DEBUG",
+						"BP_NODE_INCLUDE_BUILD_PYTHON": "true",
 					}).
 					WithSBOMOutputDir(sbomDir).
 					Execute(name, source)
 				Expect(err).ToNot(HaveOccurred(), logs.String)
+
+				Expect(logs).To(ContainLines(
+					MatchRegexp(`    Selected CPython version \(using \): \d+\.\d+\.\d+`),
+				))
+				Expect(logs).To(ContainLines(
+					"  Executing build process",
+					MatchRegexp(`    Installing CPython \d+\.\d+\.\d+`),
+					MatchRegexp(`      Completed in \d+(\.\d+)?`),
+				))
+
+				Expect(logs).To(ContainLines(
+					"  Generating SBOM for /layers/paketo-buildpacks_cpython/cpython",
+				))
 
 				Expect(logs).To(ContainLines(
 					fmt.Sprintf("%s 1.2.3", settings.Buildpack.Name),

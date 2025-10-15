@@ -60,7 +60,10 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 					settings.Buildpacks.NodeEngine.Offline,
 					settings.Buildpacks.BuildPlan.Online,
 				).
-				WithEnv(map[string]string{"BP_NODE_OPTIMIZE_MEMORY": "true"}).
+				WithEnv(map[string]string{
+					"BP_NODE_OPTIMIZE_MEMORY":      "true",
+					"BP_NODE_INCLUDE_BUILD_PYTHON": "true",
+				}).
 				WithNetwork("none").
 				Execute(name, source)
 
