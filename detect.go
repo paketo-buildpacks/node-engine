@@ -2,7 +2,6 @@ package nodeengine
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit/v2"
@@ -83,10 +82,15 @@ func Detect(nvmrcParser, nodeVersionParser VersionParser) packit.DetectFunc {
 			})
 		}
 
-		targetOs := os.Getenv("CNB_TARGET_DISTRO_NAME")
-		_, pythonNotFound := exec.LookPath("python")
+		bpNodeIncludeBuildPython, bpNodeIncludeBuildPythonExists := os.LookupEnv("BP_NODE_INCLUDE_BUILD_PYTHON")
 
-		installPython := (targetOs != "rhel" && pythonNotFound != nil)
+		installPython := false
+		if bpNodeIncludeBuildPythonExists && (bpNodeIncludeBuildPython == "" || bpNodeIncludeBuildPython == "true") {
+			installPython = true
+		} else if bpNodeIncludeBuildPythonExists && bpNodeIncludeBuildPython == "false" {
+			installPython = false
+		}
+
 		if installPython {
 			requirements = append(requirements, packit.BuildPlanRequirement{
 				Name: Cpython,
