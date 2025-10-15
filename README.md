@@ -2,9 +2,9 @@
 
 ## `docker.io/paketobuildpacks/node-engine`
 
-The Node Engine CNB provides the Node binary distribution.  The buildpack
+The Node Engine CNB provides the Node binary distribution. The buildpack
 installs the Node binary distribution onto the `$PATH` which makes it available
-for subsequent buildpacks and in the final running container.  Examples of
+for subsequent buildpacks and in the final running container. Examples of
 buildpacks that might use the Node binary distribution are the [NPM
 CNB](https://github.com/paketo-buildpacks/npm) and [Yarn Install
 CNB](https://github.com/paketo-buildpacks/yarn-install)
@@ -159,14 +159,34 @@ $BPL_DEBUG_PORT="9009"
 
 For more information on debugging, see [Official Documentation](https://nodejs.org/en/docs/guides/debugging-getting-started)
 
+### Include python during build process
+
+To require [python](https://github.com/paketo-buildpacks/cpython) during the build process, set the `BP_NODE_INCLUDE_BUILD_PYTHON` environment variable at build time. You can set it either directly:
+
+```shell
+pack build my-app --builder paketobuildpcks/builder-jammy-base \
+  --env BP_NODE_INCLUDE_BUILD_PYTHON=true
+```
+
+or through a [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) file.
+
+This is necessary for compiling native modules during `npm install` process, as `node-gyp` requires Python to complete this process.
+
+Note that the `BP_NODE_INCLUDE_BUILD_PYTHON` variable is not required in the following cases:
+
+- The [builder-jammy-full](https://github.com/paketo-buildpacks/builder-jammy-full) builder as python is already provided by the build image.
+- The UBI builders ([ubi-8-builder](https://github.com/paketo-buildpacks/builder-ubi8-base), [ubi-9-builder](https://github.com/paketo-buildpacks/ubi-9-builder), etc.), as Python is being provided by the extension during build time.
+
 ## Run Tests
 
 To run all unit tests, run:
+
 ```
 ./scripts/unit.sh
 ```
 
 To run all integration tests, run:
+
 ```
 /scripts/integration.sh
 ```
