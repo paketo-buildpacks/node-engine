@@ -56,7 +56,6 @@ func testOffline(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.Cpython.Offline,
 					settings.Buildpacks.NodeEngine.Offline,
 					settings.Buildpacks.BuildPlan.Online,
 				).
