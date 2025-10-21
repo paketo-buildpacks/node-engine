@@ -134,7 +134,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
-	github.com/github/go-spdx/v2 v2.3.3 // indirect
+	github.com/github/go-spdx/v2 v2.3.4 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
 	github.com/go-git/go-git/v5 v5.16.3 // indirect
@@ -173,7 +173,7 @@ require (
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/kastenhq/goversion v0.0.0-20230811215019-93b2f8823953 // indirect
 	github.com/kevinburke/ssh_config v1.4.0 // indirect
-	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/klauspost/compress v1.18.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
