@@ -128,8 +128,8 @@ github.com/anchore/clio v0.0.0-20250908162139-4390b5d3d46e h1:WqdMQOkseqwVBR9Exh
 github.com/anchore/clio v0.0.0-20250908162139-4390b5d3d46e/go.mod h1:Qps+CdrdcMx1k7GhKaJ1ZkKYZvRaIfbNmW6B8/5ONPs=
 github.com/anchore/fangs v0.0.0-20250908220736-f686ade3235a h1:aSRvgbJT0Vld3p781HWZ17ee+Ql+FoGA8PyPQS1NQn4=
 github.com/anchore/fangs v0.0.0-20250908220736-f686ade3235a/go.mod h1:RmTGtCeeZT3Uz1Kb3iRNUBFNLkpa1wAXXAs3ya3ELCM=
-github.com/anchore/go-collections v0.0.0-20250717130425-e4a173a279ef h1:XzwHR9N3SoIqH2aP7Gm90FyH6hhV3BkxNDJwBxkoOUI=
-github.com/anchore/go-collections v0.0.0-20250717130425-e4a173a279ef/go.mod h1:1aiktV46ATCkuVg0O573ZrH56BUawTECPETbZyBcqT8=
+github.com/anchore/go-collections v0.0.0-20251016125210-a3c352120e8c h1:eoJXyC0n7DZ4YvySG/ETdYkTar2Due7eH+UmLK6FbrA=
+github.com/anchore/go-collections v0.0.0-20251016125210-a3c352120e8c/go.mod h1:1aiktV46ATCkuVg0O573ZrH56BUawTECPETbZyBcqT8=
 github.com/anchore/go-homedir v0.0.0-20250319154043-c29668562e4d h1:gT69osH9AsdpOfqxbRwtxcNnSZ1zg4aKy2BevO3ZBdc=
 github.com/anchore/go-homedir v0.0.0-20250319154043-c29668562e4d/go.mod h1:PhSnuFYknwPZkOWKB1jXBNToChBA+l0FjwOxtViIc50=
 github.com/anchore/go-logger v0.0.0-20250813181427-74728f89a619 h1:G7a3bZv0QlY39xRKKoMK16AficGWVJo+5uuMziPZ2W8=
@@ -153,8 +153,8 @@ github.com/anchore/packageurl-go v0.1.1-0.20250220190351-d62adb6e1115 h1:ZyRCmiE
 github.com/anchore/packageurl-go v0.1.1-0.20250220190351-d62adb6e1115/go.mod h1:KoYIv7tdP5+CC9VGkeZV4/vGCKsY55VvoG+5dadg4YI=
 github.com/anchore/stereoscope v0.1.11 h1:YP/XUNcJyMbOOPAWPkeZNCVlKKTRO2cnBTEeUW6I40Y=
 github.com/anchore/stereoscope v0.1.11/go.mod h1:G3PZlzPbxFhylj9pQwtqfVPaahuWmy/UCtv5FTIIMvg=
-github.com/anchore/syft v1.34.2 h1:q7Zr5I624MaU20wfwzidTtHi8nqS8MzrJGGcIvEAWsI=
-github.com/anchore/syft v1.34.2/go.mod h1:J9fOxYe2o9I5sML6ntNF2uiPYZ+vwcWVPM26tCSyf3M=
+github.com/anchore/syft v1.35.0 h1:yXYjlB8pZKvh+lWc2Ge6BEdx71qWETnfJDUigEtSVS4=
+github.com/anchore/syft v1.35.0/go.mod h1:DdJMDHhI2V7pOjC/5FL98BKbG2DkbIT5zYmig6AORdU=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/andybalholm/brotli v1.2.0 h1:ukwgCxwYrmACq68yiUqwIWnGY0cTPox/M94sVwToPjQ=
 github.com/andybalholm/brotli v1.2.0/go.mod h1:rzTDkvFWvIrjDXZHkuS16NPggd91W3kUSvPlQ1pLaKY=
