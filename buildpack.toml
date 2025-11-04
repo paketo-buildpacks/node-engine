@@ -220,6 +220,74 @@ api = "0.10"
     uri = "https://nodejs.org/dist/v22.21.1/node-v22.21.1-linux-arm64.tar.xz"
     version = "22.21.1"
 
+  [[metadata.dependencies]]
+    arch = "amd64"
+    checksum = "sha256:2642f4428869aca32443660fd71b3918e2be1277a899bdcaeb64c93b54b5af17"
+    cpe = "cpe:2.3:a:nodejs:node.js:24.10.0:*:*:*:*:*:*:*"
+    deprecation_date = "2028-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v24.10.0?checksum=2642f4428869aca32443660fd71b3918e2be1277a899bdcaeb64c93b54b5af17&download_url=https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-x64.tar.xz"
+    source-checksum = "sha256:2642f4428869aca32443660fd71b3918e2be1277a899bdcaeb64c93b54b5af17"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-x64.tar.xz"
+    version = "24.10.0"
+
+  [[metadata.dependencies]]
+    arch = "arm64"
+    checksum = "sha256:07f0558316ebb8977dd6fb29b4de8d369a639d3d8cef544293852a6f5eea6af8"
+    cpe = "cpe:2.3:a:nodejs:node.js:24.10.0:*:*:*:*:*:*:*"
+    deprecation_date = "2028-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v24.10.0?checksum=07f0558316ebb8977dd6fb29b4de8d369a639d3d8cef544293852a6f5eea6af8&download_url=https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-arm64.tar.xz"
+    source = "https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-arm64.tar.xz"
+    source-checksum = "sha256:07f0558316ebb8977dd6fb29b4de8d369a639d3d8cef544293852a6f5eea6af8"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v24.10.0/node-v24.10.0-linux-arm64.tar.xz"
+    version = "24.10.0"
+
+  [[metadata.dependencies]]
+    arch = "amd64"
+    checksum = "sha256:46da9a098973ab7ba4fca76945581ecb2eaf468de347173897044382f10e0a0a"
+    cpe = "cpe:2.3:a:nodejs:node.js:24.11.0:*:*:*:*:*:*:*"
+    deprecation_date = "2028-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v24.11.0?checksum=46da9a098973ab7ba4fca76945581ecb2eaf468de347173897044382f10e0a0a&download_url=https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-x64.tar.xz"
+    source-checksum = "sha256:46da9a098973ab7ba4fca76945581ecb2eaf468de347173897044382f10e0a0a"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-x64.tar.xz"
+    version = "24.11.0"
+
+  [[metadata.dependencies]]
+    arch = "arm64"
+    checksum = "sha256:33a6673b2c7bffeae9deec7f9f8b31aad9119b08f13d49b2ca3ee3bebfe8260f"
+    cpe = "cpe:2.3:a:nodejs:node.js:24.11.0:*:*:*:*:*:*:*"
+    deprecation_date = "2028-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v24.11.0?checksum=33a6673b2c7bffeae9deec7f9f8b31aad9119b08f13d49b2ca3ee3bebfe8260f&download_url=https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-arm64.tar.xz"
+    source = "https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-arm64.tar.xz"
+    source-checksum = "sha256:33a6673b2c7bffeae9deec7f9f8b31aad9119b08f13d49b2ca3ee3bebfe8260f"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v24.11.0/node-v24.11.0-linux-arm64.tar.xz"
+    version = "24.11.0"
+
   [[metadata.dependency-constraints]]
     constraint = "18.*"
     id = "node"
@@ -232,6 +300,11 @@ api = "0.10"
 
   [[metadata.dependency-constraints]]
     constraint = "22.*"
+    id = "node"
+    patches = 2
+
+  [[metadata.dependency-constraints]]
+    constraint = "24.*"
     id = "node"
     patches = 2
 
