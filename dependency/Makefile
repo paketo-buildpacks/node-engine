@@ -3,10 +3,6 @@
 id:
 	@echo node
 
-test:
-	@cd test; \
-	./run-test --version $(version) --tarballPath $(tarballPath)
-
 retrieve:
 	@cd retrieval; \
 	go run . \
