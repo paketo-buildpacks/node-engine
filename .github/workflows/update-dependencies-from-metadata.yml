@@ -28,7 +28,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          # hashFiles returns empty string if file does not exist
+          go-version-file: ${{ hashFiles('dependency/retrieval/go.mod') != '' && 'dependency/retrieval/go.mod' || 'go.mod' }}
 
       - name: Run Retrieve
         id: retrieve
