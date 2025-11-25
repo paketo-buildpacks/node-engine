@@ -86,40 +86,6 @@ api = "0.10"
 
   [[metadata.dependencies]]
     arch = "amd64"
-    checksum = "sha256:7a488a09e2fc02fbd1bc4ae084bea8a589314f741c182fc02c5f3f07c79a29d4"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.19.4:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "Zlib", "deprecated_BSD-2-Clause-NetBSD"]
-    name = "Node Engine"
-    os = "linux"
-    purl = "pkg:generic/node@v20.19.4?checksum=7a488a09e2fc02fbd1bc4ae084bea8a589314f741c182fc02c5f3f07c79a29d4&download_url=https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-x64.tar.xz"
-    source = "https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-x64.tar.xz"
-    source-checksum = "sha256:7a488a09e2fc02fbd1bc4ae084bea8a589314f741c182fc02c5f3f07c79a29d4"
-    stacks = ["*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-x64.tar.xz"
-    version = "20.19.4"
-
-  [[metadata.dependencies]]
-    arch = "arm64"
-    checksum = "sha256:4492c29882f604eb4cba6ce52ad2e6436f4eeb2b2917a74b0f85e6e42e261252"
-    cpe = "cpe:2.3:a:nodejs:node.js:20.19.4:*:*:*:*:*:*:*"
-    deprecation_date = "2026-04-30T00:00:00Z"
-    id = "node"
-    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "Zlib", "deprecated_BSD-2-Clause-NetBSD"]
-    name = "Node Engine"
-    os = "linux"
-    purl = "pkg:generic/node@v20.19.4?checksum=4492c29882f604eb4cba6ce52ad2e6436f4eeb2b2917a74b0f85e6e42e261252&download_url=https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-arm64.tar.xz"
-    source = "https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-arm64.tar.xz"
-    source-checksum = "sha256:4492c29882f604eb4cba6ce52ad2e6436f4eeb2b2917a74b0f85e6e42e261252"
-    stacks = ["*"]
-    strip-components = 1
-    uri = "https://nodejs.org/dist/v20.19.4/node-v20.19.4-linux-arm64.tar.xz"
-    version = "20.19.4"
-
-  [[metadata.dependencies]]
-    arch = "amd64"
     checksum = "sha256:315046739a513a70e03a4a55a8afda8cf979f30852e576075c340084e3f8ac0f"
     cpe = "cpe:2.3:a:nodejs:node.js:20.19.5:*:*:*:*:*:*:*"
     deprecation_date = "2026-04-30T00:00:00Z"
@@ -151,6 +117,40 @@ api = "0.10"
     strip-components = 1
     uri = "https://nodejs.org/dist/v20.19.5/node-v20.19.5-linux-arm64.tar.xz"
     version = "20.19.5"
+
+  [[metadata.dependencies]]
+    arch = "amd64"
+    checksum = "sha256:c514127107ebf6e3885f793b06674574d71fe22e3df91a78c52c5a6f84b3b5b0"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.19.6:*:*:*:*:*:*:*"
+    deprecation_date = "2026-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "Zlib", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v20.19.6?checksum=c514127107ebf6e3885f793b06674574d71fe22e3df91a78c52c5a6f84b3b5b0&download_url=https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-x64.tar.xz"
+    source = "https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-x64.tar.xz"
+    source-checksum = "sha256:c514127107ebf6e3885f793b06674574d71fe22e3df91a78c52c5a6f84b3b5b0"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-x64.tar.xz"
+    version = "20.19.6"
+
+  [[metadata.dependencies]]
+    arch = "arm64"
+    checksum = "sha256:e24741779ae4c2f3c79b362fa5c0c8bbcdca1a6240eb5906c58dc762dcb62e0e"
+    cpe = "cpe:2.3:a:nodejs:node.js:20.19.6:*:*:*:*:*:*:*"
+    deprecation_date = "2026-04-30T00:00:00Z"
+    id = "node"
+    licenses = ["0BSD", "Apache-2.0", "Artistic-2.0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "BSD-3-Clause-No-Military-License", "BSD-4-Clause", "BSD-Source-Code", "CC0-1.0", "ECL-2.0", "ICU", "ISC", "JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh", "Unicode-TOU", "Zlib", "deprecated_BSD-2-Clause-NetBSD"]
+    name = "Node Engine"
+    os = "linux"
+    purl = "pkg:generic/node@v20.19.6?checksum=e24741779ae4c2f3c79b362fa5c0c8bbcdca1a6240eb5906c58dc762dcb62e0e&download_url=https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-arm64.tar.xz"
+    source = "https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-arm64.tar.xz"
+    source-checksum = "sha256:e24741779ae4c2f3c79b362fa5c0c8bbcdca1a6240eb5906c58dc762dcb62e0e"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://nodejs.org/dist/v20.19.6/node-v20.19.6-linux-arm64.tar.xz"
+    version = "20.19.6"
 
   [[metadata.dependencies]]
     arch = "amd64"
