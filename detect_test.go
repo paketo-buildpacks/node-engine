@@ -99,11 +99,11 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 	context("when $BP_NODE_VERSION is set", func() {
 		it.Before(func() {
-			os.Setenv("BP_NODE_VERSION", "4.5.6")
+			Expect(os.Setenv("BP_NODE_VERSION", "4.5.6")).To(Succeed())
 		})
 
 		it.After(func() {
-			os.Unsetenv("BP_NODE_VERSION")
+			Expect(os.Unsetenv("BP_NODE_VERSION")).To(Succeed())
 		})
 
 		it("returns a plan that provides and requires that version of node", func() {
@@ -259,11 +259,11 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			err = os.MkdirAll(filepath.Join(workingDir, "custom", "path"), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
 
-			os.Setenv("BP_NODE_PROJECT_PATH", "custom/path")
+			Expect(os.Setenv("BP_NODE_PROJECT_PATH", "custom/path")).To(Succeed())
 		})
 
 		it.After(func() {
-			os.Unsetenv("BP_NODE_PROJECT_PATH")
+			Expect(os.Unsetenv("BP_NODE_PROJECT_PATH")).To(Succeed())
 			err := os.RemoveAll(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 		})
