@@ -562,11 +562,11 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		context("when BP_DISABLE_SBOM is set incorrectly", func() {
 			it.Before(func() {
-				os.Setenv("BP_DISABLE_SBOM", "not-a-bool")
+				Expect(os.Setenv("BP_DISABLE_SBOM", "not-a-bool")).To(Succeed())
 			})
 
 			it.After(func() {
-				os.Unsetenv("BP_DISABLE_SBOM")
+				Expect(os.Unsetenv("BP_DISABLE_SBOM")).To(Succeed())
 			})
 
 			it("returns an error", func() {

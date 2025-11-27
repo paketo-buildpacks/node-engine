@@ -22,9 +22,9 @@ func testNodeVersionParser(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		file, err := os.CreateTemp("", ".node-version")
 		Expect(err).NotTo(HaveOccurred())
-		defer file.Close()
 
 		path = file.Name()
+		Expect(file.Close()).To(Succeed())
 
 		parser = nodeengine.NewNodeVersionParser()
 	})
