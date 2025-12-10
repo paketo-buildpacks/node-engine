@@ -23,7 +23,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Parse Event
       id: event
@@ -112,7 +112,7 @@ jobs:
         password: ${{ env.GCR_PASSWORD }}
         registry: ${{ env.GCR_REGISTRY }}
 
-    - uses: buildpacks/github-actions/setup-tools@v5.9.6
+    - uses: buildpacks/github-actions/setup-tools@v5.9.7
     - name: Push to DockerHub
       if: ${{  steps.parse_configs.outputs.push_to_dockerhub == 'true' }}
       id: push

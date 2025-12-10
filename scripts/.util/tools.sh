@@ -33,6 +33,8 @@ function util::tools::arch() {
         echo ""
       elif [[ "${1:-}" == "--format-amd64-x86_64" ]]; then
         echo "x86_64"
+      elif [[ "${1:-}" == "--format-amd64-x86-64" ]]; then
+        echo "x86-64"
       else
         echo "amd64"
       fi

@@ -134,10 +134,16 @@ function builder_images::pull() {
     pack inspect-builder "${builder}" --output json \
       | jq -r '.remote_info.run_images[0].name'
   )"
-  lifecycle_image="index.docker.io/buildpacksio/lifecycle:$(
+
+  os=$(util::tools::os)
+  arch=$(util::tools::arch --format-amd64-x86-64)
+
+  lifecycle_version="$(
     pack inspect-builder "${builder}" --output json \
       | jq -r '.remote_info.lifecycle.version'
   )"
+
+  lifecycle_image="index.docker.io/buildpacksio/lifecycle:${lifecycle_version}-${os}-${arch}"
 
   util::print::title "Pulling run image..."
   docker pull "${run_image}"

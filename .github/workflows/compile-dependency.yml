@@ -42,7 +42,7 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Enable experimental features for Docker daemon and CLI
       run: |
@@ -99,7 +99,7 @@ jobs:
           arch="${{ inputs.arch }}"
 
     - name: Upload compiled artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: ${{ inputs.shouldCompile == true || inputs.shouldCompile == 'true' }}
       with:
         name: '${{ inputs.uploadArtifactName }}'
