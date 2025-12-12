@@ -51,6 +51,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
 
+    - name: Free Disk Space
+      if: vars.RECLAIM_DISK_SPACE == 'true'
+      uses: paketo-buildpacks/github-config/actions/pull-request/reclaim-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        docker-images: true
+        swap-storage: true
+
     - name: Setup Go
       uses: actions/setup-go@v6
       with:
@@ -60,6 +72,7 @@ jobs:
       run: ./scripts/integration.sh --builder ${{ matrix.builder }} --token ${{ github.token }}
       env:
         TMPDIR: "${{ runner.temp }}"
+        GIT_TOKEN: ${{ github.token }}
 
   roundup:
     name: Integration Tests
