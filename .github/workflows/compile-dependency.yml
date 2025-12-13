@@ -99,7 +99,7 @@ jobs:
           arch="${{ inputs.arch }}"
 
     - name: Upload compiled artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: ${{ inputs.shouldCompile == true || inputs.shouldCompile == 'true' }}
       with:
         name: '${{ inputs.uploadArtifactName }}'
