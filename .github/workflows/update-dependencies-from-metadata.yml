@@ -195,7 +195,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download artifact files
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           name: "${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.os != '' && matrix.includes.os || 'linux' }}-${{ matrix.includes.arch != '' && matrix.includes.arch || 'amd64' }}-${{ matrix.includes.target }}"
 
@@ -229,7 +229,7 @@ jobs:
         run: echo "checksum=$(cat ${{ steps.get-file-names.outputs.checksum-file }})" >> "$GITHUB_OUTPUT"
 
       - name: Download metadata.json
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           name: metadata.json
 
@@ -299,7 +299,7 @@ jobs:
 
       # Metadata file for the non-compiled dependencies, if there are any
       - name: Download metadata.json file
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
           pattern: "from-source-metadata.json"
@@ -309,7 +309,7 @@ jobs:
       # Download each metadata file, and combine them into one
       - name: Download individual metadata-file.json file(s)
         if: ${{ needs.update-metadata.result == 'success' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v6
         with:
           path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
           pattern: "*metadata-file.json"
