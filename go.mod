@@ -1,6 +1,6 @@
 module github.com/paketo-buildpacks/node-engine/v5
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/BurntSushi/toml v1.6.0
