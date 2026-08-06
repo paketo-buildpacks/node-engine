@@ -789,8 +789,8 @@ github.com/paketo-buildpacks/libnodejs v0.4.3 h1:jVIscdU8j8XhjnVkQw0q9uOwO+V/pI0
 github.com/paketo-buildpacks/libnodejs v0.4.3/go.mod h1:aqEc7+NFTwxNqk0m8LTOSRYTL8DR1FPJh8NpscoRo6k=
 github.com/paketo-buildpacks/occam v0.31.3 h1:4EhnaRVzWVHKIKC+XY3f2KQI2EaVJDUY3RmfIojiiQ8=
 github.com/paketo-buildpacks/occam v0.31.3/go.mod h1:dQuEwpCGzohjyfSmzAc0eTTLssPjfIiCXFm7ZvhtdPM=
-github.com/paketo-buildpacks/packit/v2 v2.25.5 h1:6gPBLx5leUUHzX2cNTdkpA+FWlWel+fGclUiDH4snMI=
-github.com/paketo-buildpacks/packit/v2 v2.25.5/go.mod h1:Tr7vMlkXtXvi59DtMPmgXfr6ITPfJiCe0ROvur1PCvI=
+github.com/paketo-buildpacks/packit/v2 v2.25.6 h1:skpihbw/qdI9/Zr1JGDOTNT227g9tGiQ7N6niXPWOcw=
+github.com/paketo-buildpacks/packit/v2 v2.25.6/go.mod h1:xGz839Qg+8q/Md4YkiV/uHsn3jX+D9e+HPLGOoesW8Q=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pascaldekloe/goe v0.1.0/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pborman/getopt v0.0.0-20170112200414-7148bc3a4c30/go.mod h1:85jBQOZwpVEaDAr341tbn15RS4fCAsIst0qp7i8ex1o=
