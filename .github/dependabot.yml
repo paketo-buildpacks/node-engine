@@ -16,3 +16,18 @@ updates:
       update-types:
       - "minor"
       - "patch"
+- package-ecosystem: gomod
+  directory: "/dependency/retrieval"
+  schedule:
+    interval: daily
+  allow:
+  # Allow both direct and indirect updates for all packages
+  - dependency-type: "all"
+  # group all minor and patch dependency updates together
+  groups:
+    go-modules:
+      patterns:
+      - "*"
+      update-types:
+      - "minor"
+      - "patch"
