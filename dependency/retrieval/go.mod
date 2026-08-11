@@ -5,7 +5,7 @@ go 1.26.5
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/paketo-buildpacks/libdependency v0.2.1
-	github.com/paketo-buildpacks/packit/v2 v2.25.6
+	github.com/paketo-buildpacks/packit/v2 v2.25.7
 )
 
 require (
@@ -14,7 +14,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.3-0.20251027160822-ad3df93bed29 // indirect
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
 	github.com/anchore/packageurl-go v0.2.0 // indirect
-	github.com/cloudflare/circl v1.6.4 // indirect
+	github.com/cloudflare/circl v1.6.5 // indirect
 	github.com/cyphar/filepath-securejoin v0.7.0 // indirect
 	github.com/dgryski/go-minhash v0.0.0-20190315135803-ad340ca03076 // indirect
 	github.com/ekzhu/minhash-lsh v0.0.0-20190924033628-faac2c6342f8 // indirect
