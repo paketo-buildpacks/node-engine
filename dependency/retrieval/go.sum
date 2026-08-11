@@ -23,8 +23,8 @@ github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK3
 github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/cloudflare/circl v1.6.4 h1:pOXuDTCEYyzydgUpQ0CQz3LsinKjiSk6nNP5Lt5K64U=
-github.com/cloudflare/circl v1.6.4/go.mod h1:YxarevkLlbaHuWsxG6vmYNWBEsSp4pnp7j+4VljMavY=
+github.com/cloudflare/circl v1.6.5 h1:O64F26HEqNhznd/hrC5KZXVKYuKM2rx4deZDTc4ihQA=
+github.com/cloudflare/circl v1.6.5/go.mod h1:h5LNyxAc5nTue9DS5jT+48en2PSDYt3zdGnz5OstK6c=
 github.com/containerd/errdefs v1.0.0 h1:tg5yIfIlQIrxYtu9ajqY42W3lpS19XqdxRQeEwYG8PI=
 github.com/containerd/errdefs v1.0.0/go.mod h1:+YBYIdtsnF4Iw6nWZhJcqGSg/dwvV7tyJ/kCkyJ2k+M=
 github.com/containerd/errdefs/pkg v0.3.0 h1:9IKJ06FvyNlexW690DXuQNx2KA2cUJXx151Xdx3ZPPE=
@@ -157,8 +157,8 @@ github.com/paketo-buildpacks/libdependency v0.2.1 h1:k+DOX29/QgROSFiplePZRj3E+oT
 github.com/paketo-buildpacks/libdependency v0.2.1/go.mod h1:W3aGTrXuVKsONw7fKOyRlvgMMDTLnmDny5NoJcqrsE0=
 github.com/paketo-buildpacks/occam v0.28.0 h1:Qmd4jVspsSWcpbH93Kc4+1MoxQpQk2/od9PsRz2+fa8=
 github.com/paketo-buildpacks/occam v0.28.0/go.mod h1:BQ1V+2xBY68ulDFEbHR9f9a07fWeOuQcoJ7QJuN8X4M=
-github.com/paketo-buildpacks/packit/v2 v2.25.6 h1:skpihbw/qdI9/Zr1JGDOTNT227g9tGiQ7N6niXPWOcw=
-github.com/paketo-buildpacks/packit/v2 v2.25.6/go.mod h1:xGz839Qg+8q/Md4YkiV/uHsn3jX+D9e+HPLGOoesW8Q=
+github.com/paketo-buildpacks/packit/v2 v2.25.7 h1:29AHHkmINvl3FYYUwQur5u7SlGfSQpH8tTDqhoYNoBw=
+github.com/paketo-buildpacks/packit/v2 v2.25.7/go.mod h1:BuG9bkxNyiEsEa8O2eiRcULE9VU84A66cO3mOyZzWbc=
 github.com/pjbgf/sha1cd v0.6.0 h1:3WJ8Wz8gvDz29quX1OcEmkAlUg9diU4GxJHqs0/XiwU=
 github.com/pjbgf/sha1cd v0.6.0/go.mod h1:lhpGlyHLpQZoxMv8HcgXvZEhcGs0PG/vsZnEJ7H0iCM=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
