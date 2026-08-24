@@ -157,7 +157,7 @@ jobs:
     - name: Get Image Digest
       id: image_digest
       run: |
-        image_name="localhost:5000/npm-install:latest"
+        image_name="localhost:5000/buildpack:latest"
 
         ./scripts/publish.sh \
           --buildpack-type ${{ steps.get_buildpack_type.outputs.buildpack_type }} \
