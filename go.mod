@@ -104,7 +104,7 @@ require (
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/fifo v1.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
-	github.com/containerd/platforms v1.0.0-rc.4 // indirect
+	github.com/containerd/platforms v1.0.0-rc.5 // indirect
 	github.com/containerd/plugin v1.1.0 // indirect
 	github.com/containerd/ttrpc v1.2.9 // indirect
 	github.com/containerd/typeurl/v2 v2.3.0 // indirect
