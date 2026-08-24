@@ -151,7 +151,7 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.21 // indirect
-	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.24.0 // indirect
 	github.com/gookit/color v1.6.1 // indirect
 	github.com/gpustack/gguf-parser-go v0.26.0 // indirect
 	github.com/hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.74 // indirect
@@ -251,7 +251,7 @@ require (
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.8.1 // indirect
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
-	github.com/stretchr/testify v1.12.0 // indirect
+	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/sylabs/sif/v2 v2.24.1 // indirect
 	github.com/sylabs/squashfs v1.0.6 // indirect
@@ -296,8 +296,8 @@ require (
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
 	google.golang.org/api v0.293.0 // indirect
-	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7 // indirect
+	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260807164820-c8921c73eeea // indirect
 	google.golang.org/grpc v1.83.1 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
