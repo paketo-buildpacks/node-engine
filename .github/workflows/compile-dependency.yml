@@ -35,6 +35,10 @@ on:
         required: true
         type: string
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   compile:
     # Speed up compilation by using runners that match os and arch when they are set, otherwise fall back to emulation.
@@ -42,7 +46,9 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        persist-credentials: false
 
     - name: Enable experimental features for Docker daemon and CLI
       run: |
@@ -52,10 +58,10 @@ jobs:
         echo '{"experimental": "enabled"}' | sudo tee ~/.docker/config.json
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v4
+      uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a # v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v4
+      uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
 
     - name: Setup before compilation
       id: compile-setup
@@ -67,13 +73,13 @@ jobs:
       env:
         SKIP_LOGIN: true
       if: ${{ inputs.shouldCompile == true || inputs.shouldCompile == 'true' }}
-      uses: actions-hub/docker/cli@master
+      uses: actions-hub/docker/cli@f5fdbfc3f9d2a9265ead8962c1314108a7b7ec5d # v1.0.3
       with:
         args: "build ${{ (inputs.os != '' && inputs.arch != '') && format('--platform {0}/{1}', inputs.os, inputs.arch) || '' }} -t compilation -f dependency/actions/compile/${{ inputs.target }}.Dockerfile dependency/actions/compile"
 
     - name: docker run
       id: docker-run
-      uses: actions-hub/docker/cli@master
+      uses: actions-hub/docker/cli@f5fdbfc3f9d2a9265ead8962c1314108a7b7ec5d # v1.0.3
       env:
         SKIP_LOGIN: true
       if: ${{ inputs.shouldCompile == true || inputs.shouldCompile == 'true' }}
@@ -82,24 +88,31 @@ jobs:
 
     - name: Print contents of output dir
       shell: bash
-      run: ls -lah ${{ steps.compile-setup.outputs.outputdir }}
+      env:
+        OUTPUT_DIR: ${{ steps.compile-setup.outputs.outputdir }}
+      run: ls -lah "${OUTPUT_DIR}"
 
     - name: Test Dependency
       working-directory: dependency
       if: ${{ (inputs.shouldCompile == true || inputs.shouldCompile == 'true') && (inputs.shouldTest == true || inputs.shouldTest == 'true') }}
+      env:
+        VERSION: ${{ inputs.version }}
+        TARBALL_PATH: ${{ steps.compile-setup.outputs.outputdir }}/*.tgz
+        OS: ${{ inputs.os }}
+        ARCH: ${{ inputs.arch }}
       run: |
         #!/usr/bin/env bash
         set -euo pipefail
         shopt -s inherit_errexit
 
         make test \
-          version="${{ inputs.version }}" \
-          tarballPath="${{ steps.compile-setup.outputs.outputdir }}/*.tgz" \
-          os="${{ inputs.os }}" \
-          arch="${{ inputs.arch }}"
+          version="${VERSION}" \
+          tarballPath="${TARBALL_PATH}" \
+          os="${OS}" \
+          arch="${ARCH}"
 
     - name: Upload compiled artifact
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
       if: ${{ inputs.shouldCompile == true || inputs.shouldCompile == 'true' }}
       with:
         name: '${{ inputs.uploadArtifactName }}'

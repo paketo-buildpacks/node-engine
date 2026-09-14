@@ -6,6 +6,10 @@ on:
     types:
     - completed
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   download:
     name: Download PR Artifact
@@ -22,7 +26,7 @@ jobs:
         repo: ${{ github.repository }}
         run_id: ${{ github.event.workflow_run.id }}
         workspace: "/github/workspace"
-        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
     - id: pr-data
       run: |
         echo "author=$(cat event.json | jq -r '.pull_request.user.login')" >> "$GITHUB_OUTPUT"
@@ -38,7 +42,7 @@ jobs:
       id: unverified-commits
       uses: paketo-buildpacks/github-config/actions/pull-request/check-unverified-commits@main
       with:
-        token: ${{ secrets.PAKETO_BOT_REVIEWER_GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ github.repository }}
         number: ${{ needs.download.outputs.pr-number }}
 
@@ -46,13 +50,15 @@ jobs:
       id: human-commits
       uses: paketo-buildpacks/github-config/actions/pull-request/check-human-commits@main
       with:
-        token: ${{ secrets.PAKETO_BOT_REVIEWER_GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ github.repository }}
         number: ${{ needs.download.outputs.pr-number }}
 
     - name: Checkout
       if: steps.human-commits.outputs.human_commits == 'false' && steps.unverified-commits.outputs.unverified_commits == 'false'
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        persist-credentials: false
 
     - name: Approve
       if: steps.human-commits.outputs.human_commits == 'false' && steps.unverified-commits.outputs.unverified_commits == 'false'
@@ -64,6 +70,7 @@ jobs:
     - name: Enable Auto-Merge
       if: steps.human-commits.outputs.human_commits == 'false' && steps.unverified-commits.outputs.unverified_commits == 'false'
       run: |
-        gh pr merge ${{ needs.download.outputs.pr-number }} --auto --rebase
+        gh pr merge "${PR_NUMBER}" --auto --rebase
       env:
+        PR_NUMBER: ${{ needs.download.outputs.pr-number }}
         GITHUB_TOKEN: ${{ secrets.PAKETO_BOT_REVIEWER_GITHUB_TOKEN }}

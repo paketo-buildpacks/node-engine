@@ -6,13 +6,18 @@ name: Synchronize Labels
         paths:
             - .github/labels.yml
     workflow_dispatch: {}
+permissions:
+    contents: read
+    issues: write
 jobs:
     synchronize:
         name: Synchronize Labels
         runs-on:
             - ubuntu-24.04
         steps:
-            - uses: actions/checkout@v7
-            - uses: micnncim/action-label-syncer@v1
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - uses: micnncim/action-label-syncer@3abd5ab72fda571e69fffd97bd4e0033dd5f495c # v1
               env:
                   GITHUB_TOKEN: ${{ github.token }}

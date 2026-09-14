@@ -8,6 +8,9 @@ on:
 concurrency:
   group: publish-release
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Publish
@@ -26,6 +29,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ publish ]
     if: ${{ always() && needs.publish.result == 'failure' }}
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: File Failure Alert Issue
         uses: paketo-buildpacks/github-config/actions/issue/file@main
