@@ -7,6 +7,9 @@ on:
 
 concurrency: github_config_update
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Create PR to update shared files
@@ -14,13 +17,15 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v7
+      # zizmor: ignore[artipacked] -- persistent credentials required for push-branch
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
     - name: Checkout github-config
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
+        persist-credentials: false
         repository: paketo-buildpacks/github-config
         path: github-config
 
@@ -66,6 +71,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build]
     if: ${{ always() && needs.build.result == 'failure' }}
+    permissions:
+      contents: read
+      issues: write
     steps:
     - name: File Failure Alert Issue
       uses: paketo-buildpacks/github-config/actions/issue/file@main

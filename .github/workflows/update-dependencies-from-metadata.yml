@@ -5,10 +5,16 @@ on:
   schedule:
     - cron: '57 13 * * *'  # daily at 13:57 UTC
 
+permissions:
+  contents: read
+
 jobs:
   retrieve:
     name: Retrieve New Versions and Generate Metadata
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     outputs:
       metadata-filepath: ${{ steps.retrieve.outputs.metadata-filepath }}
       metadata-json: ${{ steps.retrieve.outputs.metadata-json }}
@@ -23,10 +29,12 @@ jobs:
       compilation-length: ${{ steps.retrieve.outputs.compilation-length }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
           # hashFiles returns empty string if file does not exist
           go-version-file: ${{ hashFiles('dependency/retrieval/go.mod') != '' && 'dependency/retrieval/go.mod' || 'go.mod' }}
@@ -65,13 +73,13 @@ jobs:
           echo "compilation-length=$complength" >> "$GITHUB_OUTPUT"
 
       - name: Upload `${{ steps.retrieve.outputs.metadata-filepath }}`
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: metadata.json
           path: ${{ steps.retrieve.outputs.metadata-filepath }}
 
       - name: Upload `${{ steps.retrieve.outputs.from-source-metadata-filepath }}`
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: from-source-metadata.json
           path: ${{ steps.retrieve.outputs.from-source-metadata-filepath }}
@@ -87,7 +95,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Has Compilation Action?
         id: compile-check
@@ -122,7 +132,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Make Temporary Artifact Directory
         id: make-outputdir
@@ -133,32 +145,41 @@ jobs:
       #   (2) URI in metadata.json is available
       - name: Download upstream tarball (if not compiled)
         if: ${{ matrix.includes.uri != ''  && needs.get-compile-and-test.outputs.should-test == 'true' }}
+        env:
+          URI: ${{ matrix.includes.uri }}
+          OUTPUT_DIR: ${{ steps.make-outputdir.outputs.outputdir }}
         run: |
           #!/usr/bin/env bash
           set -euo pipefail
           shopt -s inherit_errexit
 
-          curl ${{ matrix.includes.uri }} \
+          curl "${URI}" \
             --fail-with-body \
             --show-error \
             --silent \
             --location \
-            --output ${{ steps.make-outputdir.outputs.outputdir }}/dependency.tgz
+            --output "${OUTPUT_DIR}/dependency.tgz"
 
       # Test the dependency tarball if:
       #   (1) dependency testing code is present in the buildpack directory
       - name: Test Upstream Dependency
         working-directory: dependency
         if: ${{ needs.get-compile-and-test.outputs.should-test == 'true' }}
+        env:
+          VERSION: ${{ matrix.includes.version }}
+          TARBALL_PATH: ${{ steps.make-outputdir.outputs.outputdir }}/*.tgz
         run: |
           make test \
-            version="${{ matrix.includes.version }}" \
-            tarballPath="${{ steps.make-outputdir.outputs.outputdir }}/*.tgz"
+            version="${VERSION}" \
+            tarballPath="${TARBALL_PATH}"
   compile:
     name: Compile and Test Dependency
     needs:
       - retrieve
       - get-compile-and-test
+    permissions:
+      contents: read
+      actions: write
     strategy:
       matrix:
         includes: ${{ fromJSON(needs.retrieve.outputs.compilation-json) }}
@@ -168,7 +189,7 @@ jobs:
     #   AND:
     #   (3) there is at least one version to compile/test
     if: ${{ needs.retrieve.outputs.compilation-length > 0 && (needs.get-compile-and-test.outputs.should-compile == 'true' || needs.get-compile-and-test.outputs.should-test == 'true') }}
-    uses: ./.github/workflows/compile-dependency.yml
+    uses: $/.github/workflows/compile-dependency.yml
     with:
       version: "${{ matrix.includes.version }}"
       target: "${{ matrix.includes.target }}"
@@ -185,6 +206,9 @@ jobs:
       - retrieve
       - get-compile-and-test
       - compile
+    permissions:
+      contents: read
+      actions: write
     strategy:
       matrix:
         includes: ${{ fromJSON(needs.retrieve.outputs.compilation-json) }}
@@ -192,10 +216,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Download artifact files
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: "${{ needs.retrieve.outputs.id }}-${{ matrix.includes.version }}-${{ matrix.includes.os != '' && matrix.includes.os || 'linux' }}-${{ matrix.includes.arch != '' && matrix.includes.arch || 'amd64' }}-${{ matrix.includes.target }}"
 
@@ -210,7 +236,7 @@ jobs:
           echo "checksum-file=$(basename ./*.tgz.checksum)" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6
         with:
           aws-access-key-id: ${{ secrets.AWS_S3_DEPENDENCIES_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_S3_DEPENDENCIES_SECRET_ACCESS_KEY }}
@@ -226,10 +252,12 @@ jobs:
 
       - name: Get Checksum
         id: get-checksum
-        run: echo "checksum=$(cat ${{ steps.get-file-names.outputs.checksum-file }})" >> "$GITHUB_OUTPUT"
+        env:
+          CHECKSUM_FILE: ${{ steps.get-file-names.outputs.checksum-file }}
+        run: echo "checksum=$(cat "${CHECKSUM_FILE}")" >> "$GITHUB_OUTPUT"
 
       - name: Download metadata.json
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: metadata.json
 
@@ -264,7 +292,7 @@ jobs:
           arch: ${{ matrix.includes.arch }}
 
       - name: Upload modified metadata
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ steps.dependency-metadata.outputs.file }}
           path: ${{ steps.dependency-metadata.outputs.file }}
@@ -276,6 +304,9 @@ jobs:
       - test
       - compile
       - update-metadata
+    permissions:
+      contents: read
+      actions: read
     # Update buildpack.toml only if ALL of the following conditions are met:
     #   (1) Retrieval step has succeeded and has found at least 1 new version
     #   (2) Testing step has succeeded OR been skipped
@@ -285,7 +316,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        # zizmor: ignore[artipacked] -- persistent credentials required for push-branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
@@ -301,7 +333,7 @@ jobs:
 
       # Metadata file for the non-compiled dependencies, if there are any
       - name: Download metadata.json file
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
           pattern: "from-source-metadata.json"
@@ -311,20 +343,24 @@ jobs:
       # Download each metadata file, and combine them into one
       - name: Download individual metadata-file.json file(s)
         if: ${{ needs.update-metadata.result == 'success' }}
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
           pattern: "*metadata-file.json"
           merge-multiple: true
       - name: Display Metadata Files
-        run: ls "${{ steps.make-outputdir.outputs.outputdir }}/metadata-files"
+        env:
+          OUTPUT_DIR: ${{ steps.make-outputdir.outputs.outputdir }}
+        run: ls "${OUTPUT_DIR}/metadata-files"
       - name: Combine Metadata Files
+        env:
+          OUTPUT_DIR: ${{ steps.make-outputdir.outputs.outputdir }}
         run: |
           #!/usr/bin/env bash
           set -euo pipefail
           shopt -s inherit_errexit
 
-          jq -s 'add' ${{ steps.make-outputdir.outputs.outputdir }}/metadata-files/* > "${{ steps.make-outputdir.outputs.outputdir }}/metadata.json"
+          jq -s 'add' "${OUTPUT_DIR}"/metadata-files/* > "${OUTPUT_DIR}/metadata.json"
 
       - name: Update dependencies from metadata.json
         id: update
@@ -365,6 +401,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ retrieve, get-compile-and-test, test, compile, update-metadata, assemble ]
     if: ${{ always() && needs.retrieve.result == 'failure' || needs.get-compile-and-test.result == 'failure' || needs.test.result == 'failure' || needs.compile.result == 'failure' || needs.update-metadata.result == 'failure' || needs.assemble.result == 'failure' }}
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: File Failure Alert Issue
         uses: paketo-buildpacks/github-config/actions/issue/file@main
