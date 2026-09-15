@@ -244,7 +244,7 @@ jobs:
 
       - name: Upload to S3
         id: upload
-        uses: paketo-buildpacks/github-config/actions/dependency/upload-to-s3@main
+        uses: paketo-buildpacks/github-config/actions/dependency/upload-to-s3@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           bucket-name: "paketo-buildpacks"
           dependency-name: ${{ needs.retrieve.outputs.id }}
@@ -281,7 +281,7 @@ jobs:
 
       - name: Update `checksum` and `uri` in metadata for ${{ matrix.includes.target }} ${{ matrix.includes.version }}
         if: ${{ matrix.includes.checksum == '' && matrix.includes.uri == '' }}
-        uses: paketo-buildpacks/github-config/actions/dependency/update-metadata-json@main
+        uses: paketo-buildpacks/github-config/actions/dependency/update-metadata-json@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           version: ${{ matrix.includes.version }}
           target: ${{ matrix.includes.target }}
@@ -322,7 +322,7 @@ jobs:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
       - name: Checkout Branch
-        uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           branch: automation/dependencies/update-from-metadata
 
@@ -364,7 +364,7 @@ jobs:
 
       - name: Update dependencies from metadata.json
         id: update
-        uses: paketo-buildpacks/github-config/actions/dependency/update-from-metadata@main
+        uses: paketo-buildpacks/github-config/actions/dependency/update-from-metadata@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           buildpack_toml_path: "${{ github.workspace }}/buildpack.toml"
           metadata_file_path: "${{ steps.make-outputdir.outputs.outputdir }}/metadata.json"
@@ -375,7 +375,7 @@ jobs:
 
       - name: Commit
         id: commit
-        uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           message: "Updating buildpack.toml with new versions ${{ steps.update.outputs.new-versions }}"
           pathspec: "."
@@ -384,13 +384,13 @@ jobs:
 
       - name: Push Branch 'automation/dependencies/update-from-metadata'
         if: ${{ steps.commit.outputs.commit_sha != '' }}
-        uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           branch: automation/dependencies/update-from-metadata
 
       - name: Open Pull Request
         if: ${{ steps.commit.outputs.commit_sha != '' }}
-        uses: paketo-buildpacks/github-config/actions/pull-request/open@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/open@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
           title: "Updates buildpack.toml with ${{ steps.update.outputs.new-versions }}"
@@ -406,7 +406,7 @@ jobs:
       issues: write
     steps:
       - name: File Failure Alert Issue
-        uses: paketo-buildpacks/github-config/actions/issue/file@main
+        uses: paketo-buildpacks/github-config/actions/issue/file@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repo: ${{ github.repository }}

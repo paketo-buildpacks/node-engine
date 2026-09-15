@@ -44,21 +44,21 @@ jobs:
         echo "download_sha256_file_url=$(jq -r '.release.assets[] | select(.name | endswith("index-digest.sha256")) | .url' "${GITHUB_EVENT_PATH}")" >> "$GITHUB_OUTPUT"
 
     - name: Download .cnb buildpack
-      uses: paketo-buildpacks/github-config/actions/release/download-asset@main
+      uses: paketo-buildpacks/github-config/actions/release/download-asset@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         url: ${{ steps.event.outputs.download_cnb_file_url }}
         output: "/github/workspace/buildpackage.cnb"
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download .tgz buildpack
-      uses: paketo-buildpacks/github-config/actions/release/download-asset@main
+      uses: paketo-buildpacks/github-config/actions/release/download-asset@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         url: ${{ steps.event.outputs.download_tgz_file_url }}
         output: "/github/workspace/buildpack.tgz"
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download .sha digest
-      uses: paketo-buildpacks/github-config/actions/release/download-asset@main
+      uses: paketo-buildpacks/github-config/actions/release/download-asset@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         url: ${{ steps.event.outputs.download_sha256_file_url }}
         output: "/github/workspace/index-digest.sha256"
@@ -189,7 +189,7 @@ jobs:
       issues: write
     steps:
     - name: File Failure Alert Issue
-      uses: paketo-buildpacks/github-config/actions/issue/file@main
+      uses: paketo-buildpacks/github-config/actions/issue/file@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ github.repository }}

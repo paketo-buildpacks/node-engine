@@ -21,7 +21,7 @@ jobs:
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
       - name: Checkout PR Branch
-        uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           branch: automation/go-mod-update/update-main
       - name: Setup Go
@@ -32,7 +32,7 @@ jobs:
           go-version: stable
       - name: Get current go toolchain version
         id: current-go-version
-        uses: paketo-buildpacks/github-config/actions/update-go-mod-version@main
+        uses: paketo-buildpacks/github-config/actions/update-go-mod-version@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           go-version: ${{ steps.setup-go.outputs.go-version }}
       - name: Go mod tidy
@@ -59,7 +59,7 @@ jobs:
           git diff
       - name: Commit
         id: commit
-        uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           message: "Updates go mod version to ${{ steps.setup-go.outputs.go-version }}"
           pathspec: "."
@@ -68,13 +68,13 @@ jobs:
 
       - name: Push Branch
         if: ${{ steps.commit.outputs.commit_sha != '' }}
-        uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           branch: automation/go-mod-update/update-main
 
       - name: Open Pull Request
         if: ${{ steps.commit.outputs.commit_sha != '' }}
-        uses: paketo-buildpacks/github-config/actions/pull-request/open@main
+        uses: paketo-buildpacks/github-config/actions/pull-request/open@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
           title: "Updates go mod version to ${{ steps.setup-go.outputs.go-version }}"
@@ -90,7 +90,7 @@ jobs:
       issues: write
     steps:
       - name: File Failure Alert Issue
-        uses: paketo-buildpacks/github-config/actions/issue/file@main
+        uses: paketo-buildpacks/github-config/actions/issue/file@95db4417114813f5661189259ba2caa93f76c6b9 # main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repo: ${{ github.repository }}
