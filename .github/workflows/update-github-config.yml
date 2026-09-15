@@ -30,12 +30,12 @@ jobs:
         path: github-config
 
     - name: Checkout Branch
-      uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
+      uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         branch: automation/github-config/update
 
     - name: Run the sync action
-      uses: paketo-buildpacks/github-config/actions/sync@main
+      uses: paketo-buildpacks/github-config/actions/sync@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         workspace: /github/workspace
         config: /github/workspace/github-config/implementation
@@ -45,7 +45,7 @@ jobs:
 
     - name: Commit
       id: commit
-      uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
+      uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         message: "Updating github-config"
         pathspec: "."
@@ -54,13 +54,13 @@ jobs:
 
     - name: Push Branch
       if: ${{ steps.commit.outputs.commit_sha != '' }}
-      uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@main
+      uses: paketo-buildpacks/github-config/actions/pull-request/push-branch@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         branch: automation/github-config/update
 
     - name: Open Pull Request
       if: ${{ steps.commit.outputs.commit_sha != '' }}
-      uses: paketo-buildpacks/github-config/actions/pull-request/open@main
+      uses: paketo-buildpacks/github-config/actions/pull-request/open@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
         title: "Updates github-config"
@@ -76,7 +76,7 @@ jobs:
       issues: write
     steps:
     - name: File Failure Alert Issue
-      uses: paketo-buildpacks/github-config/actions/issue/file@main
+      uses: paketo-buildpacks/github-config/actions/issue/file@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ github.repository }}

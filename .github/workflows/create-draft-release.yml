@@ -64,7 +64,7 @@ jobs:
         go-version-file: go.mod
     - name: Free Disk Space
       if: vars.RECLAIM_DISK_SPACE == 'true'
-      uses: paketo-buildpacks/github-config/actions/pull-request/reclaim-disk-space@main
+      uses: paketo-buildpacks/github-config/actions/pull-request/reclaim-disk-space@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         tool-cache: false
         android: true
@@ -113,7 +113,7 @@ jobs:
 
     - name: Reset Draft Release
       id: reset
-      uses: paketo-buildpacks/github-config/actions/release/reset-draft@main
+      uses: paketo-buildpacks/github-config/actions/release/reset-draft@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         repo: ${{ github.repository }}
         token: ${{ github.token }}
@@ -121,7 +121,7 @@ jobs:
     - name: Calculate Semver Tag
       if: github.event.inputs.version == ''
       id: semver
-      uses: paketo-buildpacks/github-config/actions/tag/calculate-semver@main
+      uses: paketo-buildpacks/github-config/actions/tag/calculate-semver@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         repo: ${{ github.repository }}
         token: ${{ github.token }}
@@ -166,7 +166,7 @@ jobs:
 
     - name: Create Release Notes
       id: create-release-notes
-      uses: paketo-buildpacks/github-config/actions/release/notes@main
+      uses: paketo-buildpacks/github-config/actions/release/notes@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         repo: ${{ github.repository }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
@@ -244,7 +244,7 @@ jobs:
         printf "release_assets=%s\n" "${release_assets}" >> "$GITHUB_OUTPUT"
 
     - name: Create Release
-      uses: paketo-buildpacks/github-config/actions/release/create@main
+      uses: paketo-buildpacks/github-config/actions/release/create@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         repo: ${{ github.repository }}
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
@@ -265,7 +265,7 @@ jobs:
       issues: write
     steps:
     - name: File Failure Alert Issue
-      uses: paketo-buildpacks/github-config/actions/issue/file@main
+      uses: paketo-buildpacks/github-config/actions/issue/file@95db4417114813f5661189259ba2caa93f76c6b9 # main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ github.repository }}
