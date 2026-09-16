@@ -31,6 +31,6 @@ jobs:
 
     - name: Auto-label Semver
       if: ${{ failure() }}
-      uses: paketo-buildpacks/github-config/actions/pull-request/auto-semver-label@95db4417114813f5661189259ba2caa93f76c6b9 # main
+      uses: paketo-buildpacks/github-config/actions/pull-request/auto-semver-label@main
       env:
         GITHUB_TOKEN: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
