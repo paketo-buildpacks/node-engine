@@ -1,6 +1,6 @@
 module github.com/paketo-buildpacks/node-engine/retrieval
 
-go 1.27.2
+go 1.27.3
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
