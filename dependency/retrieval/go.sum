@@ -155,8 +155,8 @@ github.com/paketo-buildpacks/libdependency v0.2.1 h1:k+DOX29/QgROSFiplePZRj3E+oT
 github.com/paketo-buildpacks/libdependency v0.2.1/go.mod h1:W3aGTrXuVKsONw7fKOyRlvgMMDTLnmDny5NoJcqrsE0=
 github.com/paketo-buildpacks/occam v0.28.0 h1:Qmd4jVspsSWcpbH93Kc4+1MoxQpQk2/od9PsRz2+fa8=
 github.com/paketo-buildpacks/occam v0.28.0/go.mod h1:BQ1V+2xBY68ulDFEbHR9f9a07fWeOuQcoJ7QJuN8X4M=
-github.com/paketo-buildpacks/packit/v2 v2.25.8 h1:2NSZrd93cN27J4XXgVXyscXUGUkFanbzDVpKIYu6j50=
-github.com/paketo-buildpacks/packit/v2 v2.25.8/go.mod h1:GXZDiF4DFZTwcxmy52u6IP2xDsmpT2394tYosmNFcGk=
+github.com/paketo-buildpacks/packit/v2 v2.26.0 h1:0diJf+hTqnIDkAFIHkZCtbmHuooh9oFUFQeoqj3tlqM=
+github.com/paketo-buildpacks/packit/v2 v2.26.0/go.mod h1:Pw2AAT0sj4muE7Hptl7HWlA7tz84r7r0mnsKlcTit48=
 github.com/pjbgf/sha1cd v0.7.0 h1:ZRNPKHj+gfkLBf0KJv/p1Hmz+7bqCT5o311YX0nq+DA=
 github.com/pjbgf/sha1cd v0.7.0/go.mod h1:pKR5Li+qTCo+ebqITZfwPlJGoCFCvSO00qxjbNtTUFQ=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
