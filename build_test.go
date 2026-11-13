@@ -3,6 +3,7 @@ package nodeengine_test
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -610,6 +611,278 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 
 	})
+
+	context("when the npm bundled in Node.js is upgraded to the pinned npm", func() {
+		var (
+			layerDir       string
+			bundledDir     string
+			nodeVersion    string
+			bundledVersion string
+			pinnedEngines  string
+			npmDependency  postal.Dependency
+			npmDeliverErr  error
+		)
+
+		writeNpm := func(dir, version, engines string) {
+			Expect(os.MkdirAll(filepath.Join(dir, "bin"), os.ModePerm)).To(Succeed())
+			pkg := fmt.Sprintf(`{"name":"npm","version":%q,"engines":{"node":%q}}`, version, engines)
+			Expect(os.WriteFile(filepath.Join(dir, "package.json"), []byte(pkg), 0600)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(dir, "bin", "npm-cli.js"), []byte(version), 0600)).To(Succeed())
+		}
+
+		readNpmVersion := func() string {
+			content, err := os.ReadFile(filepath.Join(bundledDir, "package.json"))
+			Expect(err).NotTo(HaveOccurred())
+			return string(content)
+		}
+
+		stagingDirs := func() []string {
+			matches, err := filepath.Glob(filepath.Join(layerDir, "lib", "node_modules", ".npm-upgrade-*"))
+			Expect(err).NotTo(HaveOccurred())
+			return matches
+		}
+
+		bomNames := func(entries []packit.BOMEntry) []string {
+			var names []string
+			for _, entry := range entries {
+				names = append(names, entry.Name)
+			}
+			return names
+		}
+
+		it.Before(func() {
+			layerDir = filepath.Join(layersDir, nodeengine.Node)
+			bundledDir = filepath.Join(layerDir, "lib", "node_modules", "npm")
+			nodeVersion = "24.21.0"
+			bundledVersion = "11.19.0"
+			pinnedEngines = "^20.17.0 || >=22.9.0"
+			npmDeliverErr = nil
+			npmDependency = postal.Dependency{ID: nodeengine.Npm, Name: "npm", Version: "11.19.1", Checksum: "sha256:npm-sha"}
+
+			dependencyManager.ResolveCall.Stub = func(path, id, version, stack string) (postal.Dependency, error) {
+				if id == nodeengine.Npm {
+					return npmDependency, nil
+				}
+				return postal.Dependency{ID: nodeengine.Node, Name: "Node Engine", Version: nodeVersion, Checksum: "sha256:node-sha"}, nil
+			}
+
+			// Node.js delivers a bundled npm and corepack; npm delivers the pinned package.
+			dependencyManager.DeliverCall.Stub = func(dependency postal.Dependency, cnbPath, layerPath, platformPath string) error {
+				if dependency.ID == nodeengine.Npm {
+					if npmDeliverErr != nil {
+						return npmDeliverErr
+					}
+					writeNpm(layerPath, dependency.Version, pinnedEngines)
+					return nil
+				}
+
+				writeNpm(filepath.Join(layerPath, "lib", "node_modules", "npm"), bundledVersion, ">=20")
+				Expect(os.MkdirAll(filepath.Join(layerPath, "lib", "node_modules", "corepack"), os.ModePerm)).To(Succeed())
+				Expect(os.MkdirAll(filepath.Join(layerPath, "bin"), os.ModePerm)).To(Succeed())
+				return os.Symlink("../lib/node_modules/npm/bin/npm-cli.js", filepath.Join(layerPath, "bin", "npm"))
+			}
+
+			dependencyManager.GenerateBillOfMaterialsCall.Stub = func(dependencies ...postal.Dependency) []packit.BOMEntry {
+				var entries []packit.BOMEntry
+				for _, dependency := range dependencies {
+					entries = append(entries, packit.BOMEntry{Name: dependency.ID})
+				}
+				return entries
+			}
+
+			entryResolver.MergeLayerTypesCall.Returns.Launch = true
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
+		})
+
+		it("replaces the bundled npm and records it in the BOM and layer metadata", func() {
+			result, err := build(buildContext)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(dependencyManager.ResolveCall.CallCount).To(Equal(2))
+			Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
+			Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal(nodeengine.Npm))
+			Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal(""))
+			Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
+
+			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(2))
+			Expect(dependencyManager.DeliverCall.Receives.Dependency).To(Equal(npmDependency))
+			Expect(dependencyManager.DeliverCall.Receives.LayerPath).To(HavePrefix(filepath.Join(layerDir, "lib", "node_modules", ".npm-upgrade-")))
+
+			Expect(readNpmVersion()).To(ContainSubstring(`"version":"11.19.1"`))
+			Expect(filepath.Join(layerDir, "bin", "npm")).To(BeARegularFile())
+			Expect(filepath.Join(layerDir, "lib", "node_modules", "corepack")).To(BeADirectory())
+			Expect(stagingDirs()).To(BeEmpty())
+
+			// Must stay readable to the app's run user.
+			info, err := os.Stat(filepath.Join(layerDir, "lib", "node_modules", "npm"))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(info.Mode().Perm()).To(Equal(os.FileMode(0o755)))
+
+			Expect(result.Layers).To(HaveLen(1))
+			Expect(result.Layers[0].Metadata).To(Equal(map[string]interface{}{
+				nodeengine.DepKey:         "sha256:node-sha",
+				nodeengine.BuildKey:       true,
+				nodeengine.LaunchKey:      true,
+				nodeengine.NpmDepKey:      "sha256:npm-sha",
+				nodeengine.NpmUpgradedKey: true,
+			}))
+
+			Expect(bomNames(result.Build.BOM)).To(Equal([]string{"node", "npm"}))
+			Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node", "npm"}))
+
+			Expect(buffer.String()).To(ContainSubstring("Checking npm bundled in the Node.js distribution"))
+			Expect(buffer.String()).To(ContainSubstring("Installing npm 11.19.1"))
+			Expect(buffer.String()).To(ContainSubstring("Upgraded bundled npm 11.19.0 -> 11.19.1"))
+		})
+
+		context("when Node.js is not 24.x", func() {
+			it.Before(func() {
+				nodeVersion = "22.23.2"
+				bundledVersion = "10.9.8"
+			})
+
+			it("leaves the bundled npm and the layer metadata untouched", func() {
+				result, err := build(buildContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(dependencyManager.ResolveCall.CallCount).To(Equal(1))
+				Expect(dependencyManager.DeliverCall.CallCount).To(Equal(1))
+				Expect(readNpmVersion()).To(ContainSubstring(`"version":"10.9.8"`))
+
+				Expect(result.Layers[0].Metadata).To(Equal(map[string]interface{}{
+					nodeengine.DepKey:    "sha256:node-sha",
+					nodeengine.BuildKey:  true,
+					nodeengine.LaunchKey: true,
+				}))
+				Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node"}))
+				Expect(buffer.String()).NotTo(ContainSubstring("Checking npm bundled in the Node.js distribution"))
+			})
+		})
+
+		context("when the bundled npm is not older than the pinned npm", func() {
+			it.Before(func() {
+				bundledVersion = "11.19.1"
+			})
+
+			it("keeps the bundled npm", func() {
+				result, err := build(buildContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(dependencyManager.DeliverCall.CallCount).To(Equal(1))
+				Expect(readNpmVersion()).To(ContainSubstring(`"version":"11.19.1"`))
+				Expect(result.Layers[0].Metadata).NotTo(HaveKey(nodeengine.NpmUpgradedKey))
+				Expect(result.Layers[0].Metadata).To(HaveKeyWithValue(nodeengine.NpmDepKey, "sha256:npm-sha"))
+				Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node"}))
+				Expect(buffer.String()).To(ContainSubstring("Keeping bundled npm 11.19.1 (not older than pinned npm 11.19.1)"))
+			})
+		})
+
+		context("when the bundled npm is a different major version", func() {
+			it.Before(func() {
+				bundledVersion = "10.9.9"
+			})
+
+			it("keeps the bundled npm", func() {
+				result, err := build(buildContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(dependencyManager.DeliverCall.CallCount).To(Equal(1))
+				Expect(readNpmVersion()).To(ContainSubstring(`"version":"10.9.9"`))
+				Expect(result.Layers[0].Metadata).NotTo(HaveKey(nodeengine.NpmUpgradedKey))
+				Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node"}))
+				Expect(buffer.String()).To(ContainSubstring("Keeping bundled npm 10.9.9 (pinned npm 11.19.1 is a different major version)"))
+			})
+		})
+
+		context("when the pinned npm does not support the Node.js version", func() {
+			it.Before(func() {
+				pinnedEngines = ">=26.0.0"
+			})
+
+			it("warns and keeps the bundled npm", func() {
+				result, err := build(buildContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(dependencyManager.DeliverCall.CallCount).To(Equal(2))
+				Expect(readNpmVersion()).To(ContainSubstring(`"version":"11.19.0"`))
+				Expect(stagingDirs()).To(BeEmpty())
+				Expect(result.Layers[0].Metadata).NotTo(HaveKey(nodeengine.NpmUpgradedKey))
+				Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node"}))
+				Expect(buffer.String()).To(ContainSubstring(`WARNING: npm 11.19.1 requires Node.js ">=26.0.0", which does not include 24.21.0`))
+				Expect(buffer.String()).To(ContainSubstring("Keeping bundled npm 11.19.0"))
+			})
+		})
+
+		context("when the pinned npm cannot be installed", func() {
+			it.Before(func() {
+				npmDeliverErr = errors.New("failed to deliver npm")
+			})
+
+			it("returns an error and leaves the bundled npm in place", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError("failed to deliver npm"))
+
+				Expect(readNpmVersion()).To(ContainSubstring(`"version":"11.19.0"`))
+				Expect(filepath.Join(layerDir, "bin", "npm")).To(BeARegularFile())
+				Expect(stagingDirs()).To(BeEmpty())
+			})
+		})
+
+		context("when the pinned npm cannot be resolved", func() {
+			it.Before(func() {
+				dependencyManager.ResolveCall.Stub = func(path, id, version, stack string) (postal.Dependency, error) {
+					if id == nodeengine.Npm {
+						return postal.Dependency{}, errors.New("no npm dependency")
+					}
+					return postal.Dependency{ID: nodeengine.Node, Name: "Node Engine", Version: nodeVersion, Checksum: "sha256:node-sha"}, nil
+				}
+			})
+
+			it("returns an error", func() {
+				_, err := build(buildContext)
+				Expect(err).To(MatchError("failed to resolve pinned npm for Node.js 24.21.0: no npm dependency"))
+			})
+		})
+
+		context("when the layer was cached with the upgraded npm", func() {
+			it.Before(func() {
+				err := os.WriteFile(filepath.Join(layersDir, "node.toml"), []byte(`[metadata]
+dependency-sha = "sha256:node-sha"
+npm-dependency-sha = "sha256:npm-sha"
+npm-upgraded = true
+build = true
+launch = true
+`), 0600)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			it("reuses the layer and keeps npm in the BOM", func() {
+				result, err := build(buildContext)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
+				Expect(bomNames(result.Build.BOM)).To(Equal([]string{"node", "npm"}))
+				Expect(bomNames(result.Launch.BOM)).To(Equal([]string{"node", "npm"}))
+				Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
+			})
+
+			context("when the pinned npm has changed", func() {
+				it.Before(func() {
+					npmDependency.Checksum = "sha256:new-npm-sha"
+				})
+
+				it("rebuilds the layer", func() {
+					result, err := build(buildContext)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(dependencyManager.DeliverCall.CallCount).To(Equal(2))
+					Expect(result.Layers[0].Metadata).To(HaveKeyWithValue(nodeengine.NpmDepKey, "sha256:new-npm-sha"))
+					Expect(buffer.String()).To(ContainSubstring("Executing build process"))
+					Expect(buffer.String()).NotTo(ContainSubstring("Reusing cached layer"))
+				})
+			})
+		})
+	})
 }
 
 func testIsLayerReusable(t *testing.T, context spec.G, it spec.S) {
@@ -668,4 +941,42 @@ func testIsLayerReusable(t *testing.T, context spec.G, it spec.S) {
 		Expect(isReusable).To(BeFalse())
 	})
 
+}
+
+func testIsNpmUpgradeReusable(t *testing.T, context spec.G, it spec.S) {
+	var (
+		Expect = NewWithT(t).Expect
+
+		layer  packit.Layer
+		logger = scribe.NewEmitter(io.Discard)
+	)
+
+	it.Before(func() {
+		layer = packit.Layer{
+			Path:     "test",
+			Metadata: map[string]interface{}{nodeengine.NpmDepKey: "sha256:npm-sha"},
+		}
+	})
+
+	it("returns true if the pinned npm checksum matches", func() {
+		Expect(nodeengine.IsNpmUpgradeReusable(layer, "sha256:npm-sha", logger)).To(BeTrue())
+	})
+
+	it("returns false if the pinned npm checksum differs", func() {
+		Expect(nodeengine.IsNpmUpgradeReusable(layer, "sha256:other-sha", logger)).To(BeFalse())
+	})
+
+	it("returns false if the layer has no npm checksum but one is pinned", func() {
+		delete(layer.Metadata, nodeengine.NpmDepKey)
+		Expect(nodeengine.IsNpmUpgradeReusable(layer, "sha256:npm-sha", logger)).To(BeFalse())
+	})
+
+	it("returns false if the layer has an npm checksum but none applies", func() {
+		Expect(nodeengine.IsNpmUpgradeReusable(layer, "", logger)).To(BeFalse())
+	})
+
+	it("returns true if neither the layer nor the build uses the npm upgrade", func() {
+		delete(layer.Metadata, nodeengine.NpmDepKey)
+		Expect(nodeengine.IsNpmUpgradeReusable(layer, "", logger)).To(BeTrue())
+	})
 }
