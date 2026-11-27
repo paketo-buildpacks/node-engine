@@ -356,6 +356,20 @@ api = "0.10"
     uri = "https://nodejs.org/dist/v26.13.1/node-v26.13.1-linux-arm64.tar.xz"
     version = "26.13.1"
 
+  [[metadata.dependencies]]
+    checksum = "sha256:8ad8563b81e71b90ef405b140bccf3ba9b5e7884ab210bd49ee4e2f4bc6f61f5"
+    cpe = "cpe:2.3:a:npmjs:npm:11.21.2:*:*:*:*:*:*:*"
+    id = "npm"
+    licenses = ["Artistic-2.0"]
+    name = "Npm"
+    purl = "pkg:generic/npm@11.21.2?checksum=8ad8563b81e71b90ef405b140bccf3ba9b5e7884ab210bd49ee4e2f4bc6f61f5&download_url=https://registry.npmjs.org/npm/-/npm-11.21.2.tgz"
+    source = "https://registry.npmjs.org/npm/-/npm-11.21.2.tgz"
+    source-checksum = "sha256:8ad8563b81e71b90ef405b140bccf3ba9b5e7884ab210bd49ee4e2f4bc6f61f5"
+    stacks = ["*"]
+    strip-components = 1
+    uri = "https://registry.npmjs.org/npm/-/npm-11.21.2.tgz"
+    version = "11.21.2"
+
   [[metadata.dependency-constraints]]
     constraint = "18.*"
     id = "node"
